@@ -9,6 +9,7 @@ import java.util.UUID;
 public class GameObject
 {
     protected Rectangle rect;
+    protected Rectangle bounds=null;
     protected BufferedImage surface = null;
     protected int layer = -1;
     protected boolean use_colliders = false;
@@ -48,9 +49,23 @@ public class GameObject
         return tag;
     }
 
+    public void SetBounds( Rectangle bounds )
+    {
+        this.bounds = bounds;
+    }
+
     public void SetPosition( Point position )
     {
-        this.rect.setLocation( position );
+        rect.setLocation( position );
+        if( bounds == null ) return;
+
+        if( rect.width <= bounds.width && rect.height <= bounds.height )
+        {
+            if( rect.x < bounds.x ) rect.x = bounds.x;
+            else if( rect.x + rect.width >= bounds.x + bounds.width ) rect.x = bounds.x + bounds.width - rect.width;
+            if( rect.y < bounds.y ) rect.y = bounds.y;
+            else if( rect.y + rect.height >= bounds.y + bounds.height ) rect.y = bounds.y + bounds.height - rect.height;
+        }
     }
 
     public void SetTag( String tag )

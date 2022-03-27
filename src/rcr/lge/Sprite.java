@@ -2,7 +2,6 @@ package rcr.lge;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -13,7 +12,6 @@ public class Sprite extends GameObject
     private LinkedHashMap<String, ArrayList<BufferedImage>> surfaces;
     private String iname;
     private int idx;
-    private Rectangle bounds = null;
     private double elapsed = 0;
 
     public Sprite( String iname, Point position  )
@@ -78,21 +76,4 @@ public class Sprite extends GameObject
         surface = surfaces.get( iname ).get( idx );
         this.rect.setSize( this.surface.getWidth(), this.surface.getHeight() );
     }
-
-    public Rectangle GetBounds()
-    {
-        if( bounds == null )
-            return null;
-        else
-            return new Rectangle( bounds.x, bounds.y, bounds.width, bounds.height );
-    }
-
-    public void SetBounds( Rectangle bounds )
-    {
-        if( bounds == null )
-            this.bounds = null;
-        else
-            this.bounds = new Rectangle( bounds.x, bounds.y, bounds.width, bounds.height );
-    }
-
 }
