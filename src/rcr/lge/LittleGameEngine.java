@@ -10,6 +10,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -25,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
@@ -36,16 +38,16 @@ import javax.sound.sampled.Clip;
 
 public class LittleGameEngine
 {
-    static final int VLIMIT           = 0xFFFFFFFF;
-    static final int GUI_LAYER        = 0xFFFF;
-    static final int E_ON_DELETE      = 0b00000001;
-    static final int E_ON_START       = 0b00000010;
-    static final int E_ON_PRE_UPDATE  = 0b00000100;
-    static final int E_ON_UPDATE      = 0b00001000;
-    static final int E_ON_POST_UPDATE = 0b00010000;
-    static final int E_ON_COLLISION   = 0b00100000;
-    static final int E_ON_PRE_RENDER  = 0b01000000;
-    static final int E_ON_QUIT        = 0b10000010;
+    public static final int VLIMIT           = 0xFFFFFFFF;
+    public static final int GUI_LAYER        = 0xFFFF;
+    public static final int E_ON_DELETE      = 0b00000001;
+    public static final int E_ON_START       = 0b00000010;
+    public static final int E_ON_PRE_UPDATE  = 0b00000100;
+    public static final int E_ON_UPDATE      = 0b00001000;
+    public static final int E_ON_POST_UPDATE = 0b00010000;
+    public static final int E_ON_COLLISION   = 0b00100000;
+    public static final int E_ON_PRE_RENDER  = 0b01000000;
+    public static final int E_ON_QUIT        = 0b10000010;
 
     private static LittleGameEngine lge = null;
     private IEvents on_main_update;
@@ -59,13 +61,13 @@ public class LittleGameEngine
     private Color bgColor;
     private Color collidersColor;
 
-    private LinkedHashMap<String, ArrayList<BufferedImage>> images;
-    private LinkedHashMap<String, Font> fonts;
-    private LinkedHashMap<String, byte[]> sounds;
+    private HashMap<String, ArrayList<BufferedImage>> images;
+    private HashMap<String, Font> fonts;
+    private HashMap<String, byte[]> sounds;
     private LinkedHashMap<Integer, ArrayList<GameObject>> gObjects;
     private ArrayList<GameObject> gObjectsToAdd;
     private ArrayList<GameObject> gObjectsToDel;
-    private ArrayList<KeyEvent> key_events;
+    private HashMap<Integer, Boolean> keys_pressed;
     private ArrayList<MouseEvent> mouse_events;
     private boolean[] mouse_buttons;
 
@@ -88,7 +90,7 @@ public class LittleGameEngine
 
         camera = new Camera( new Point( 0, 0),  win_size );
 
-        key_events = new ArrayList<KeyEvent>();
+        keys_pressed = new HashMap<Integer, Boolean>();
         mouse_events = new ArrayList<MouseEvent>();
         mouse_buttons = new boolean[] { false, false, false };
 
@@ -101,18 +103,17 @@ public class LittleGameEngine
                 @Override
                 public void keyPressed( KeyEvent e )
                 {
-                    synchronized( key_events )
+                    synchronized( keys_pressed )
                     {
-                        key_events.add( e );
+                        keys_pressed.put( e.getKeyCode(), true );
                     }
                 }
 
                 @Override
                 public void keyReleased( KeyEvent e )
                 {
-                    synchronized( key_events )
                     {
-                        key_events.add( e );
+                        keys_pressed.put( e.getKeyCode(), false );
                     }
                 }
             }
@@ -263,9 +264,22 @@ public class LittleGameEngine
 
 */
     // camera
-    public void UnsetCameraTarget()
+    public Point GetCameraPosition()
     {
-        camera.target = null;
+        return camera.rect.getLocation();
+    }
+
+    public Dimension GetCameraSize()
+    {
+        return camera.rect.getSize();
+    }
+
+    public void SetCameraTarget( GameObject gobj )
+    {
+        if( gobj == null )
+            camera.target = gobj;
+        else
+            SetCameraTarget( gobj, true );
     }
 
     public void SetCameraTarget( GameObject gobj, boolean center )
@@ -278,30 +292,23 @@ public class LittleGameEngine
         camera.target_center = center;
     }
 
-
-    // events
-    public boolean KeyDown( int key )
+    public void SetCameraBounds( Rectangle bounds )
     {
-        synchronized( key_events )
-        {
-            for( KeyEvent e : key_events )
-                if( e.getID() == KeyEvent.KEY_PRESSED )
-                    if( e.getKeyCode() == key )
-                        return true;
-        }
-        return false;
+        camera.bounds = bounds;
     }
 
-    public boolean KeyUp( int key )
+    public void SetCameraPosition( Point position )
     {
-        synchronized( key_events )
+        camera.SetPosition( position );
+    }
+
+    // events
+    public boolean KeyPressed( int key )
+    {
+        synchronized( keys_pressed )
         {
-            for( KeyEvent e : key_events )
-                if( e.getID() == KeyEvent.KEY_RELEASED )
-                    if( e.getKeyCode() == key )
-                        return true;
+            return keys_pressed.getOrDefault( key, false );
         }
-        return false;
     }
 
     public boolean[] GetMouseButtons()
@@ -349,11 +356,6 @@ public class LittleGameEngine
         this.on_main_update = iface;
     }
 
-    public double GetFPS()
-    {
-        return 1000;
-    }
-
     public void Quit()
     {
         running = false;
@@ -363,20 +365,20 @@ public class LittleGameEngine
     public void Run( int fps )
     {
         running = true;
-        double tick_expected = 1.0/fps;
-        double tick_prev = System.currentTimeMillis()/1000.0;
+        long tick_expected = (long)( 1000.0/fps );
+        long tick_prev = System.currentTimeMillis();
         while( running )
         {
             // events
-            synchronized( key_events ) { key_events.clear(); }
             synchronized( mouse_events ) { mouse_events.clear(); }
 
             // --- tiempo en ms desde el ciclo anterior
-            while( System.currentTimeMillis()/1000.0 - tick_prev < tick_expected )
-            try { Thread.sleep( 1 ); } catch (InterruptedException e) {}
+            long tick_elapsed = System.currentTimeMillis() - tick_prev;
+            if( tick_elapsed < tick_expected )
+                try { Thread.sleep( tick_expected - tick_elapsed  ); } catch (InterruptedException e) {}
 
-            double now = System.currentTimeMillis()/1000.0;
-            double dt = now  - tick_prev;
+            long now = System.currentTimeMillis();
+            double dt = (now  - tick_prev)/1000.0;
             tick_prev = now;
 
            //# --- Del gobj and gobj.OnDelete
@@ -656,22 +658,27 @@ public class LittleGameEngine
 
 
     // imagenes
-    public void LoadImage( String iname, String pattern )
+    public ArrayList<BufferedImage> GetImages( String iname )
     {
-        LoadImage( iname, pattern, 1, new Dimension( 0, 0 ) );
+        return images.get( iname );
     }
 
-    public void LoadImage( String iname, String pattern, Dimension size )
+    public void LoadImage( String iname, String pattern, boolean flipX, boolean flipY  )
     {
-        LoadImage( iname, pattern, 0, size );
+        LoadImage( iname, pattern, 1, new Dimension( 0, 0 ), flipX, flipY );
     }
 
-    public void LoadImage( String iname, String pattern, double scale )
+    public void LoadImage( String iname, String pattern, Dimension size, boolean flipX, boolean flipY  )
     {
-        LoadImage( iname, pattern, scale, new Dimension( 0, 0 ) );
+        LoadImage( iname, pattern, 0, size, flipX, flipY );
     }
 
-    private void LoadImage( String iname, String pattern, double scale, Dimension size )
+    public void LoadImage( String iname, String pattern, double scale, boolean flipX, boolean flipY  )
+    {
+        LoadImage( iname, pattern, scale, new Dimension( 0, 0 ), flipX, flipY );
+    }
+
+    private void LoadImage( String iname, String pattern, double scale, Dimension size, boolean flipX, boolean flipY  )
     {
         ArrayList<BufferedImage> images = ReadImages( pattern );
 
@@ -683,7 +690,13 @@ public class LittleGameEngine
                 Image scaled_image = img.getScaledInstance( size.width, size.height, BufferedImage.SCALE_SMOOTH );
                 BufferedImage bi = new BufferedImage( scaled_image.getWidth(null), scaled_image.getHeight(null), BufferedImage.TYPE_INT_ARGB );
                 Graphics2D g2d = bi.createGraphics();
-                g2d.drawImage( scaled_image, 0, 0, null );
+
+                int w = scaled_image.getWidth(null);
+                int h = scaled_image.getHeight(null);
+                if( flipX ) g2d.drawImage( scaled_image, w, 0, -w, h, null );
+                if( flipY ) g2d.drawImage( scaled_image, 0, h, w, -h, null );
+                if( !flipX && !flipY ) g2d.drawImage( scaled_image, 0, 0, null );
+
                 g2d.dispose();
                 images.set( i, bi );
             }
@@ -698,18 +711,19 @@ public class LittleGameEngine
                 Image scaled_image = img.getScaledInstance( width, height, BufferedImage.SCALE_SMOOTH );
                 BufferedImage bi = new BufferedImage( scaled_image.getWidth(null), scaled_image.getHeight(null), BufferedImage.TYPE_INT_ARGB );
                 Graphics2D g2d = bi.createGraphics();
-                g2d.drawImage( scaled_image, 0, 0, null );
+
+                int w = scaled_image.getWidth(null);
+                int h = scaled_image.getHeight(null);
+                if( flipX ) g2d.drawImage( scaled_image, w, 0, -w, h, null );
+                if( flipY ) g2d.drawImage( scaled_image, 0, h, w, -h, null );
+                if( !flipX && !flipY ) g2d.drawImage( scaled_image, 0, 0, null );
+
                 g2d.dispose();
                 images.set( i, bi );
             }
         }
 
         this.images.put( iname, images );
-    }
-
-    public ArrayList<BufferedImage> GetImages( String iname )
-    {
-        return images.get( iname );
     }
 
     private ArrayList<BufferedImage> ReadImages( String pattern )
