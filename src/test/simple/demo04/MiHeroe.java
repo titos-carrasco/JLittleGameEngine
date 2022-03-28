@@ -1,4 +1,4 @@
-package test.simple.demo03;
+package test.simple.demo04;
 
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -10,19 +10,19 @@ import rcr.lge.Sprite;
 public class MiHeroe extends Sprite
 {
     private LittleGameEngine lge;
-    private int heading;
+    private int state;
 
     public MiHeroe()
     {
-        super( new String[] { "heroe_right","heroe_left" }, new Point( 550, 346 ), "Heroe" );
+        super( new String[] { "heroe_idle_right","heroe_idle_left","heroe_run_right","heroe_run_left" }, new Point( 550, 346 ), "Heroe" );
 
         // acceso al motor de juegos
         lge = LittleGameEngine.GetLGE();
 
         // sus atributos
         SetOnEvents( LittleGameEngine.E_ON_UPDATE );
-        SetShape( "heroe_right", 0 );
-        heading = 1;
+        SetShape( "heroe_idle_right", 0 );
+        state = 1;
         SetBounds( new Rectangle( 0, 0, 1920, 1056 ) );
     }
 
@@ -36,23 +36,39 @@ public class MiHeroe extends Sprite
         // la posiciona actual del heroe
         Point position = GetPosition();
 
-        // cambiamos sus coordenadas segun la tecla presionada
+        // cambiamos sus coordenadas, orientacion e imagen segun la tecla presionada
         if( lge.KeyPressed( KeyEvent.VK_RIGHT ) )
         {
             position.x = (int)(position.x + pixels);
-            if( heading != 1 )
+            if( state != 2 )
             {
-                SetShape( "heroe_right", 0 );
-                heading = 1;
+                SetShape( "heroe_run_right", 0 );
+                state = 2;
             }
         }
         else if( lge.KeyPressed( KeyEvent.VK_LEFT ) )
         {
             position.x = (int)(position.x - pixels);
-            if( heading != -1 )
+            if( state != -2 )
             {
-                SetShape( "heroe_left", 0 );
-                heading = -1;
+                SetShape( "heroe_run_left", 0 );
+                state = -2;
+            }
+        }
+        else if( state == 2 )
+        {
+            if( state != 1 )
+            {
+                SetShape( "heroe_idle_right", 0 );
+                state = 1;
+            }
+        }
+        else if( state == -2 )
+        {
+            if( state != -1 )
+            {
+                SetShape( "heroe_idle_left", 0 );
+                state = -1;
             }
         }
 
@@ -60,6 +76,9 @@ public class MiHeroe extends Sprite
             position.y = (int)(position.y + pixels);
         else if( lge.KeyPressed( KeyEvent.VK_DOWN ) )
             position.y = (int)(position.y - pixels);
+
+        // siguiente imagen de la secuencia
+        NextShape( dt, 0.050 );
 
         // lo posicionamos
         SetPosition( position );

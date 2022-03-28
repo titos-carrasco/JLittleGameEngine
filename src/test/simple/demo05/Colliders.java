@@ -1,4 +1,4 @@
-package test.simple.demo03;
+package test.simple.demo05;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,29 +12,33 @@ import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
 import rcr.lge.Sprite;
 
-
-public class MovePlayer implements IEvents
+public class Colliders implements IEvents
 {
     LittleGameEngine lge;
 
-    public MovePlayer()
+    public Colliders()
     {
         String resource_dir = this.getClass().getResource( "" ).getPath() + "../../resources";
 
         // creamos el juego
         Dimension win_size = new Dimension( 640, 480 );
 
-        lge = LittleGameEngine.Init( win_size, "Move Player", new Color( 0xFFFF00 ) );
+        lge = LittleGameEngine.Init( win_size, "Colliders", new Color( 0xFFFF00 ) );
         lge.ShowColliders( new Color( 0xFF0000 ) );
         lge.SetOnMainUpdate( this );
 
         // cargamos los recursos que usaremos
         lge.LoadImage( "fondo", resource_dir + "/images/Backgrounds/FreeTileset/Fondo.png", false, false );
-        lge.LoadImage( "heroe_right", resource_dir + "/images/Swordsman/Idle/Idle_000.png", 0.16, false, false );
-        lge.LoadImage( "heroe_left", resource_dir + "/images/Swordsman/Idle/Idle_000.png", 0.16, true, false );
+        lge.LoadImage( "heroe_idle_right", resource_dir + "/images/Swordsman/Idle/Idle_0*.png", 0.16, false, false );
+        lge.LoadImage( "heroe_idle_left", resource_dir + "/images/Swordsman/Idle/Idle_0*.png", 0.16, true, false );
+        lge.LoadImage( "heroe_run_right", resource_dir + "/images/Swordsman/Run/Run_0*.png", 0.16, false, false );
+        lge.LoadImage( "heroe_run_left", resource_dir + "/images/Swordsman/Run/Run_0*.png", 0.16, true, false );
+        lge.LoadImage( "ninja", resource_dir + "/images/Swordsman/Idle/Idle_000.png", 0.16, false, false );
         lge.LoadImage( "mute", resource_dir + "/images/icons/sound-*.png", false, false );
         lge.LoadTTFFont( "monospace.plain.16", resource_dir + "/fonts/FreeMono.ttf", Font.PLAIN, 16 );
         lge.LoadSound( "fondo", resource_dir + "/sounds/happy-and-sad.wav" );
+        lge.LoadSound( "aves", resource_dir + "/sounds/bird-thrush-nightingale.wav" );
+        lge.LoadSound( "poing", resource_dir + "/sounds/cartoon-poing.wav" );
 
         // activamos la musica de fondo
         lge.SetSoundVolume( "fondo", 0.5 );
@@ -43,6 +47,11 @@ public class MovePlayer implements IEvents
         // agregamos el fondo
         Sprite fondo = new Sprite( "fondo", new Point( 0, 0 ), "fondo" );
         lge.AddGObject( fondo, 0 );
+
+        // agregamos un ninja
+        Sprite ninja = new Sprite( "ninja", new Point (350,250), "ninja" );
+        ninja.UseColliders( true );
+        lge.AddGObject( ninja, 1 );
 
         // agregamos al heroe
         MiHeroe heroe = new MiHeroe();
@@ -94,6 +103,12 @@ public class MovePlayer implements IEvents
                 mute.NextShape( 0,  0 );
             }
         }
+
+        // de manera aleatorio activamos sonido de aves
+        int n = (int)( Math.random()*1000 );
+        //if( n < 3 )
+        //    lge.PlaySound( "aves", false );
+
     }
 
     // main loop
@@ -105,8 +120,9 @@ public class MovePlayer implements IEvents
     // show time
     public static void main ( String[] args )
     {
-        MovePlayer game = new MovePlayer();
+        Colliders game = new Colliders();
         game.Run( 60 );
         System.out.println( "Eso es todo!!! ");
     }
+
 }

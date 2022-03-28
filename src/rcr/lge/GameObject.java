@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class GameObject
@@ -89,7 +90,7 @@ public class GameObject
     public void OnPreUpdate( double dt ){};
     public void OnUpdate( double dt ){};
     public void OnPostUpdate( double dt ){};
-    public void OnCollision( double dt ){};
+    public void OnCollision( double dt, ArrayList<GameObject> gobjs ){};
     public void OnPreRender( double dt ){};
     public void OnQuit() {};
 

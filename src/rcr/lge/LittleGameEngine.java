@@ -381,21 +381,21 @@ public class LittleGameEngine
             double dt = (now  - tick_prev)/1000.0;
             tick_prev = now;
 
-           //# --- Del gobj and gobj.OnDelete
-            //ondelete = []
-            //for gobj in Engine.gObjectsToDel:
-            //    Engine.gObjects[gobj._layer].remove( gobj )
-            //    del gobj._layer
-            //    if( Engine.cameraTarget == gobj ):
-            //        Engine.cameraTarget = None, false
-            //    if( hasattr( gobj, "OnDelete" ) ): ondelete.append( gobj )
-            //Engine.gObjectsToDel = []
-            //if( Engine.on_events_enabled & Engine.E_ON_DELETE ):
-            //    for gobj in ondelete: gobj.OnDelete()
+            // --- Del gobj and gobj.OnDelete
+            ArrayList<GameObject> ondelete = new  ArrayList<GameObject>();
+            for( GameObject  gobj : gObjectsToDel )
+            {
+                gObjects.get( gobj.layer ).remove( gobj );
+                if( camera.target == gobj ) camera.target = null;
+                if( (gobj.on_events_enabled & E_ON_DELETE) != 0x00 ) ondelete.add( gobj );
+            }
+            gObjectsToDel.clear();
+            for( GameObject gobj : ondelete ) gobj.OnDelete();
+            ondelete = null;
 
             // --- Add Gobj and gobj.OnStart
             boolean reorder = false;
-            //onstart = []
+            ArrayList<GameObject> onstart = new ArrayList<GameObject>();
             for( GameObject  gobj : gObjectsToAdd )
             {
                 Integer layer = gobj.layer;
@@ -409,12 +409,12 @@ public class LittleGameEngine
                 {
                     gobjs.add( gobj );
                     reorder = true;
+                    if( (gobj.on_events_enabled & E_ON_START) != 0x00 ) onstart.add( gobj );
                 }
-                //if( hasattr( gobj, "OnStart" ) ): onstart.append( gobj )
             }
             gObjectsToAdd.clear();
-            //if( Engine.on_events_enabled & Engine.E_ON_START ):
-            //    for gobj in onstart: gobj.OnStart()
+            for( GameObject gobj : onstart ) gobj.OnStart();
+            onstart = null;
 
             // ---
             if( reorder )
@@ -424,9 +424,15 @@ public class LittleGameEngine
             }
             // --
 
-            //# --- gobj.OnPreUpdate
-            //if( Engine.on_events_enabled & Engine.E_ON_PRE_UPDATE ):
-            //    list( gobj.OnPreUpdate( dt ) for layer, gobjs in Engine.gObjects.items() for gobj in gobjs if hasattr( gobj, "OnPreUpdate" ) )
+            // --- gobj.OnPreUpdate
+            for( Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet() )
+            {
+                for( GameObject gobj : elem.getValue() )
+                {
+                    if( (gobj.on_events_enabled & E_ON_PRE_UPDATE) != 0x00 )
+                    gobj.OnPreUpdate( dt );
+                }
+            }
 
             // --- gobj.OnUpdate
             for( Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet() )
@@ -438,33 +444,54 @@ public class LittleGameEngine
                 }
             }
 
-            //if( Engine.on_events_enabled & Engine.E_ON_POST_UPDATE ):
-            //# --- gobj.OnPostUpdate
-            //    list( gobj.OnPostUpdate( dt ) for layer, gobjs in Engine.gObjects.items() for gobj in gobjs if hasattr( gobj, "OnPostUpdate" ) )
+            // --- gobj.OnPostUpdate
+            for( Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet() )
+            {
+                for( GameObject gobj : elem.getValue() )
+                {
+                    if( (gobj.on_events_enabled & E_ON_POST_UPDATE) != 0x00 )
+                    gobj.OnPostUpdate( dt );
+                }
+            }
 
             // --- game.OnMainUpdate
             if( on_main_update != null ) on_main_update.OnMainUpdate( dt );
 
-            //# --- gobj.OnCollision
-            //if( Engine.on_events_enabled & Engine.E_ON_COLLISION ):
-            //    oncollisions = []
-            //    for layer, gobjs in Engine.gObjects.items():
-            //        if( layer == Engine.GUI_LAYER ): continue
-            //        with_use_colliders = list( ( gobj, gobj.GetRectangle() ) for gobj in gobjs if gobj._use_colliders )
-            //        with_on_collision = list( ( gobj, rect ) for gobj, rect in with_use_colliders if hasattr( gobj, "OnCollision" ) )
+            // --- gobj.OnCollision
+            LinkedHashMap<GameObject, ArrayList<GameObject>> oncollisions = new LinkedHashMap<GameObject, ArrayList<GameObject>>();
+            for( Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet() )
+            {
+                int layer = elem.getKey();
+                if( layer != GUI_LAYER )
+                {
+                    for( GameObject gobj1 : elem.getValue() )
+                    {
+                        ArrayList<GameObject> colliders = new ArrayList<GameObject>();
+                        if( !gobj1.use_colliders ) continue;
+                        for( GameObject gobj2 : elem.getValue() )
+                        {
+                            if( gobj1 == gobj2 ) continue;
+                            if( !gobj2.use_colliders ) continue;
+                            if( !gobj1.rect.intersects( gobj2.rect ) ) continue;
+                            colliders.add( gobj2 );
+                        }
+                        if( colliders.size() > 0 ) oncollisions.put( gobj1, colliders );
 
-            //        for o1, r1 in with_on_collision:
-            //            o1_collisions = []
-            //            for o2, r2 in with_use_colliders:
-            //                if o1 != o2:
-            //                    if r1.CollideRectangle( r2 ):
-            //                        o1_collisions.append( ( o2, r2 ) )
-            //            oncollisions.append( ( o1, o1_collisions ) )
-            //    list( gobj.OnCollision( dt, collisions ) for gobj, collisions in oncollisions if collisions )
+                    }
+                }
+            }
+            for( Entry<GameObject, ArrayList<GameObject>> elem : oncollisions.entrySet() )
+                elem.getKey().OnCollision( dt, elem.getValue() );
 
-            //# --- gobj.OnPreRender
-            //if( Engine.on_events_enabled & Engine.E_ON_PRE_RENDER ):
-            //    list( gobj.OnPreRender( dt ) for layer, gobjs in Engine.gObjects.items() for gobj in gobjs if hasattr( gobj, "OnPreRender" ) )
+            // --- gobj.OnPreRender
+            for( Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet() )
+            {
+                for( GameObject gobj : elem.getValue() )
+                {
+                    if( (gobj.on_events_enabled & E_ON_PRE_RENDER) != 0x00 )
+                    gobj.OnPreRender( dt );
+                }
+            }
 
             // --- Camera Tracking
             camera.FollowTarget();
@@ -519,9 +546,15 @@ public class LittleGameEngine
             win.getComponent(0).getGraphics().drawImage( screen, 0, 0, null );
         }
 
-        //# --- gobj.OnPreRender
-        //if( Engine.on_events_enabled & Engine.E_ON_QUIT):
-        //    list( gobj.OnQuit() for layer, gobjs in Engine.gObjects.items() for gobj in gobjs if hasattr( gobj, "OnQuit" ) )
+        // --- gobj.OnQuit
+        for( Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet() )
+        {
+            for( GameObject gobj : elem.getValue() )
+            {
+                if( (gobj.on_events_enabled & E_ON_PRE_UPDATE) != 0x00 )
+                gobj.OnQuit();
+            }
+        }
 
         //# eso es todo
         win.dispose();

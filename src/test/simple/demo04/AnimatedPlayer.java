@@ -1,4 +1,4 @@
-package test.simple.demo03;
+package test.simple.demo04;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,26 +12,27 @@ import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
 import rcr.lge.Sprite;
 
-
-public class MovePlayer implements IEvents
+public class AnimatedPlayer implements IEvents
 {
     LittleGameEngine lge;
 
-    public MovePlayer()
+    public AnimatedPlayer()
     {
         String resource_dir = this.getClass().getResource( "" ).getPath() + "../../resources";
 
         // creamos el juego
         Dimension win_size = new Dimension( 640, 480 );
 
-        lge = LittleGameEngine.Init( win_size, "Move Player", new Color( 0xFFFF00 ) );
+        lge = LittleGameEngine.Init( win_size, "Animated Player", new Color( 0xFFFF00 ) );
         lge.ShowColliders( new Color( 0xFF0000 ) );
         lge.SetOnMainUpdate( this );
 
         // cargamos los recursos que usaremos
         lge.LoadImage( "fondo", resource_dir + "/images/Backgrounds/FreeTileset/Fondo.png", false, false );
-        lge.LoadImage( "heroe_right", resource_dir + "/images/Swordsman/Idle/Idle_000.png", 0.16, false, false );
-        lge.LoadImage( "heroe_left", resource_dir + "/images/Swordsman/Idle/Idle_000.png", 0.16, true, false );
+        lge.LoadImage( "heroe_idle_right", resource_dir + "/images/Swordsman/Idle/Idle_0*.png", 0.16, false, false );
+        lge.LoadImage( "heroe_idle_left", resource_dir + "/images/Swordsman/Idle/Idle_0*.png", 0.16, true, false );
+        lge.LoadImage( "heroe_run_right", resource_dir + "/images/Swordsman/Run/Run_0*.png", 0.16, false, false );
+        lge.LoadImage( "heroe_run_left", resource_dir + "/images/Swordsman/Run/Run_0*.png", 0.16, true, false );
         lge.LoadImage( "mute", resource_dir + "/images/icons/sound-*.png", false, false );
         lge.LoadTTFFont( "monospace.plain.16", resource_dir + "/fonts/FreeMono.ttf", Font.PLAIN, 16 );
         lge.LoadSound( "fondo", resource_dir + "/sounds/happy-and-sad.wav" );
@@ -44,7 +45,6 @@ public class MovePlayer implements IEvents
         Sprite fondo = new Sprite( "fondo", new Point( 0, 0 ), "fondo" );
         lge.AddGObject( fondo, 0 );
 
-        // agregamos al heroe
         MiHeroe heroe = new MiHeroe();
         heroe.UseColliders( true );
         lge.AddGObject( heroe, 1 );
@@ -105,8 +105,9 @@ public class MovePlayer implements IEvents
     // show time
     public static void main ( String[] args )
     {
-        MovePlayer game = new MovePlayer();
+        AnimatedPlayer game = new AnimatedPlayer();
         game.Run( 60 );
         System.out.println( "Eso es todo!!! ");
     }
+
 }

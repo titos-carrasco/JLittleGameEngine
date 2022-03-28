@@ -71,6 +71,8 @@ public class Sprite extends GameObject
     {
         this.elapsed = 0;
         this.iname = iname;
+
+        if( idx >= surfaces.get( iname ).size() ) idx = 0;
         this.idx = idx;
 
         surface = surfaces.get( iname ).get( idx );
