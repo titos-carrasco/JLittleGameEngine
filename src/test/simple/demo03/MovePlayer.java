@@ -25,6 +25,7 @@ public class MovePlayer implements IEvents {
         lge = LittleGameEngine.Init(win_size, "Move Player", new Color(0xFFFF00));
         lge.ShowColliders(new Color(0xFF0000));
         lge.SetOnMainUpdate(this);
+        lge.SetOnEvents(LittleGameEngine.E_ON_UPDATE);
 
         // cargamos los recursos que usaremos
         lge.LoadImage("fondo", resource_dir + "/images/Backgrounds/FreeTileset/Fondo.png", false, false);
@@ -35,8 +36,7 @@ public class MovePlayer implements IEvents {
         lge.LoadSound("fondo", resource_dir + "/sounds/happy-and-sad.wav");
 
         // activamos la musica de fondo
-        lge.SetSoundVolume("fondo", 0.5);
-        lge.PlaySound("fondo", true);
+        lge.PlaySound("fondo", true, 50);
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new Point(0, 0), "fondo");

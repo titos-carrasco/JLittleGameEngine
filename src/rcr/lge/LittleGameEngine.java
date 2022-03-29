@@ -1,10 +1,8 @@
 package rcr.lge;
 
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
@@ -31,13 +29,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
-public class LittleGameEngine extends Canvas implements KeyListener, MouseListener, WindowListener {
+public class LittleGameEngine extends JPanel implements KeyListener, MouseListener, WindowListener {
     private static final long serialVersionUID = 6162190111045934737L;
 
     public static final int VLIMIT = 0xFFFFFFFF;
@@ -52,22 +56,23 @@ public class LittleGameEngine extends Canvas implements KeyListener, MouseListen
     public static final int E_ON_QUIT = 0b10000010;
 
     private static LittleGameEngine lge = null;
-    private IEvents on_main_update;
-    private boolean running;
+    private IEvents on_main_update = null;
+    protected int on_events_enabled = 0x00;
     private double[] average_fps;
     private int average_fps_idx;
+    private boolean running = false;
 
     private Camera camera;
 
-    private Frame win;
+    private JFrame win;
     private BufferedImage screen;
     private Color bgColor;
-    private Color collidersColor;
+    private Color collidersColor = null;
 
     private HashMap<String, ArrayList<BufferedImage>> images;
     private HashMap<String, Font> fonts;
-    private HashMap<String, byte[]> sounds;
-    private LinkedHashMap<Integer, ArrayList<GameObject>> gObjects;
+    private HashMap<String, ClipData> sounds;
+    private TreeMap<Integer, ArrayList<GameObject>> gObjects;
     private ArrayList<GameObject> gObjectsToAdd;
     private ArrayList<GameObject> gObjectsToDel;
     private HashMap<Integer, Boolean> keys_pressed;
@@ -75,19 +80,16 @@ public class LittleGameEngine extends Canvas implements KeyListener, MouseListen
     private boolean[] mouse_buttons;
 
     private LittleGameEngine(Dimension win_size, String title, Color bgColor) {
-        on_main_update = null;
-        running = false;
         average_fps = new double[30];
         average_fps_idx = 0;
 
         this.bgColor = bgColor;
-        collidersColor = null;
 
         fonts = new LinkedHashMap<String, Font>();
-        sounds = new LinkedHashMap<String, byte[]>();
+        sounds = new HashMap<String, ClipData>();
         images = new LinkedHashMap<String, ArrayList<BufferedImage>>();
 
-        gObjects = new LinkedHashMap<Integer, ArrayList<GameObject>>();
+        gObjects = new TreeMap<Integer, ArrayList<GameObject>>();
         gObjectsToAdd = new ArrayList<GameObject>();
         gObjectsToDel = new ArrayList<GameObject>();
 
@@ -101,9 +103,9 @@ public class LittleGameEngine extends Canvas implements KeyListener, MouseListen
         addMouseListener(this);
         setFocusable(true);
         setSize(win_size);
-        // setBackground( bgColor );
+        setPreferredSize(win_size);
 
-        win = new Frame();
+        win = new JFrame();
         win.addWindowListener(this);
         win.setTitle(title);
         win.add(this);
@@ -187,12 +189,6 @@ public class LittleGameEngine extends Canvas implements KeyListener, MouseListen
         collidersColor = color;
     }
 
-    /*
-     * def GetCollisions( gobj ): return [ o for o in Engine.gObjects[gobj._layer]
-     * if o != gobj and \ o._use_colliders and \ gobj._rect.CollideRectangle(
-     * o._rect ) ]
-     */
-
     // camera
     public Point GetCameraPosition() {
         return camera.rect.getLocation();
@@ -231,6 +227,11 @@ public class LittleGameEngine extends Canvas implements KeyListener, MouseListen
         synchronized (keys_pressed) {
             return keys_pressed.getOrDefault(key, false);
         }
+    }
+
+    // events
+    public void SetOnEvents(int on_events_enabled) {
+        this.on_events_enabled = on_events_enabled;
     }
 
     // mouse events
@@ -318,12 +319,12 @@ public class LittleGameEngine extends Canvas implements KeyListener, MouseListen
                     ondelete.add(gobj);
             }
             gObjectsToDel.clear();
-            for (GameObject gobj : ondelete)
-                gobj.OnDelete();
+            if ((on_events_enabled & E_ON_DELETE) != 0)
+                for (GameObject gobj : ondelete)
+                    gobj.OnDelete();
             ondelete = null;
 
             // --- Add Gobj and gobj.OnStart
-            boolean reorder = false;
             ArrayList<GameObject> onstart = new ArrayList<GameObject>();
             for (GameObject gobj : gObjectsToAdd) {
                 Integer layer = gobj.layer;
@@ -334,143 +335,150 @@ public class LittleGameEngine extends Canvas implements KeyListener, MouseListen
                 }
                 if (!gobjs.contains(gobj)) {
                     gobjs.add(gobj);
-                    reorder = true;
                     if ((gobj.on_events_enabled & E_ON_START) != 0x00)
                         onstart.add(gobj);
                 }
             }
             gObjectsToAdd.clear();
-            for (GameObject gobj : onstart)
-                gobj.OnStart();
+            if ((on_events_enabled & E_ON_START) != 0)
+                for (GameObject gobj : onstart)
+                    gobj.OnStart();
             onstart = null;
 
-            // ---
-            if (reorder) {
-                // Engine.gObjects = dict( sorted( Engine.gObjects.items() ) )
-                reorder = false;
-            }
-            // --
-
             // --- gobj.OnPreUpdate
-            for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
-                for (GameObject gobj : elem.getValue()) {
-                    if ((gobj.on_events_enabled & E_ON_PRE_UPDATE) != 0x00)
-                        gobj.OnPreUpdate(dt);
+            if ((on_events_enabled & E_ON_PRE_UPDATE) != 0)
+                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                    for (GameObject gobj : elem.getValue()) {
+                        if ((gobj.on_events_enabled & E_ON_PRE_UPDATE) != 0x00)
+                            gobj.OnPreUpdate(dt);
+                    }
                 }
-            }
 
             // --- gobj.OnUpdate
-            for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
-                for (GameObject gobj : elem.getValue()) {
-                    if ((gobj.on_events_enabled & E_ON_UPDATE) != 0x00)
-                        gobj.OnUpdate(dt);
+            if ((on_events_enabled & E_ON_UPDATE) != 0)
+                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                    for (GameObject gobj : elem.getValue()) {
+                        if ((gobj.on_events_enabled & E_ON_UPDATE) != 0x00)
+                            gobj.OnUpdate(dt);
+                    }
                 }
-            }
 
             // --- gobj.OnPostUpdate
-            for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
-                for (GameObject gobj : elem.getValue()) {
-                    if ((gobj.on_events_enabled & E_ON_POST_UPDATE) != 0x00)
-                        gobj.OnPostUpdate(dt);
+            if ((on_events_enabled & E_ON_POST_UPDATE) != 0)
+                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                    for (GameObject gobj : elem.getValue()) {
+                        if ((gobj.on_events_enabled & E_ON_POST_UPDATE) != 0x00)
+                            gobj.OnPostUpdate(dt);
+                    }
                 }
-            }
 
             // --- game.OnMainUpdate
             if (on_main_update != null)
                 on_main_update.OnMainUpdate(dt);
 
             // --- gobj.OnCollision
-            LinkedHashMap<GameObject, ArrayList<GameObject>> oncollisions = new LinkedHashMap<GameObject, ArrayList<GameObject>>();
-            for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
-                int layer = elem.getKey();
-                if (layer != GUI_LAYER) {
-                    for (GameObject gobj1 : elem.getValue()) {
-                        ArrayList<GameObject> colliders = new ArrayList<GameObject>();
-                        if (!gobj1.use_colliders)
-                            continue;
-                        for (GameObject gobj2 : elem.getValue()) {
-                            if (gobj1 == gobj2)
+            if ((on_events_enabled & E_ON_COLLISION) != 0) {
+                LinkedHashMap<GameObject, ArrayList<GameObject>> oncollisions = new LinkedHashMap<GameObject, ArrayList<GameObject>>();
+                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                    int layer = elem.getKey();
+                    if (layer != GUI_LAYER) {
+                        for (GameObject gobj1 : elem.getValue()) {
+                            ArrayList<GameObject> colliders = new ArrayList<GameObject>();
+                            if (!gobj1.use_colliders)
                                 continue;
-                            if (!gobj2.use_colliders)
-                                continue;
-                            if (!gobj1.rect.intersects(gobj2.rect))
-                                continue;
-                            colliders.add(gobj2);
-                        }
-                        if (colliders.size() > 0)
-                            oncollisions.put(gobj1, colliders);
+                            for (GameObject gobj2 : elem.getValue()) {
+                                if (gobj1 == gobj2)
+                                    continue;
+                                if (!gobj2.use_colliders)
+                                    continue;
+                                if (!gobj1.rect.intersects(gobj2.rect))
+                                    continue;
+                                colliders.add(gobj2);
+                            }
+                            if (colliders.size() > 0)
+                                oncollisions.put(gobj1, colliders);
 
+                        }
                     }
                 }
+                for (Entry<GameObject, ArrayList<GameObject>> elem : oncollisions.entrySet())
+                    elem.getKey().OnCollision(dt, elem.getValue());
             }
-            for (Entry<GameObject, ArrayList<GameObject>> elem : oncollisions.entrySet())
-                elem.getKey().OnCollision(dt, elem.getValue());
 
             // --- gobj.OnPreRender
-            for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
-                for (GameObject gobj : elem.getValue()) {
-                    if ((gobj.on_events_enabled & E_ON_PRE_RENDER) != 0x00)
-                        gobj.OnPreRender(dt);
+            if ((on_events_enabled & E_ON_PRE_RENDER) != 0)
+                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                    for (GameObject gobj : elem.getValue()) {
+                        if ((gobj.on_events_enabled & E_ON_PRE_RENDER) != 0x00)
+                            gobj.OnPreRender(dt);
+                    }
                 }
-            }
 
             // --- Camera Tracking
             camera.FollowTarget();
 
             // --- Rendering
-            int vh = (int) camera.rect.getHeight();
-            Graphics2D g2d = screen.createGraphics();
-            g2d.setColor(bgColor);
-            g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
+            synchronized (screen) {
+                int vh = (int) camera.rect.getHeight();
+                Graphics2D g2d = screen.createGraphics();
+                g2d.setColor(bgColor);
+                g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
 
-            // --- layers
-            for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
-                int layer = elem.getKey();
-                if (layer != GUI_LAYER) {
-                    for (GameObject gobj : elem.getValue()) {
-                        Point p = Fix_XY(gobj);
-                        BufferedImage surface = gobj.surface;
-                        if (surface != null)
-                            g2d.drawImage(surface, p.x, p.y, null);
+                // --- layers
+                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                    int layer = elem.getKey();
+                    if (layer != GUI_LAYER) {
+                        for (GameObject gobj : elem.getValue()) {
+                            Point p = Fix_XY(gobj);
+                            BufferedImage surface = gobj.surface;
+                            if (surface != null)
+                                g2d.drawImage(surface, p.x, p.y, null);
 
-                        if (collidersColor != null && gobj.use_colliders) {
-                            g2d.setColor(collidersColor);
-                            g2d.drawRect(p.x, p.y, gobj.rect.width - 1, gobj.rect.height - 1);
+                            if (collidersColor != null && gobj.use_colliders) {
+                                g2d.setColor(collidersColor);
+                                g2d.drawRect(p.x, p.y, gobj.rect.width - 1, gobj.rect.height - 1);
+                            }
                         }
                     }
                 }
-            }
 
-            // --- GUI
-            for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
-                int layer = elem.getKey();
-                if (layer == GUI_LAYER) {
-                    for (GameObject gobj : elem.getValue()) {
-                        BufferedImage surface = gobj.surface;
-                        if (surface != null) {
-                            int x = gobj.rect.x;
-                            int y = gobj.rect.y;
-                            // int w = gobj.width;
-                            int h = gobj.rect.height;
-                            g2d.drawImage(surface, x, vh - y - h, null);
+                // --- GUI
+                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                    int layer = elem.getKey();
+                    if (layer == GUI_LAYER) {
+                        for (GameObject gobj : elem.getValue()) {
+                            BufferedImage surface = gobj.surface;
+                            if (surface != null) {
+                                int x = gobj.rect.x;
+                                int y = gobj.rect.y;
+                                // int w = gobj.width;
+                                int h = gobj.rect.height;
+                                g2d.drawImage(surface, x, vh - y - h, null);
+                            }
                         }
                     }
                 }
+                g2d.dispose();
             }
-            g2d.dispose();
-
             // ---
-            // this.repaint();
-            // canvas.invalidate();
             this.getGraphics().drawImage(screen, 0, 0, null);
+            this.repaint();
         }
 
         // --- gobj.OnQuit
-        for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
-            for (GameObject gobj : elem.getValue()) {
-                if ((gobj.on_events_enabled & E_ON_PRE_UPDATE) != 0x00)
-                    gobj.OnQuit();
+        if ((on_events_enabled & E_ON_QUIT) != 0)
+            for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                for (GameObject gobj : elem.getValue()) {
+                    if ((gobj.on_events_enabled & E_ON_PRE_UPDATE) != 0x00)
+                        gobj.OnQuit();
+                }
             }
+
+        // apagamos los sonidos
+        for (Entry<String, ClipData> elem : sounds.entrySet()) {
+            ClipData clip_data = elem.getValue();
+            if (clip_data.clip != null)
+                clip_data.clip.stop();
         }
 
         // eso es todo
@@ -478,8 +486,10 @@ public class LittleGameEngine extends Canvas implements KeyListener, MouseListen
     }
 
     @Override
-    public void update(Graphics g) {
-        g.drawImage(screen, 0, 0, null);
+    public void paintComponent(Graphics g) {
+        synchronized (screen) {
+            g.drawImage(screen, 0, 0, null);
+        }
     }
 
     // sistema cartesiano y zona visible dada por la camara
@@ -561,47 +571,103 @@ public class LittleGameEngine extends Canvas implements KeyListener, MouseListen
         } catch (Exception e) {
         }
 
-        byte[] data = sounds.get(name);
-        if (data == null) {
+        ClipData clip_data = sounds.get(name);
+        if (clip_data == null) {
             try {
                 FileInputStream fis = new FileInputStream(fname);
-                data = fis.readAllBytes();
+                clip_data = new ClipData();
+                clip_data.clip = null;
+                clip_data.data = fis.readAllBytes();
+                clip_data.level = 50;
+                sounds.put(name, clip_data);
                 fis.close();
-
-                sounds.put(name, data);
             } catch (Exception e) {
-                System.out.println("LoadSound: " + e);
+                //System.out.println("LoadSound(): " + e);
             }
         }
     }
 
-    public void PlaySound(String name, boolean loop) {
-        byte[] data = sounds.get(name);
-        if (data == null)
+    public void PlaySound(String name, boolean loop, double level) {
+        ClipData clip_data = sounds.get(name);
+
+        if (clip_data == null)
+            return;
+
+        if (clip_data.clip != null)
             return;
 
         try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(data);
+            ByteArrayInputStream bis = new ByteArrayInputStream(clip_data.data);
             AudioInputStream ais = AudioSystem.getAudioInputStream(bis);
 
-            Clip clip = AudioSystem.getClip();
-            clip.open(ais);
+            clip_data.clip = AudioSystem.getClip();
+
+            clip_data.level = level;
+            SetSoundVolume(clip_data);
+
+            clip_data.clip.addLineListener(new LineListener() {
+                private ClipData the_clip_data = clip_data;
+
+                @Override
+                public void update(LineEvent event) {
+                    if (event.getType() == LineEvent.Type.STOP) {
+                        the_clip_data.clip.close();
+                        the_clip_data.clip = null;
+                    }
+                }
+            });
+            clip_data.clip.open(ais);
             if (loop)
-                clip.loop(Clip.LOOP_CONTINUOUSLY);
+                clip_data.clip.loop(Clip.LOOP_CONTINUOUSLY);
             else
-                clip.start();
+                clip_data.clip.start();
         } catch (Exception e) {
-            System.out.println("PlaySound: " + e);
+            //System.out.println("PlaySound(): " + e);
         }
     }
 
     public void StopSound(String name) {
+        ClipData clip_data = sounds.get(name);
+
+        if (clip_data == null)
+            return;
+
+        if (clip_data.clip == null)
+            return;
+
+        clip_data.clip.stop();
     }
 
-    public void SetSoundVolume(String name, double volume) {
+    public void SetSoundVolume(String name, double level) {
+        ClipData clip_data = sounds.get(name);
+
+        if (clip_data == null)
+            return;
+
+        clip_data.level = level;
+
+        if (clip_data.clip == null)
+            return;
+
+        SetSoundVolume(clip_data);
     }
 
-    public void GetSoundVolume(String name) {
+    private void SetSoundVolume(ClipData clip_data) {
+        try {
+            FloatControl volume = (FloatControl) clip_data.clip.getControl(FloatControl.Type.VOLUME);
+            volume.setValue((float) (clip_data.level / 100.0));
+        } catch (Exception e) {
+            //System.out.println("SetSoundVolume(): " + e);
+        }
+    }
+
+    public double GetSoundVolume(String name) {
+        ClipData clip_data = sounds.get(name);
+
+        if (clip_data == null)
+            return 0;
+
+        return clip_data.level;
     }
 
     // imagenes

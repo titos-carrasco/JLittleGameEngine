@@ -18,19 +18,17 @@ public class Camera extends GameObject {
         if (target == null)
             return;
 
-        // la posiciond del que seguimos
-        Point position = target.GetPosition();
-        int x = position.x;
-        int y = position.y;
+        // la posicion del que seguimos
+        int x = target.rect.x;
+        int y = target.rect.y;
 
         // el centro de la camara en el centro del gobj
         if (target_center) {
-            Dimension size = target.rect.getSize();
-            x = x + size.width / 2;
-            y = y + size.height / 2;
+            x = x + target.rect.width / 2;
+            y = y + target.rect.height / 2;
         }
 
-        SetPosition(new Point(x - rect.width / 2, y - rect.height / 2));
+        SetPosition(x - rect.width / 2, y - rect.height / 2);
     }
 
 }

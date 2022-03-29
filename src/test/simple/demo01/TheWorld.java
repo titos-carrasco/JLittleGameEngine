@@ -34,8 +34,7 @@ public class TheWorld implements IEvents {
         lge.LoadSound("fondo", resource_dir + "/sounds/happy-and-sad.wav");
 
         // activamos la musica de fondo
-        lge.SetSoundVolume("fondo", 0.5);
-        lge.PlaySound("fondo", true);
+        lge.PlaySound("fondo", true, 50);
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new Point(0, 0), "fondo");

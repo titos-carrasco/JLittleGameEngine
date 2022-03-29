@@ -18,13 +18,21 @@ public class GameObject {
     protected int on_events_enabled = 0x00;
 
     public GameObject(Point origin, Dimension size) {
-        this(origin, size, null);
+        this(origin.x, origin.y, size.width, size.height, null);
     }
 
     public GameObject(Point origin, Dimension size, String name) {
+        this(origin.x, origin.y, size.width, size.height, name);
+    }
+
+    public GameObject(int x, int y, int width, int height) {
+        this(x, y, width, height, null);
+    }
+
+    public GameObject(int x, int y, int width, int height, String name) {
         if (name == null)
             name = "__no_name__" + UUID.randomUUID().toString();
-        rect = new Rectangle(origin, size);
+        rect = new Rectangle(x, y, width, height);
         this.name = name;
     }
 
@@ -49,9 +57,15 @@ public class GameObject {
     }
 
     public void SetPosition(Point position) {
-        rect.setLocation(position);
+        SetPosition(position.x, position.y);
+    }
+
+    public void SetPosition(int x, int y) {
         if (bounds == null)
             return;
+
+        rect.x = x;
+        rect.y = y;
 
         if (rect.width <= bounds.width && rect.height <= bounds.height) {
             if (rect.x < bounds.x)

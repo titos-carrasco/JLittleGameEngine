@@ -78,7 +78,7 @@ public class MiHeroe extends Sprite {
 
     @Override
     public void OnCollision(double dt, ArrayList<GameObject> gobjs) {
-        lge.PlaySound("poing", false);
+        lge.PlaySound("poing", false,50);
         SetPosition(last);
     }
 

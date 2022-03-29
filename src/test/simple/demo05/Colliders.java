@@ -25,6 +25,7 @@ public class Colliders implements IEvents {
         lge = LittleGameEngine.Init(win_size, "Colliders", new Color(0xFFFF00));
         lge.ShowColliders(new Color(0xFF0000));
         lge.SetOnMainUpdate(this);
+        lge.SetOnEvents(LittleGameEngine.E_ON_UPDATE | LittleGameEngine.E_ON_COLLISION);
 
         // cargamos los recursos que usaremos
         lge.LoadImage("fondo", resource_dir + "/images/Backgrounds/FreeTileset/Fondo.png", false, false);
@@ -40,8 +41,7 @@ public class Colliders implements IEvents {
         lge.LoadSound("poing", resource_dir + "/sounds/cartoon-poing.wav");
 
         // activamos la musica de fondo
-        lge.SetSoundVolume("fondo", 0.5);
-        //lge.PlaySound("fondo", true);
+        lge.PlaySound("fondo", true, 100);
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new Point(0, 0), "fondo");
@@ -63,7 +63,7 @@ public class Colliders implements IEvents {
 
         // agregamos el icono del sonido
         Sprite mute = new Sprite("mute", new Point(8, 463), "mute");
-        mute.SetShape("mute", 1);
+        mute.SetShape("mute", 50);
         lge.AddGObjectGUI(mute);
 
         // # configuramos la camara
@@ -100,9 +100,9 @@ public class Colliders implements IEvents {
         }
 
         // de manera aleatorio activamos sonido de aves
-        //int n = (int) (Math.random() * 1000);
-        //if( n < 3 )
-        //    lge.PlaySound( "aves", false );
+        // int n = (int) (Math.random() * 1000);
+        // if( n < 3 )
+        // lge.PlaySound( "aves", false );
 
     }
 

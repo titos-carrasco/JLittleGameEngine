@@ -24,6 +24,7 @@ public class Bouncing implements IEvents {
         lge = LittleGameEngine.Init(win_size, "Bouncing Balls", new Color(0xFFFFFF));
         lge.ShowColliders(new Color(0xFF0000));
         lge.SetOnMainUpdate(this);
+        lge.SetOnEvents(LittleGameEngine.E_ON_UPDATE | LittleGameEngine.E_ON_COLLISION);
 
         // cargamos los recursos que usaremos
         lge.LoadTTFFont("monospace.plain.16", resource_dir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);

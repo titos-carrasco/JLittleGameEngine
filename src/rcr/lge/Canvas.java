@@ -26,7 +26,7 @@ public class Canvas extends GameObject {
 
     public void DrawText(String text, Point position, String fname, Color color) {
         int x = position.x;
-        int y = position.y;
+        int y = rect.height - position.y;
 
         Graphics2D g2d = surface.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -35,48 +35,53 @@ public class Canvas extends GameObject {
 
         g2d.setColor(color);
         g2d.setFont(f);
-        g2d.drawString(text, x, rect.height - y);
+        g2d.drawString(text, x, y);
         g2d.dispose();
     }
 
     public void DrawPoint(Point position, Color color) {
-        Point p = new Point(position.x, 0);
-        p.y = rect.height - position.y;
+        int x = position.x;
+        int y = rect.height - position.y;
 
         Graphics2D g2d = surface.createGraphics();
         g2d.setColor(color);
-        g2d.drawLine(p.x, p.y, p.x, p.y);
+        g2d.drawLine(x, y, x, y);
         g2d.dispose();
     }
 
     public void DrawCircle(Point position, int radius, Color color, boolean thickness) {
-        Point p = new Point(position.x, 0);
-        p.y = rect.height - position.y;
+        int x = position.x;
+        int y = rect.height - position.y;
 
         Graphics2D g2d = surface.createGraphics();
         g2d.setColor(color);
         if (thickness)
-            g2d.drawOval(p.x, p.y, radius, radius);
+            g2d.drawOval(x, y, radius, radius);
         else
-            g2d.fillOval(p.x, p.y, radius, radius);
+            g2d.fillOval(x, y, radius, radius);
         g2d.dispose();
     }
 
     public void DrawRectangle(Point position, Dimension size, Color color, boolean thickness) {
+        int x = position.x;
         int y = rect.height - size.height - position.y;
+
         Graphics2D g2d = surface.createGraphics();
         g2d.setColor(color);
         if (thickness)
-            g2d.drawRect(position.x, y, size.width - 1, size.height - 1);
+            g2d.drawRect(x, y, size.width - 1, size.height - 1);
         else
-            g2d.fillRect(position.x, y, size.width, size.height);
+            g2d.fillRect(x, y, size.width, size.height);
         g2d.dispose();
     }
 
     public void DrawSurface(Point position, BufferedImage surface) {
-        // x, y = position
-        // w, h = self.GetSize()
-        // self._surface.blit( surface, (x, h - surface.get_height() - y) )
+        int x = position.x;
+        int y = rect.height - surface.getHeight() - position.y;
+
+        Graphics2D g2d = this.surface.createGraphics();
+        g2d.drawImage(surface, x, y, null);
+        g2d.dispose();
     }
 
 }
