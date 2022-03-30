@@ -56,28 +56,31 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     public static final int E_ON_QUIT = 0b10000010;
 
     private static LittleGameEngine lge = null;
-    private IEvents on_main_update = null;
-    private int on_events_enabled = 0x00;
+
+    private TreeMap<Integer, ArrayList<GameObject>> gLayers;
+    private HashMap<String, GameObject> gObjects;
+    private ArrayList<GameObject> gObjectsToAdd;
+    private ArrayList<GameObject> gObjectsToDel;
+    private Camera camera;
+
     private double[] average_fps;
     private int average_fps_idx;
     private boolean running = false;
 
-    private Camera camera;
+    private IEvents on_main_update = null;
+    private int on_events_enabled = 0x00;
+    private HashMap<Integer, Boolean> keys_pressed;
+    private ArrayList<MouseEvent> mouse_events;
+    private boolean[] mouse_buttons;
+
+    private HashMap<String, ArrayList<BufferedImage>> images;
+    private HashMap<String, Font> fonts;
+    private HashMap<String, ClipData> sounds;
 
     private JFrame win;
     private BufferedImage screen;
     private Color bgColor;
     private Color collidersColor = null;
-
-    private HashMap<String, ArrayList<BufferedImage>> images;
-    private HashMap<String, Font> fonts;
-    private HashMap<String, ClipData> sounds;
-    private TreeMap<Integer, ArrayList<GameObject>> gObjects;
-    private ArrayList<GameObject> gObjectsToAdd;
-    private ArrayList<GameObject> gObjectsToDel;
-    private HashMap<Integer, Boolean> keys_pressed;
-    private ArrayList<MouseEvent> mouse_events;
-    private boolean[] mouse_buttons;
 
     private LittleGameEngine(Dimension win_size, String title, Color bgColor) {
         average_fps = new double[30];
@@ -85,11 +88,12 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
         this.bgColor = bgColor;
 
-        fonts = new LinkedHashMap<String, Font>();
+        fonts = new HashMap<String, Font>();
         sounds = new HashMap<String, ClipData>();
-        images = new LinkedHashMap<String, ArrayList<BufferedImage>>();
+        images = new HashMap<String, ArrayList<BufferedImage>>();
 
-        gObjects = new TreeMap<Integer, ArrayList<GameObject>>();
+        gObjects = new HashMap<String, GameObject>();
+        gLayers = new TreeMap<Integer, ArrayList<GameObject>>();
         gObjectsToAdd = new ArrayList<GameObject>();
         gObjectsToDel = new ArrayList<GameObject>();
 
@@ -131,6 +135,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         assert gobj.layer < 0 : "'gobj' ya fue agregado";
         assert layer >= 0 && layer <= GUI_LAYER : "'layer' invalido";
         gobj.layer = layer;
+        gObjects.put(gobj.name, gobj);
         gObjectsToAdd.add(gobj);
     }
 
@@ -139,31 +144,20 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     public GameObject GetGObject(String name) {
-        for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
-            for (GameObject gobj : elem.getValue())
-                if (gobj.name == name)
-                    return gobj;
-        }
-
-        return null;
+        return gObjects.get(name);
     }
 
-    public GameObject[] GetGObjects() {
-        return GetGObjects("*");
+    public int GetCountGObjects() {
+        return gObjects.size();
     }
 
     public GameObject[] GetGObjects(String pattern) {
         ArrayList<GameObject> gobjs = new ArrayList<GameObject>();
 
-        for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
-            for (GameObject gobj : elem.getValue())
-                if (pattern == "*")
-                    gobjs.add(gobj);
-                else if (pattern == gobj.name)
-                    gobjs.add(gobj);
-                else {
-                }
-        }
+        pattern = pattern.replaceAll("[*]", ".*");
+        for (GameObject gobj : gObjects.values())
+            if (gobj.name.matches(pattern))
+                gobjs.add(gobj);
 
         return gobjs.toArray(new GameObject[gobjs.size()]);
     }
@@ -174,22 +168,20 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     public void DelGObject(String pattern) {
-        for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
-            for (GameObject gobj : elem.getValue())
-                if (pattern == "*")
-                    DelGObject(gobj);
-                else if (pattern == gobj.name)
-                    DelGObject(gobj);
-                else {
-                }
-        }
+        pattern = pattern.replaceAll("[*]", ".*");
+        for (GameObject gobj : gObjects.values())
+            if (gobj.name.matches(pattern))
+                gObjectsToDel.add(gobj);
     }
 
-    public ArrayList<GameObject> IntersectGObject( GameObject gobj ) {
+    public ArrayList<GameObject> IntersectGObjects(GameObject gobj) {
         ArrayList<GameObject> gobjs = new ArrayList<GameObject>();
-        for( GameObject o : gObjects.get(  gobj.layer ))
-            if( gobj.use_colliders && o.use_colliders && gobj.rect.intersects(o.rect ))
-                gobjs.add( o );
+
+        if (gobj.use_colliders)
+            for (GameObject o : gLayers.get(gobj.layer))
+                if (gobj != o && o.use_colliders && gobj.rect.intersects(o.rect))
+                    gobjs.add(o);
+
         return gobjs;
     }
 
@@ -320,7 +312,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             // --- Del gobj and gobj.OnDelete
             ArrayList<GameObject> ondelete = new ArrayList<GameObject>();
             for (GameObject gobj : gObjectsToDel) {
-                gObjects.get(gobj.layer).remove(gobj);
+                gObjects.remove(gobj.name);
+                gLayers.get(gobj.layer).remove(gobj);
                 if (camera.target == gobj)
                     camera.target = null;
                 if ((gobj.on_events_enabled & E_ON_DELETE) != 0x00)
@@ -336,10 +329,10 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             ArrayList<GameObject> onstart = new ArrayList<GameObject>();
             for (GameObject gobj : gObjectsToAdd) {
                 Integer layer = gobj.layer;
-                ArrayList<GameObject> gobjs = gObjects.get(layer);
+                ArrayList<GameObject> gobjs = gLayers.get(layer);
                 if (gobjs == null) {
                     gobjs = new ArrayList<GameObject>();
-                    gObjects.put(layer, gobjs);
+                    gLayers.put(layer, gobjs);
                 }
                 if (!gobjs.contains(gobj)) {
                     gobjs.add(gobj);
@@ -355,7 +348,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
             // --- gobj.OnPreUpdate
             if ((on_events_enabled & E_ON_PRE_UPDATE) != 0)
-                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
                     for (GameObject gobj : elem.getValue()) {
                         if ((gobj.on_events_enabled & E_ON_PRE_UPDATE) != 0x00)
                             gobj.OnPreUpdate(dt);
@@ -364,7 +357,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
             // --- gobj.OnUpdate
             if ((on_events_enabled & E_ON_UPDATE) != 0)
-                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
                     for (GameObject gobj : elem.getValue()) {
                         if ((gobj.on_events_enabled & E_ON_UPDATE) != 0x00)
                             gobj.OnUpdate(dt);
@@ -373,7 +366,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
             // --- gobj.OnPostUpdate
             if ((on_events_enabled & E_ON_POST_UPDATE) != 0)
-                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
                     for (GameObject gobj : elem.getValue()) {
                         if ((gobj.on_events_enabled & E_ON_POST_UPDATE) != 0x00)
                             gobj.OnPostUpdate(dt);
@@ -387,7 +380,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             // --- gobj.OnCollision
             if ((on_events_enabled & E_ON_COLLISION) != 0) {
                 LinkedHashMap<GameObject, ArrayList<GameObject>> oncollisions = new LinkedHashMap<GameObject, ArrayList<GameObject>>();
-                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
                     int layer = elem.getKey();
                     if (layer != GUI_LAYER) {
                         for (GameObject gobj1 : elem.getValue()) {
@@ -419,7 +412,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
             // --- gobj.OnPreRender
             if ((on_events_enabled & E_ON_PRE_RENDER) != 0)
-                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
                     for (GameObject gobj : elem.getValue()) {
                         if ((gobj.on_events_enabled & E_ON_PRE_RENDER) != 0x00)
                             gobj.OnPreRender(dt);
@@ -437,7 +430,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                 g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
 
                 // --- layers
-                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
                     int layer = elem.getKey();
                     if (layer != GUI_LAYER) {
                         for (GameObject gobj : elem.getValue()) {
@@ -455,7 +448,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                 }
 
                 // --- GUI
-                for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+                for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
                     int layer = elem.getKey();
                     if (layer == GUI_LAYER) {
                         for (GameObject gobj : elem.getValue()) {
@@ -479,7 +472,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
         // --- gobj.OnQuit
         if ((on_events_enabled & E_ON_QUIT) != 0)
-            for (Entry<Integer, ArrayList<GameObject>> elem : gObjects.entrySet()) {
+            for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
                 for (GameObject gobj : elem.getValue()) {
                     if ((gobj.on_events_enabled & E_ON_PRE_UPDATE) != 0x00)
                         gobj.OnQuit();
@@ -551,6 +544,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             if (fname.charAt(2) == ':')
                 fname = fname.substring(3);
         } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
         }
 
         if (fonts.get(name) == null) {
@@ -560,8 +555,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                 File file = new File(fname);
                 font = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream(file));
             } catch (Exception e) {
-                System.out.println(fname);
-                System.out.println(e);
+                e.printStackTrace();
                 System.exit(1);
             }
             Font f = font.deriveFont(fstyle, fsize);
@@ -581,6 +575,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             if (fname.charAt(2) == ':')
                 fname = fname.substring(3);
         } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
         }
 
         ClipData clip_data = sounds.get(name);
@@ -594,7 +590,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                 sounds.put(name, clip_data);
                 fis.close();
             } catch (Exception e) {
-                // System.out.println("LoadSound(): " + e);
+                e.printStackTrace();
+                System.exit(1);
             }
         }
     }
@@ -634,7 +631,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             else
                 clip_data.clip.start();
         } catch (Exception e) {
-            // System.out.println("PlaySound(): " + e);
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -755,6 +753,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             if (pattern.charAt(2) == ':')
                 pattern = pattern.substring(3);
         } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
         }
 
         ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
@@ -772,8 +772,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         try {
             paths = Files.newDirectoryStream(p, pattern);
         } catch (Exception e) {
-            System.out.println(pattern);
-            System.out.println(e);
+            e.printStackTrace();
             System.exit(1);
         }
         for (Path path : paths)
@@ -793,8 +792,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         try {
             img = ImageIO.read(f);
         } catch (Exception e) {
-            System.out.println(fname);
-            System.out.println(e);
+            e.printStackTrace();
             System.exit(1);
         }
         return img;

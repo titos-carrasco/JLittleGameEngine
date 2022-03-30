@@ -5,9 +5,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.net.URI;
+import java.util.Scanner;
 
 import rcr.lge.Canvas;
 import rcr.lge.GameObject;
@@ -17,6 +17,8 @@ import rcr.lge.Sprite;
 
 public class Game implements IEvents {
     private LittleGameEngine lge;
+
+    private int[][] mapa;
 
     public Game() {
         // la ruta a los recursos del juego
@@ -49,54 +51,53 @@ public class Game implements IEvents {
         Canvas infobar = new Canvas(new Point(0, 714), new Dimension(640, 20), "infobar");
         lge.AddGObjectGUI(infobar);
 
-        // agregamos a Betty
-        Betty betty = new Betty("Betty", win_size);
-        betty.SetPosition(32 * 9, 32 * 13);
-        betty.UseColliders(true);
-        lge.AddGObject(betty, 1);
-
-        // agregamos 3 zombies
-        for (int i = 0; i < 3; i++) {
-            Zombie zombie = new Zombie("Zombie-" + i);
-            zombie.SetPosition(32 + 32 * 4 + 32 * (i * 4), 32 * 1);
-            zombie.UseColliders(true);
-            lge.AddGObject(zombie, 1);
-        }
-
-        // agregamos los muros para las colisiones
-        // 1. fue creado con Tiled
-        // 2 exportado desde Tiled como .png y editado para dejar sus contornos
-        // 4. exportado desde Tiled como .csv para conocer las coordenadas de los muros
+        // cargamos el mapa en memoria
         try {
-            File f = new File(resource_dir + "/images/Betty/Fondo.csv");
-            FileReader fr;
-            fr = new FileReader(f);
-            BufferedReader br = new BufferedReader(fr);
-
-            String line;
-            int y = win_size.height - 32;
-            while ((line = br.readLine()) != null) {
-                int x = 0;
-                for (String elem : line.split(",")) {
-                    if (elem.equals("muro")) {
-                        GameObject muro = new GameObject(new Point(x, y), new Dimension(32, 32));
-                        muro.SetTag("muro");
-                        muro.UseColliders(true);
-                        lge.AddGObject(muro, 1);
-                    }
-                    x = x + 32;
-                }
-                y = y - 32;
+            String fname = new URI(resource_dir + "/images/Betty/Mapa.txt").getPath();
+            mapa = new int[22][19];
+            int x = 0, y = mapa.length - 1;
+            Scanner scanner = new Scanner(new File(fname));
+            while (scanner.hasNextLine()) {
+                String[] line = scanner.nextLine().split(",");
+                for (x = 0; x < line.length; x++)
+                    mapa[y][x] = Integer.valueOf(line[x]);
+                y--;
             }
-            br.close();
-            fr.close();
+            scanner.close();
+
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
 
+        // agregamos a Betty
+        Betty betty = new Betty("Betty", win_size);
+        betty.SetPosition(32 * 9, 32 * 13);
+        lge.AddGObject(betty, 1);
+
+        // agregamos 3 zombies
+        for (int i = 0; i < 1; i++) {
+            Zombie zombie = new Zombie("Zombie-" + i, win_size);
+            zombie.SetPosition(32 + 32 * 4 + 32 * (i * 4), 32 * 1);
+            lge.AddGObject(zombie, 1);
+        }
+
+        // agregamos los muros para las colisiones (segun el mapa)
+        for (int y = 0; y < mapa.length; y++)
+            for (int x = 0; x < mapa[y].length; x++)
+                if (mapa[y][x] == 1) {
+                    GameObject muro = new GameObject(new Point(x * 32, y * 32),
+                            new Dimension(32, 32));
+                    muro.UseColliders(true);
+                    lge.AddGObject(muro, 1);
+                }
+
         // comenzamos
         betty.SetAlive(true);
+        for (GameObject gobj : lge.GetGObjects("Zombie-*")) {
+            Zombie zombie = (Zombie) gobj;
+            zombie.SetActive(true);
+        }
     }
 
     @Override
@@ -110,7 +111,7 @@ public class Game implements IEvents {
         boolean[] mouse_buttons = lge.GetMouseButtons();
 
         String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", 1.0 / lge.GetFPS(),
-                lge.GetGObjects().length, mouse_position.x, mouse_position.y, mouse_buttons[0] ? 1 : 0,
+                lge.GetCountGObjects(), mouse_position.x, mouse_position.y, mouse_buttons[0] ? 1 : 0,
                 mouse_buttons[1] ? 1 : 0, mouse_buttons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.GetGObject("infobar");
         infobar.Fill(new Color(0x80808080, true));

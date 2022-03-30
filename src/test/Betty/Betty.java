@@ -14,7 +14,7 @@ public class Betty extends Sprite {
 
     private boolean alive;
     private Dimension win_size;
-    private Point last;
+    private Point last_point;
 
     public Betty(String name, Dimension win_size) {
         super(new String[] { "betty_idle", "betty_down", "betty_up", "betty_left", "betty_right" }, new Point(0, 0),
@@ -27,6 +27,7 @@ public class Betty extends Sprite {
         SetShape("betty_idle", 0);
         SetTag("Betty");
         alive = false;
+        UseColliders(true);
         this.win_size = win_size;
     }
 
@@ -34,7 +35,7 @@ public class Betty extends Sprite {
         return alive;
     }
 
-    public void SetAlive( boolean alive) {
+    public void SetAlive(boolean alive) {
         this.alive = alive;
         SetShape("betty_idle", 0);
     }
@@ -53,7 +54,7 @@ public class Betty extends Sprite {
         // nuestra posicion actual y tamano
         int x = GetX();
         int y = GetY();
-        last = new Point( x, y );
+        last_point = new Point(x, y);
 
         // cambiamos sus coordenadas e imagen segun la tecla presionada
         int idx = GetCurrentIdx();
@@ -71,19 +72,29 @@ public class Betty extends Sprite {
             y = y - pixels;
         } else {
             SetShape("betty_idle", idx);
+            if (x % 32 < 4)
+                x = Math.round(x / 32) * 32;
+            else if (x % 32 > 28)
+                x = Math.round((x + 32) / 32) * 32;
+            if (y % 32 < 4)
+                y = Math.round(y / 32) * 32;
+            else if (y % 32 > 28)
+                y = Math.round((y + 32) / 32) * 32;
         }
 
         // tunel?
-        if( x < -16 ) x = win_size.width - 16;
-        else if( x > win_size.width - 16 ) x = -16;
+        if (x < -16)
+            x = win_size.width - 16;
+        else if (x > win_size.width - 16)
+            x = -16;
 
         // siguiente imagen de la secuencia
-        NextShape(dt, 0.009);
         SetPosition(x, y);
+        NextShape(dt, 0.1);
     }
 
     @Override
     public void OnCollision(double dt, ArrayList<GameObject> gobjs) {
-        SetPosition( last );
+        SetPosition(last_point);
     }
 }

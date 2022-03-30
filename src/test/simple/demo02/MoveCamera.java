@@ -77,7 +77,7 @@ public class MoveCamera implements IEvents {
         boolean[] mouse_buttons = lge.GetMouseButtons();
 
         String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", 1.0 / lge.GetFPS(),
-                lge.GetGObjects().length, mouse_position.x, mouse_position.y, mouse_buttons[0] ? 1 : 0,
+                lge.GetCountGObjects(), mouse_position.x, mouse_position.y, mouse_buttons[0] ? 1 : 0,
                 mouse_buttons[1] ? 1 : 0, mouse_buttons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.GetGObject("infobar");
         infobar.Fill(new Color(0x10202020, true));

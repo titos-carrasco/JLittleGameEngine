@@ -1,5 +1,6 @@
 package test.Betty;
 
+import java.awt.Dimension;
 import java.awt.Point;
 
 import rcr.lge.LittleGameEngine;
@@ -7,10 +8,12 @@ import rcr.lge.Sprite;
 
 public class Zombie extends Sprite {
     private LittleGameEngine lge;
+
+    private Dimension win_size;
     private char dir;
     private boolean active;
 
-    public Zombie(String name) {
+    public Zombie(String name, Dimension win_size) {
         super("zombie", new Point(0, 0), name);
 
         // acceso al motor de juegos
@@ -19,8 +22,13 @@ public class Zombie extends Sprite {
         SetOnEvents(LittleGameEngine.E_ON_UPDATE);
         SetShape("zombie", 0);
         SetTag("zombie");
-        dir = 'R';
+        UseColliders(true);
+
         active = false;
+        this.win_size = win_size;
+
+        // direccion inicial - Right, Down, Left, Up
+        dir = "RDLU".charAt((int) (Math.random() * 4));
     }
 
     public void SetActive(boolean active) {
@@ -37,7 +45,7 @@ public class Zombie extends Sprite {
         // int pixels = (int)(velocity*dt);
         int pixels = 2;
 
-        // las coordenadas de Betty
+        // las coestrategiaadas de Betty
         Betty betty = (Betty) lge.GetGObject("Betty");
         int bx = betty.GetX();
         int by = betty.GetY();
@@ -45,90 +53,92 @@ public class Zombie extends Sprite {
         // nuestra posicion actual
         int x = GetX();
         int y = GetY();
-        int xori = x;
-        int yori = y;
+        int _x = x;
+        int _y = y;
 
-        // nuevas coordenadas
-        String orden = "";
-
-        boolean abajo = y < by;
+        // posicion respecto a Betty
+        boolean abajo = y <= by;
         boolean arriba = y > by;
-        boolean izquierda = x < bx;
+        boolean izquierda = x <= bx;
         boolean derecha = x > bx;
+
+        // estrategia de movimiento
+        String estrategia = "";
 
         if (dir == 'R') {
             if (abajo && izquierda)
-                orden = "URDL";
+                estrategia = "URDL";
             else if (abajo && derecha)
-                orden = "UDRL";
+                estrategia = "URDL";
             else if (arriba && izquierda)
-                orden = "DRUL";
+                estrategia = "DRUL";
             else if (arriba && derecha)
-                orden = "DURL";
+                estrategia = "DRUL";
             else if (arriba)
-                orden = "DRUL";
+                estrategia = "DRUL";
             else if (abajo)
-                orden = "URDL";
+                estrategia = "URDL";
             else if (izquierda)
-                orden = "RUDL";
+                estrategia = "RUDL";
             else if (derecha)
-                orden = "UDRL";
-        } else if (dir == 'L') {
-            if (abajo && izquierda)
-                orden = "UDLR";
-            else if (abajo && derecha)
-                orden = "LUDR";
-            else if (arriba && izquierda)
-                orden = "DULR";
-            else if (arriba && derecha)
-                orden = "DLUR";
-            else if (arriba)
-                orden = "DLUR";
-            else if (abajo)
-                orden = "ULDR";
-            else if (izquierda)
-                orden = "LUDR";
-            else if (derecha)
-                orden = "UDLR";
+                estrategia = "URDL";
         } else if (dir == 'U') {
             if (abajo && izquierda)
-                orden = "URLD";
+                estrategia = "URLD";
             else if (abajo && derecha)
-                orden = "ULRD";
+                estrategia = "ULRD";
             else if (arriba && izquierda)
-                orden = "RLUD";
+                estrategia = "RLUD";
             else if (arriba && derecha)
-                orden = "LRUD";
+                estrategia = "LURD";
             else if (arriba)
-                orden = "LRUD";
+                estrategia = "LRUD";
             else if (abajo)
-                orden = "ULRD";
+                estrategia = "ULRD";
             else if (izquierda)
-                orden = "RULD";
+                estrategia = "RULD";
             else if (derecha)
-                orden = "LURD";
+                estrategia = "LURD";
+        } else if (dir == 'L') {
+            if (abajo && izquierda)
+                estrategia = "UDLR";
+            else if (abajo && derecha)
+                estrategia = "LUDR";
+            else if (arriba && izquierda)
+                estrategia = "DULR";
+            else if (arriba && derecha)
+                estrategia = "DLUR";
+            else if (arriba)
+                estrategia = "DLUR";
+            else if (abajo)
+                estrategia = "ULDR";
+            else if (izquierda)
+                estrategia = "LUDR";
+            else if (derecha)
+                estrategia = "UDLR";
         } else if (dir == 'D') {
             if (abajo && izquierda)
-                orden = "RLDU";
+                estrategia = "RLDU";
             else if (abajo && derecha)
-                orden = "LRDU";
+                estrategia = "LRDU";
             else if (arriba && izquierda)
-                orden = "RDLU";
+                estrategia = "RDLU";
             else if (arriba && derecha)
-                orden = "LDRU";
+                estrategia = "LDRU";
             else if (arriba)
-                orden = "DLRU";
+                estrategia = "DLRU";
             else if (abajo)
-                orden = "LRDU";
+                estrategia = "LRDU";
             else if (izquierda)
-                orden = "RDLU";
+                estrategia = "RDLU";
             else if (derecha)
-                orden = "LDRU";
+                estrategia = "LDRU";
         }
 
-        for (int i = 0; i < orden.length(); i++) {
-            char c = orden.charAt(i);
-
+        // probamos cada movimiento de la estrategia
+        for (int i = 0; i < estrategia.length(); i++) {
+            char c = estrategia.charAt(i);
+            System.out.printf( "%s - %c\n", estrategia, c);
             if (c == 'R')
                 x = x + pixels;
             else if (c == 'L')
@@ -137,26 +147,27 @@ public class Zombie extends Sprite {
                 y = y + pixels;
             else if (c == 'D')
                 y = y - pixels;
-            SetPosition(x, y);
 
-            // collisions = Engine.GetCollisions( self )
-            // bloqueos = [ gobj for gobj in collisions if gobj.GetTag() == "muro" or
-            // gobj.GetTag() == "zombie" ]
-            // if( len( bloqueos ) == 0 ):
-            // self.dir = c
-            // break
-            SetPosition(xori, yori);
+            // verificamos que no colisionemos con este movimiento
+            SetPosition( x, y );
+            if (lge.IntersectGObjects(this).size() == 0) {
+                dir = c;
+
+                // tunel?
+                if (x < -16)
+                    x = win_size.width - 16;
+                else if (x > win_size.width - 16)
+                    x = -16;
+                SetPosition( x, y );
+                break;
+            }
+
+            // otro intento
+            SetPosition( _x, _y );
         }
 
-        // tunel?
-        x = GetX();
-        y = GetY();
-        // w, h = Engine.GetCamera().GetSize()
-        // if( x < -16 ): x = w - 16
-        // elif( x > w - 16 ): x = -16
-        SetPosition(x, y);
-
         // siguiente imagen de la secuencia
-        NextShape(dt, 0.100);
+        NextShape(dt, 0.1);
     }
+
 }

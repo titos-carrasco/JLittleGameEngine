@@ -38,7 +38,7 @@ public class MiHeroe extends Sprite {
         // la posiciona actual del heroe
         int x = GetX();
         int y = GetY();
-        last = new Point(x,y);
+        last = new Point(x, y);
 
         // cambiamos sus coordenadas, orientacion e imagen segun la tecla presionada
         if (lge.KeyPressed(KeyEvent.VK_RIGHT)) {
@@ -71,15 +71,15 @@ public class MiHeroe extends Sprite {
             y = (int) (y - pixels);
 
         // siguiente imagen de la secuencia
-        NextShape(dt, 0.050);
+        NextShape(dt, 0.1);
 
         // lo posicionamos
-        SetPosition(x,y);
+        SetPosition(x, y);
     }
 
     @Override
     public void OnCollision(double dt, ArrayList<GameObject> gobjs) {
-        lge.PlaySound("poing", false,50);
+        lge.PlaySound("poing", false, 50);
         SetPosition(last);
     }
 

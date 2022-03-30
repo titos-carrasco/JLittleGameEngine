@@ -62,7 +62,7 @@ public class Sprite extends GameObject {
     }
 
     public void SetShape(String iname, int idx) {
-        this.elapsed = 0;
+        //this.elapsed = 0;
         this.iname = iname;
 
         if (idx >= surfaces.get(iname).size())
