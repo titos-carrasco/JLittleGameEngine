@@ -75,7 +75,7 @@ public class Bouncing implements IEvents {
     public static void main(String[] args) {
         Bouncing game = new Bouncing();
         game.Run(60);
-        System.out.println("Eso es todo!!! ");
+        System.out.println("Eso es todo!!!");
     }
 
 }

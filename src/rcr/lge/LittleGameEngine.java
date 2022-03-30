@@ -57,7 +57,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
     private static LittleGameEngine lge = null;
     private IEvents on_main_update = null;
-    protected int on_events_enabled = 0x00;
+    private int on_events_enabled = 0x00;
     private double[] average_fps;
     private int average_fps_idx;
     private boolean running = false;
@@ -185,17 +185,25 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         }
     }
 
+    public ArrayList<GameObject> IntersectGObject( GameObject gobj ) {
+        ArrayList<GameObject> gobjs = new ArrayList<GameObject>();
+        for( GameObject o : gObjects.get(  gobj.layer ))
+            if( gobj.use_colliders && o.use_colliders && gobj.rect.intersects(o.rect ))
+                gobjs.add( o );
+        return gobjs;
+    }
+
     public void ShowColliders(Color color) {
         collidersColor = color;
     }
 
     // camera
     public Point GetCameraPosition() {
-        return camera.rect.getLocation();
+        return camera.GetPosition();
     }
 
     public Dimension GetCameraSize() {
-        return camera.rect.getSize();
+        return camera.GetSize();
     }
 
     public void SetCameraTarget(GameObject gobj) {
@@ -215,7 +223,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     public void SetCameraBounds(Rectangle bounds) {
-        camera.bounds = bounds;
+        camera.SetBounds(bounds);
     }
 
     public void SetCameraPosition(Point position) {
@@ -383,9 +391,13 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                     int layer = elem.getKey();
                     if (layer != GUI_LAYER) {
                         for (GameObject gobj1 : elem.getValue()) {
-                            ArrayList<GameObject> colliders = new ArrayList<GameObject>();
+                            if ((gobj1.on_events_enabled & E_ON_COLLISION) == 0)
+                                continue;
+
                             if (!gobj1.use_colliders)
                                 continue;
+
+                            ArrayList<GameObject> colliders = new ArrayList<GameObject>();
                             for (GameObject gobj2 : elem.getValue()) {
                                 if (gobj1 == gobj2)
                                     continue;
@@ -582,7 +594,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                 sounds.put(name, clip_data);
                 fis.close();
             } catch (Exception e) {
-                //System.out.println("LoadSound(): " + e);
+                // System.out.println("LoadSound(): " + e);
             }
         }
     }
@@ -622,7 +634,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             else
                 clip_data.clip.start();
         } catch (Exception e) {
-            //System.out.println("PlaySound(): " + e);
+            // System.out.println("PlaySound(): " + e);
         }
     }
 
@@ -657,7 +669,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             FloatControl volume = (FloatControl) clip_data.clip.getControl(FloatControl.Type.VOLUME);
             volume.setValue((float) (clip_data.level / 100.0));
         } catch (Exception e) {
-            //System.out.println("SetSoundVolume(): " + e);
+            // System.out.println("SetSoundVolume(): " + e);
         }
     }
 

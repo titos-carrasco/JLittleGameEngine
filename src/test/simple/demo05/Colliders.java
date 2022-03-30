@@ -47,6 +47,15 @@ public class Colliders implements IEvents {
         Sprite fondo = new Sprite("fondo", new Point(0, 0), "fondo");
         lge.AddGObject(fondo, 0);
 
+        // agregamos la barra de info
+        Canvas infobar = new Canvas(new Point(0, 460), new Dimension(640, 20), "infobar");
+        lge.AddGObjectGUI(infobar);
+
+        // agregamos el icono del sonido
+        Sprite mute = new Sprite("mute", new Point(8, 463), "mute");
+        mute.SetShape("mute", 50);
+        lge.AddGObjectGUI(mute);
+
         // agregamos un ninja
         Sprite ninja = new Sprite("ninja", new Point(350, 250), "ninja");
         ninja.UseColliders(true);
@@ -56,15 +65,6 @@ public class Colliders implements IEvents {
         MiHeroe heroe = new MiHeroe();
         heroe.UseColliders(true);
         lge.AddGObject(heroe, 1);
-
-        // agregamos la barra de info
-        Canvas infobar = new Canvas(new Point(0, 460), new Dimension(640, 20), "infobar");
-        lge.AddGObjectGUI(infobar);
-
-        // agregamos el icono del sonido
-        Sprite mute = new Sprite("mute", new Point(8, 463), "mute");
-        mute.SetShape("mute", 50);
-        lge.AddGObjectGUI(mute);
 
         // # configuramos la camara
         lge.SetCameraBounds(new Rectangle(0, 0, 1920, 1056));
@@ -96,14 +96,17 @@ public class Colliders implements IEvents {
             if (mouse_position.x >= 8 && mouse_position.x <= 20 && mouse_position.y >= 463 && mouse_position.y <= 475) {
                 Sprite mute = (Sprite) lge.GetGObject("mute");
                 mute.NextShape(0, 0);
+                if (mute.GetCurrentIdx() == 0)
+                    lge.SetSoundVolume("fondo", 0);
+                else
+                    lge.SetSoundVolume("fondo", 50);
             }
         }
 
         // de manera aleatorio activamos sonido de aves
-        // int n = (int) (Math.random() * 1000);
-        // if( n < 3 )
-        // lge.PlaySound( "aves", false );
-
+        int n = (int) (Math.random() * 1000);
+        if (n < 3)
+            lge.PlaySound("aves", false, 50);
     }
 
     // main loop
@@ -115,7 +118,7 @@ public class Colliders implements IEvents {
     public static void main(String[] args) {
         Colliders game = new Colliders();
         game.Run(60);
-        System.out.println("Eso es todo!!! ");
+        System.out.println("Eso es todo!!!");
     }
 
 }

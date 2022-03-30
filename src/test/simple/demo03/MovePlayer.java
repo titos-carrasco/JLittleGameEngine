@@ -42,11 +42,6 @@ public class MovePlayer implements IEvents {
         Sprite fondo = new Sprite("fondo", new Point(0, 0), "fondo");
         lge.AddGObject(fondo, 0);
 
-        // agregamos al heroe
-        MiHeroe heroe = new MiHeroe();
-        heroe.UseColliders(true);
-        lge.AddGObject(heroe, 1);
-
         // agregamos la barra de info
         Canvas infobar = new Canvas(new Point(0, 460), new Dimension(640, 20), "infobar");
         lge.AddGObjectGUI(infobar);
@@ -55,6 +50,11 @@ public class MovePlayer implements IEvents {
         Sprite mute = new Sprite("mute", new Point(8, 463), "mute");
         mute.SetShape("mute", 1);
         lge.AddGObjectGUI(mute);
+
+        // agregamos al heroe
+        MiHeroe heroe = new MiHeroe();
+        heroe.UseColliders(true);
+        lge.AddGObject(heroe, 1);
 
         // # configuramos la camara
         lge.SetCameraBounds(new Rectangle(0, 0, 1920, 1056));
@@ -86,6 +86,10 @@ public class MovePlayer implements IEvents {
             if (mouse_position.x >= 8 && mouse_position.x <= 20 && mouse_position.y >= 463 && mouse_position.y <= 475) {
                 Sprite mute = (Sprite) lge.GetGObject("mute");
                 mute.NextShape(0, 0);
+                if (mute.GetCurrentIdx() == 0)
+                    lge.SetSoundVolume("fondo", 0);
+                else
+                    lge.SetSoundVolume("fondo", 50);
             }
         }
     }
@@ -99,6 +103,6 @@ public class MovePlayer implements IEvents {
     public static void main(String[] args) {
         MovePlayer game = new MovePlayer();
         game.Run(60);
-        System.out.println("Eso es todo!!! ");
+        System.out.println("Eso es todo!!!");
     }
 }

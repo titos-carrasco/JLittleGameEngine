@@ -40,16 +40,6 @@ public class TheWorld implements IEvents {
         Sprite fondo = new Sprite("fondo", new Point(0, 0), "fondo");
         lge.AddGObject(fondo, 0);
 
-        // agregamos un Sprite
-        Sprite heroe = new Sprite("heroe", new Point(226, 142), "Heroe");
-        heroe.UseColliders(true);
-        lge.AddGObject(heroe, 1);
-
-        // agregamos un texto con transparencia
-        Canvas canvas = new Canvas(new Point(200, 110), new Dimension(400, 200));
-        canvas.DrawText("Little Game Engine", new Point(30, 90), "backlash.plain.40", new Color(20, 20, 20));
-        lge.AddGObjectGUI(canvas);
-
         // agregamos la barra de info
         Canvas infobar = new Canvas(new Point(0, 420), new Dimension(800, 20), "infobar");
         lge.AddGObjectGUI(infobar);
@@ -58,6 +48,16 @@ public class TheWorld implements IEvents {
         Sprite mute = new Sprite("mute", new Point(8, 423), "mute");
         mute.SetShape("mute", 1);
         lge.AddGObjectGUI(mute);
+
+        // agregamos al heroe
+        Sprite heroe = new Sprite("heroe", new Point(226, 142), "Heroe");
+        heroe.UseColliders(true);
+        lge.AddGObject(heroe, 1);
+
+        // agregamos un texto con transparencia
+        Canvas canvas = new Canvas(new Point(200, 110), new Dimension(400, 200));
+        canvas.DrawText("Little Game Engine", new Point(30, 90), "backlash.plain.40", new Color(20, 20, 20));
+        lge.AddGObjectGUI(canvas);
     }
 
     @Override
@@ -83,6 +83,10 @@ public class TheWorld implements IEvents {
             if (mouse_position.x >= 8 && mouse_position.x <= 20 && mouse_position.y >= 423 && mouse_position.y <= 435) {
                 Sprite mute = (Sprite) lge.GetGObject("mute");
                 mute.NextShape(0, 0);
+                if (mute.GetCurrentIdx() == 0)
+                    lge.SetSoundVolume("fondo", 0);
+                else
+                    lge.SetSoundVolume("fondo", 50);
             }
         }
 
@@ -100,6 +104,6 @@ public class TheWorld implements IEvents {
     public static void main(String[] args) {
         TheWorld game = new TheWorld();
         game.Run(60);
-        System.out.println("Eso es todo!!! ");
+        System.out.println("Eso es todo!!!");
     }
 }

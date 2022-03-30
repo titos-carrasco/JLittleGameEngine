@@ -31,17 +31,18 @@ public class MiHeroe extends Sprite {
         double pixels = velocity * dt;
 
         // la posiciona actual del heroe
-        Point position = GetPosition();
+        int x = GetX();
+        int y = GetY();
 
         // cambiamos sus coordenadas segun la tecla presionada
         if (lge.KeyPressed(KeyEvent.VK_RIGHT)) {
-            position.x = (int) (position.x + pixels);
+            x = (int) (x + pixels);
             if (heading != 1) {
                 SetShape("heroe_right", 0);
                 heading = 1;
             }
         } else if (lge.KeyPressed(KeyEvent.VK_LEFT)) {
-            position.x = (int) (position.x - pixels);
+            x = (int) (x - pixels);
             if (heading != -1) {
                 SetShape("heroe_left", 0);
                 heading = -1;
@@ -49,11 +50,11 @@ public class MiHeroe extends Sprite {
         }
 
         if (lge.KeyPressed(KeyEvent.VK_UP))
-            position.y = (int) (position.y + pixels);
+            y = (int) (y + pixels);
         else if (lge.KeyPressed(KeyEvent.VK_DOWN))
-            position.y = (int) (position.y - pixels);
+            y = (int) (y - pixels);
 
         // lo posicionamos
-        SetPosition(position);
+        SetPosition(x, y);
     }
 }

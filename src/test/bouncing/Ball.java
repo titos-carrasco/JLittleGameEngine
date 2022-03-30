@@ -11,7 +11,6 @@ import rcr.lge.LittleGameEngine;
 
 public class Ball extends Canvas {
 
-    Color fill_color;
     private double vx, vy;
     private double g, e;
 
@@ -19,36 +18,31 @@ public class Ball extends Canvas {
         super(new Point((int) (50 + Math.random() * 700), (int) (200 + Math.random() * 350)), new Dimension(20, 20));
         SetOnEvents(LittleGameEngine.E_ON_UPDATE | LittleGameEngine.E_ON_COLLISION);
         UseColliders(true);
-        fill_color = new Color(0, 255, 0, 64);
         vx = -10 + Math.random() * 20;
         vy = 0;
         g = 240;
         e = 0.5;
-    }
 
-    @Override
-    public void OnUpdate(double dt) {
-        Point position = GetPosition();
-
-        position.x = (int) (position.x + vx * dt);
-        position.y = (int) (position.y + vy * dt);
-        vy = vy - g * dt;
-
-        SetPosition(position);
+        Color fill_color = new Color(0, 255, 0, 64);
         Fill(fill_color);
     }
 
     @Override
-    public void OnCollision(double dt, ArrayList<GameObject> gobjs) {
-        Point position = GetPosition();
-        for (GameObject gobj : gobjs) {
-            if (gobj.GetTag() == "ground") {
-                Point p = gobj.GetPosition();
-                Dimension d = gobj.GetSize();
+    public void OnUpdate(double dt) {
+        int x = (int) (GetX() + vx * dt);
+        int y = (int) (GetY() + vy * dt);
+        vy = vy - g * dt;
 
-                p.x = position.x;
-                p.y = p.y + d.height;
-                SetPosition(p);
+        SetPosition(x, y);
+    }
+
+    @Override
+    public void OnCollision(double dt, ArrayList<GameObject> gobjs) {
+        for (GameObject gobj : gobjs) {
+            if (gobj.GetTag().equals("ground")) {
+                int x = GetX();
+                int y = gobj.GetY() + gobj.GetHeight();
+                SetPosition(x, y);
 
                 vy = -vy * e;
                 if (Math.abs(vy) < 30) {
@@ -59,6 +53,7 @@ public class Ball extends Canvas {
                 break;
             }
         }
+
     }
 
 }

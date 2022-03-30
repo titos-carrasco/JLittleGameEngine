@@ -4,16 +4,16 @@ import java.awt.Dimension;
 import java.awt.Point;
 
 public class Camera extends GameObject {
-    protected GameObject target;
-    protected boolean target_center;
+    GameObject target;
+    boolean target_center;
 
-    protected Camera(Point position, Dimension size) {
+    Camera(Point position, Dimension size) {
         super(position, size, "__LGE_CAMERA__");
         target = null;
         target_center = true;
     }
 
-    protected void FollowTarget() {
+    void FollowTarget() {
         // nadie a quien seguir
         if (target == null)
             return;

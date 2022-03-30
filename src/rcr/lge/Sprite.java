@@ -8,10 +8,10 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 public class Sprite extends GameObject {
-    private LinkedHashMap<String, ArrayList<BufferedImage>> surfaces;
-    private String iname;
-    private int idx;
-    private double elapsed = 0;
+    LinkedHashMap<String, ArrayList<BufferedImage>> surfaces;
+    String iname;
+    int idx;
+    double elapsed = 0;
 
     public Sprite(String iname, Point position) {
         this(new String[] { iname }, position, null);

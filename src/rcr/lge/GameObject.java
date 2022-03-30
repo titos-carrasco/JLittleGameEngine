@@ -8,14 +8,14 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class GameObject {
-    protected Rectangle rect;
-    protected Rectangle bounds = null;
-    protected BufferedImage surface = null;
-    protected int layer = -1;
-    protected boolean use_colliders = false;
-    protected String name;
-    protected String tag = "";
-    protected int on_events_enabled = 0x00;
+    Rectangle rect;
+    Rectangle bounds = null;
+    BufferedImage surface = null;
+    boolean use_colliders = false;
+    int layer = -1;
+    String name;
+    String tag = "";
+    int on_events_enabled = 0x00;
 
     public GameObject(Point origin, Dimension size) {
         this(origin.x, origin.y, size.width, size.height, null);
@@ -37,23 +37,43 @@ public class GameObject {
     }
 
     public Point GetPosition() {
-        return rect.getLocation();
+        return new Point(rect.getLocation());
+    }
+
+    public int GetX() {
+        return rect.x;
+    }
+
+    public int GetY() {
+        return rect.y;
     }
 
     public Dimension GetSize() {
-        return rect.getSize();
+        return new Dimension(rect.getSize());
+    }
+
+    public int GetWidth() {
+        return rect.width;
+    }
+
+    public int GetHeight() {
+        return rect.height;
+    }
+
+    public Rectangle GetRectangle() {
+        return new Rectangle(rect);
     }
 
     public String GetName() {
-        return name;
+        return new String(name);
     }
 
     public String GetTag() {
-        return tag;
+        return new String(tag);
     }
 
     public void SetBounds(Rectangle bounds) {
-        this.bounds = bounds;
+        this.bounds = new Rectangle(bounds);
     }
 
     public void SetPosition(Point position) {
@@ -61,11 +81,11 @@ public class GameObject {
     }
 
     public void SetPosition(int x, int y) {
-        if (bounds == null)
-            return;
-
         rect.x = x;
         rect.y = y;
+
+        if (bounds == null)
+            return;
 
         if (rect.width <= bounds.width && rect.height <= bounds.height) {
             if (rect.x < bounds.x)
@@ -80,7 +100,7 @@ public class GameObject {
     }
 
     public void SetTag(String tag) {
-        this.tag = tag;
+        this.tag = new String(tag);
     }
 
     public void UseColliders(boolean use_colliders) {
