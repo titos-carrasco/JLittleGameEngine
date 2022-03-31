@@ -5,11 +5,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Transparency;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -56,6 +58,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     public static final int E_ON_QUIT = 0b10000010;
 
     private static LittleGameEngine lge = null;
+    private GraphicsConfiguration gconfig;
 
     private TreeMap<Integer, ArrayList<GameObject>> gLayers;
     private HashMap<String, GameObject> gObjects;
@@ -117,7 +120,19 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         win.setResizable(false);
         win.setVisible(true);
 
-        screen = new BufferedImage(win_size.width, win_size.height, BufferedImage.TYPE_INT_ARGB);
+        // screen = new BufferedImage(win_size.width, win_size.height,
+        // BufferedImage.TYPE_INT_ARGB);
+        gconfig = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+        screen = gconfig.createCompatibleImage(win_size.width, win_size.height, Transparency.OPAQUE);
+
+        Font f = new Font("Arial", Font.PLAIN, 16);
+        Graphics2D g2d = screen.createGraphics();
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
+        g2d.setColor(Color.BLACK);
+        g2d.drawString("Loading...", win_size.width/2, win_size.height/2);
+        g2d.dispose();
+        this.repaint();
     }
 
     public static LittleGameEngine Init(Dimension win_size, String title, Color bgColor) {
@@ -466,7 +481,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                 g2d.dispose();
             }
             // ---
-            this.getGraphics().drawImage(screen, 0, 0, null);
+            // this.getGraphics().drawImage(screen, 0, 0, null);
             this.repaint();
         }
 
@@ -701,11 +716,11 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         ArrayList<BufferedImage> images = ReadImages(pattern);
 
         if (size.width > 0 && size.height > 0) {
-            for (int i = 0; i < images.size(); i++) {
+            int img_size = images.size();
+            for (int i = 0; i < img_size; i++) {
                 BufferedImage img = images.get(i);
                 Image scaled_image = img.getScaledInstance(size.width, size.height, BufferedImage.SCALE_SMOOTH);
-                BufferedImage bi = new BufferedImage(scaled_image.getWidth(null), scaled_image.getHeight(null),
-                        BufferedImage.TYPE_INT_ARGB);
+                BufferedImage bi = gconfig.createCompatibleImage(size.width, size.height, Transparency.TRANSLUCENT);
                 Graphics2D g2d = bi.createGraphics();
 
                 int w = scaled_image.getWidth(null);
@@ -721,13 +736,13 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                 images.set(i, bi);
             }
         } else if (scale > 0 && scale != 1) {
-            for (int i = 0; i < images.size(); i++) {
+            int img_size = images.size();
+            for (int i = 0; i < img_size; i++) {
                 BufferedImage img = images.get(i);
                 int width = (int) Math.round(img.getWidth() * scale);
                 int height = (int) Math.round(img.getHeight() * scale);
                 Image scaled_image = img.getScaledInstance(width, height, BufferedImage.SCALE_SMOOTH);
-                BufferedImage bi = new BufferedImage(scaled_image.getWidth(null), scaled_image.getHeight(null),
-                        BufferedImage.TYPE_INT_ARGB);
+                BufferedImage bi = gconfig.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
                 Graphics2D g2d = bi.createGraphics();
 
                 int w = scaled_image.getWidth(null);
