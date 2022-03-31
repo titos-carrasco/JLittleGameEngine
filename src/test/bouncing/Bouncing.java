@@ -15,9 +15,6 @@ public class Bouncing implements IEvents {
     private Canvas ground;
 
     public Bouncing() {
-        // la ruta a los recursos del juego
-        String resource_dir = getClass().getResource("../resources").getPath();
-
         // creamos el juego
         Dimension win_size = new Dimension(800, 600);
 
@@ -27,6 +24,8 @@ public class Bouncing implements IEvents {
         lge.SetOnEvents(LittleGameEngine.E_ON_UPDATE | LittleGameEngine.E_ON_COLLISION);
 
         // cargamos los recursos que usaremos
+        String resource_dir = lge.GetRealPath(this, "../resources");
+
         lge.LoadTTFFont("monospace.plain.16", resource_dir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos el suelo

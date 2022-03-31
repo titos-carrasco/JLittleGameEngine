@@ -16,9 +16,6 @@ public class MoveCamera implements IEvents {
     private LittleGameEngine lge;
 
     public MoveCamera() {
-        // la ruta a los recursos del juego
-        String resource_dir = getClass().getResource("../../resources").getPath();
-
         // creamos el juego
         Dimension win_size = new Dimension(640, 480);
 
@@ -27,6 +24,8 @@ public class MoveCamera implements IEvents {
         lge.SetOnMainUpdate(this);
 
         // cargamos los recursos que usaremos
+        String resource_dir = lge.GetRealPath(this, "../../resources");
+
         lge.LoadImage("fondo", resource_dir + "/images/Backgrounds/FreeTileset/Fondo.png", false, false);
         lge.LoadImage("heroe", resource_dir + "/images/Swordsman/Idle/Idle_00*.png", 0.16, false, false);
         lge.LoadImage("mute", resource_dir + "/images/icons/sound-*.png", false, false);

@@ -66,7 +66,7 @@ public class MiHeroe extends Sprite {
             y = (int) (y - pixels);
 
         // siguiente imagen de la secuencia
-        NextShape(dt, 0.1);
+        NextShape(dt, 0.050);
 
         // lo posicionamos
         SetPosition(x, y);

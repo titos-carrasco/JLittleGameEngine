@@ -21,18 +21,17 @@ public class Game implements IEvents {
     private int[][] mapa;
 
     public Game() {
-        // la ruta a los recursos del juego
-        String resource_dir = getClass().getResource("../resources").getPath();
-
         // creamos el juego
         Dimension win_size = new Dimension(608, 736);
 
-        lge = LittleGameEngine.Init(win_size, "Colliders", new Color(0xFFFF00));
+        lge = LittleGameEngine.Init(win_size, "Betty", new Color(0xFFFF00));
         lge.ShowColliders(new Color(0xFF0000));
         lge.SetOnMainUpdate(this);
         lge.SetOnEvents(LittleGameEngine.E_ON_UPDATE | LittleGameEngine.E_ON_COLLISION);
 
         // cargamos los recursos que usaremos
+        String resource_dir = lge.GetRealPath(this, "../resources");
+
         lge.LoadImage("fondo", resource_dir + "/images/Betty/Fondo.png", false, false);
         lge.LoadImage("betty_idle", resource_dir + "/images/Betty/idle-0*.png", false, false);
         lge.LoadImage("betty_down", resource_dir + "/images/Betty/down-0*.png", false, false);

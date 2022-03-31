@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -86,6 +87,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     private Color collidersColor = null;
 
     private LittleGameEngine(Dimension win_size, String title, Color bgColor) {
+        gconfig = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
         average_fps = new double[30];
         average_fps_idx = 0;
 
@@ -120,17 +122,15 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         win.setResizable(false);
         win.setVisible(true);
 
-        // screen = new BufferedImage(win_size.width, win_size.height,
-        // BufferedImage.TYPE_INT_ARGB);
-        gconfig = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-        screen = gconfig.createCompatibleImage(win_size.width, win_size.height, Transparency.OPAQUE);
+        screen = CreateOpageImage(win_size.width, win_size.height);
 
-        Font f = new Font("Arial", Font.PLAIN, 16);
+        Font f = new Font("Arial", Font.PLAIN, 40);
         Graphics2D g2d = screen.createGraphics();
         g2d.setColor(Color.WHITE);
         g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
         g2d.setColor(Color.BLACK);
-        g2d.drawString("Loading...", win_size.width/2, win_size.height/2);
+        g2d.setFont(f);
+        g2d.drawString("Loading...", (win_size.width - 160) / 2, (win_size.height - 8) / 2);
         g2d.dispose();
         this.repaint();
     }
@@ -143,6 +143,26 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
     public static LittleGameEngine GetLGE() {
         return lge;
+    }
+
+    public String GetRealPath(Object obj_class, String path) {
+        String p = null;
+        try {
+            p = new URI(obj_class.getClass().getResource(path).getPath()).getPath();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return p;
+    }
+
+    // graphics
+    BufferedImage CreateOpageImage(int width, int height) {
+        return gconfig.createCompatibleImage(width, height, Transparency.OPAQUE);
+    }
+
+    BufferedImage CreateTranslucentImage(int width, int height) {
+        return gconfig.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
     }
 
     // gobjects
@@ -555,7 +575,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
     public void LoadTTFFont(String name, String fname, int fstyle, int fsize) {
         try {
-            fname = new URI(fname).getPath();
             if (fname.charAt(2) == ':')
                 fname = fname.substring(3);
         } catch (Exception e) {
@@ -586,7 +605,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     // sonidos
     public void LoadSound(String name, String fname) {
         try {
-            fname = new URI(fname).getPath();
             if (fname.charAt(2) == ':')
                 fname = fname.substring(3);
         } catch (Exception e) {
@@ -720,7 +738,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             for (int i = 0; i < img_size; i++) {
                 BufferedImage img = images.get(i);
                 Image scaled_image = img.getScaledInstance(size.width, size.height, BufferedImage.SCALE_SMOOTH);
-                BufferedImage bi = gconfig.createCompatibleImage(size.width, size.height, Transparency.TRANSLUCENT);
+                BufferedImage bi = CreateTranslucentImage(size.width, size.height);
                 Graphics2D g2d = bi.createGraphics();
 
                 int w = scaled_image.getWidth(null);
@@ -742,7 +760,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                 int width = (int) Math.round(img.getWidth() * scale);
                 int height = (int) Math.round(img.getHeight() * scale);
                 Image scaled_image = img.getScaledInstance(width, height, BufferedImage.SCALE_SMOOTH);
-                BufferedImage bi = gconfig.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+                BufferedImage bi = CreateTranslucentImage(width, height);
                 Graphics2D g2d = bi.createGraphics();
 
                 int w = scaled_image.getWidth(null);
@@ -764,7 +782,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
     private ArrayList<BufferedImage> ReadImages(String pattern) {
         try {
-            pattern = new URI(pattern).getPath();
             if (pattern.charAt(2) == ':')
                 pattern = pattern.substring(3);
         } catch (Exception e) {
@@ -853,7 +870,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
     @Override
     public void keyReleased(KeyEvent e) {
-        {
+        synchronized (keys_pressed) {
             keys_pressed.put(e.getKeyCode(), false);
         }
     }

@@ -15,9 +15,6 @@ public class Birds implements IEvents {
     private LittleGameEngine lge;
 
     public Birds() {
-        // la ruta a los recursos del juego
-        String resource_dir = getClass().getResource("../resources").getPath();
-
         // creamos el juego
         Dimension win_size = new Dimension(800, 440);
 
@@ -27,6 +24,8 @@ public class Birds implements IEvents {
         lge.SetOnEvents(LittleGameEngine.E_ON_UPDATE);
 
         // cargamos los recursos que usaremos
+        String resource_dir = lge.GetRealPath(this, "../resources");
+
         lge.LoadImage("fondo", resource_dir + "/images/Backgrounds/FreeTileset/Fondo.png", win_size, false, false);
         lge.LoadImage("heroe", resource_dir + "/images/Swordsman/Idle/Idle_00*.png", 0.08, false, false);
         lge.LoadImage("mute", resource_dir + "/images/icons/sound-*.png", false, false);
