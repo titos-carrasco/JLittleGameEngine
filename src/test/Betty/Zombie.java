@@ -2,7 +2,9 @@ package test.Betty;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.util.ArrayList;
 
+import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
 import rcr.lge.Sprite;
 
@@ -53,13 +55,11 @@ public class Zombie extends Sprite {
         // nuestra posicion actual
         int x = GetX();
         int y = GetY();
-        int _x = x;
-        int _y = y;
 
         // posicion respecto a Betty
-        boolean abajo = y <= by;
+        boolean abajo = y < by;
         boolean arriba = y > by;
-        boolean izquierda = x <= bx;
+        boolean izquierda = x < bx;
         boolean derecha = x > bx;
 
         // estrategia de movimiento
@@ -69,11 +69,11 @@ public class Zombie extends Sprite {
             if (abajo && izquierda)
                 estrategia = "URDL";
             else if (abajo && derecha)
-                estrategia = "URDL";
+                estrategia = "UDRL";
             else if (arriba && izquierda)
                 estrategia = "DRUL";
             else if (arriba && derecha)
-                estrategia = "DRUL";
+                estrategia = "DURL";
             else if (arriba)
                 estrategia = "DRUL";
             else if (abajo)
@@ -81,24 +81,7 @@ public class Zombie extends Sprite {
             else if (izquierda)
                 estrategia = "RUDL";
             else if (derecha)
-                estrategia = "URDL";
-        } else if (dir == 'U') {
-            if (abajo && izquierda)
-                estrategia = "URLD";
-            else if (abajo && derecha)
-                estrategia = "ULRD";
-            else if (arriba && izquierda)
-                estrategia = "RLUD";
-            else if (arriba && derecha)
-                estrategia = "LURD";
-            else if (arriba)
-                estrategia = "LRUD";
-            else if (abajo)
-                estrategia = "ULRD";
-            else if (izquierda)
-                estrategia = "RULD";
-            else if (derecha)
-                estrategia = "LURD";
+                estrategia = "UDRL";
         } else if (dir == 'L') {
             if (abajo && izquierda)
                 estrategia = "UDLR";
@@ -116,6 +99,23 @@ public class Zombie extends Sprite {
                 estrategia = "LUDR";
             else if (derecha)
                 estrategia = "UDLR";
+        } else if (dir == 'U') {
+            if (abajo && izquierda)
+                estrategia = "URLD";
+            else if (abajo && derecha)
+                estrategia = "ULRD";
+            else if (arriba && izquierda)
+                estrategia = "RLUD";
+            else if (arriba && derecha)
+                estrategia = "LRUD";
+            else if (arriba)
+                estrategia = "LRUD";
+            else if (abajo)
+                estrategia = "ULRD";
+            else if (izquierda)
+                estrategia = "RULD";
+            else if (derecha)
+                estrategia = "LURD";
         } else if (dir == 'D') {
             if (abajo && izquierda)
                 estrategia = "RLDU";
@@ -137,33 +137,35 @@ public class Zombie extends Sprite {
 
         // probamos cada movimiento de la estrategia
         for (int i = 0; i < estrategia.length(); i++) {
+            int nx = x, ny = y;
             char c = estrategia.charAt(i);
-            System.out.printf( "%s - %c\n", estrategia, c);
+
             if (c == 'R')
-                x = x + pixels;
+                nx += pixels;
             else if (c == 'L')
-                x = x - pixels;
+                nx -= pixels;
             else if (c == 'U')
-                y = y + pixels;
+                ny += pixels;
             else if (c == 'D')
-                y = y - pixels;
+                ny -= pixels;
 
             // verificamos que no colisionemos con este movimiento
-            SetPosition( x, y );
-            if (lge.IntersectGObjects(this).size() == 0) {
+            SetPosition(nx, ny);
+            ArrayList<GameObject> gobjs = lge.IntersectGObjects(this);
+            if (gobjs.size() == 0) {
                 dir = c;
 
                 // tunel?
-                if (x < -16)
-                    x = win_size.width - 16;
-                else if (x > win_size.width - 16)
-                    x = -16;
-                SetPosition( x, y );
+                if (nx < -16)
+                    nx = win_size.width - 16;
+                else if (nx > win_size.width - 16)
+                    nx = -16;
+                SetPosition(nx, ny);
                 break;
             }
 
             // otro intento
-            SetPosition( _x, _y );
+            SetPosition(x, y);
         }
 
         // siguiente imagen de la secuencia

@@ -76,7 +76,7 @@ public class Game implements IEvents {
         lge.AddGObject(betty, 1);
 
         // agregamos 3 zombies
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 3; i++) {
             Zombie zombie = new Zombie("Zombie-" + i, win_size);
             zombie.SetPosition(32 + 32 * 4 + 32 * (i * 4), 32 * 1);
             lge.AddGObject(zombie, 1);
