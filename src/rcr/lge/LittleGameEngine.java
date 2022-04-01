@@ -145,6 +145,13 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         return lge;
     }
 
+    private void assertion(boolean condition, String msg) {
+        if (!condition) {
+            System.out.println(msg);
+            System.exit(1);
+        }
+    }
+
     public String GetRealPath(Object obj_class, String path) {
         String p = null;
         try {
@@ -167,8 +174,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
     // gobjects
     public void AddGObject(GameObject gobj, int layer) {
-        assert gobj.layer < 0 : "'gobj' ya fue agregado";
-        assert layer >= 0 && layer <= GUI_LAYER : "'layer' invalido";
+        assertion(gobj.layer < 0, "'gobj' ya fue agregado");
+        assertion(layer >= 0 && layer <= GUI_LAYER, "'layer' invalido");
         gobj.layer = layer;
         gObjects.put(gobj.name, gobj);
         gObjectsToAdd.add(gobj);
@@ -198,7 +205,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     public void DelGObject(GameObject gobj) {
-        assert gobj.layer >= 0 : "'gobj' no ha sido agregado";
+        assertion(gobj.layer >= 0, "'gobj' no ha sido agregado");
         gObjectsToDel.add(gobj);
     }
 
@@ -241,9 +248,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     public void SetCameraTarget(GameObject gobj, boolean center) {
-        assert gobj.layer < 0 : "'gobj' ya fue agregado";
-        assert gobj.layer >= 0 : "'gobj' no ha sido agregado";
-        assert gobj.layer != GUI_LAYER : "'gobj' invalido";
+        assertion(gobj.layer >= 0, "'gobj' no ha sido agregado");
+        assertion(gobj.layer != GUI_LAYER, "'gobj' invalido");
 
         camera.target = gobj;
         camera.target_center = center;
