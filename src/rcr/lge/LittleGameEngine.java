@@ -67,8 +67,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     private ArrayList<GameObject> gObjectsToDel;
     private Camera camera;
 
-    private double[] average_fps;
-    private int average_fps_idx;
+    private double[] fps_data;
+    private int fps_idx;
     private boolean running = false;
 
     private IEvents on_main_update = null;
@@ -86,10 +86,14 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     private Color bgColor;
     private Color collidersColor = null;
 
-    private LittleGameEngine(Dimension win_size, String title, Color bgColor) {
+    // ------ game engine ------
+    public LittleGameEngine(Dimension win_size, String title, Color bgColor) {
+        assertion(LittleGameEngine.lge == null, "LittleGameEngine ya se encuentra activa");
+        lge = this;
+
         gconfig = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-        average_fps = new double[30];
-        average_fps_idx = 0;
+        fps_data = new double[30];
+        fps_idx = 0;
 
         this.bgColor = bgColor;
 
@@ -135,12 +139,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         this.repaint();
     }
 
-    public static LittleGameEngine Init(Dimension win_size, String title, Color bgColor) {
-        if (lge == null)
-            lge = new LittleGameEngine(win_size, title, bgColor);
-        return lge;
-    }
-
     public static LittleGameEngine GetLGE() {
         return lge;
     }
@@ -163,158 +161,20 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         return p;
     }
 
-    // graphics
-    BufferedImage CreateOpageImage(int width, int height) {
-        return gconfig.createCompatibleImage(width, height, Transparency.OPAQUE);
-    }
-
-    BufferedImage CreateTranslucentImage(int width, int height) {
-        return gconfig.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
-    }
-
-    // gobjects
-    public void AddGObject(GameObject gobj, int layer) {
-        assertion(gobj.layer < 0, "'gobj' ya fue agregado");
-        assertion(layer >= 0 && layer <= GUI_LAYER, "'layer' invalido");
-        gobj.layer = layer;
-        gObjects.put(gobj.name, gobj);
-        gObjectsToAdd.add(gobj);
-    }
-
-    public void AddGObjectGUI(GameObject gobj) {
-        AddGObject(gobj, GUI_LAYER);
-    }
-
-    public GameObject GetGObject(String name) {
-        return gObjects.get(name);
-    }
-
-    public int GetCountGObjects() {
-        return gObjects.size();
-    }
-
-    public GameObject[] GetGObjects(String pattern) {
-        ArrayList<GameObject> gobjs = new ArrayList<GameObject>();
-
-        pattern = pattern.replaceAll("[*]", ".*");
-        for (GameObject gobj : gObjects.values())
-            if (gobj.name.matches(pattern))
-                gobjs.add(gobj);
-
-        return gobjs.toArray(new GameObject[gobjs.size()]);
-    }
-
-    public void DelGObject(GameObject gobj) {
-        assertion(gobj.layer >= 0, "'gobj' no ha sido agregado");
-        gObjectsToDel.add(gobj);
-    }
-
-    public void DelGObject(String pattern) {
-        pattern = pattern.replaceAll("[*]", ".*");
-        for (GameObject gobj : gObjects.values())
-            if (gobj.name.matches(pattern))
-                gObjectsToDel.add(gobj);
-    }
-
-    public ArrayList<GameObject> IntersectGObjects(GameObject gobj) {
-        ArrayList<GameObject> gobjs = new ArrayList<GameObject>();
-
-        if (gobj.use_colliders)
-            for (GameObject o : gLayers.get(gobj.layer))
-                if (gobj != o && o.use_colliders && gobj.rect.intersects(o.rect))
-                    gobjs.add(o);
-
-        return gobjs;
+    public double GetFPS() {
+        double dt = 0;
+        for (double val : fps_data)
+            dt += val;
+        dt = dt / fps_data.length;
+        return dt == 0 ? 0 : 1/dt;
     }
 
     public void ShowColliders(Color color) {
         collidersColor = color;
     }
 
-    // camera
-    public Point GetCameraPosition() {
-        return camera.GetPosition();
-    }
-
-    public Dimension GetCameraSize() {
-        return camera.GetSize();
-    }
-
-    public void SetCameraTarget(GameObject gobj) {
-        if (gobj == null)
-            camera.target = gobj;
-        else
-            SetCameraTarget(gobj, true);
-    }
-
-    public void SetCameraTarget(GameObject gobj, boolean center) {
-        assertion(gobj.layer >= 0, "'gobj' no ha sido agregado");
-        assertion(gobj.layer != GUI_LAYER, "'gobj' invalido");
-
-        camera.target = gobj;
-        camera.target_center = center;
-    }
-
-    public void SetCameraBounds(Rectangle bounds) {
-        camera.SetBounds(bounds);
-    }
-
-    public void SetCameraPosition(Point position) {
-        camera.SetPosition(position);
-    }
-
-    // key events
-    public boolean KeyPressed(int key) {
-        synchronized (keys_pressed) {
-            return keys_pressed.getOrDefault(key, false);
-        }
-    }
-
-    // events
     public void SetOnEvents(int on_events_enabled) {
         this.on_events_enabled = on_events_enabled;
-    }
-
-    // mouse events
-    public boolean[] GetMouseButtons() {
-        synchronized (mouse_events) {
-            return mouse_buttons;
-        }
-    }
-
-    public Point GetMousePosition() {
-        Point mouse_location = MouseInfo.getPointerInfo().getLocation();
-        Point win_location = win.getLocation();
-        Point canvas_location = this.getLocation();
-
-        int wh = lge.camera.rect.height;
-        int x = mouse_location.x - (win_location.x + canvas_location.x);
-        int y = wh - (mouse_location.y - (win_location.y + canvas_location.y));
-
-        return new Point(x, y);
-    }
-
-    public Point GetMouseClicked(int button) {
-        synchronized (mouse_events) {
-            for (MouseEvent e : mouse_events)
-                if (e.getID() == MouseEvent.MOUSE_CLICKED)
-                    if (e.getButton() == button + 1) {
-                        int wh = lge.camera.rect.height;
-                        Point p = new Point(e.getX(), e.getY());
-                        p.y = wh - p.y;
-                        return p;
-                    }
-        }
-        return null;
-    }
-
-    // game
-    public double GetFPS() {
-        double fps = 0;
-        for (double val : average_fps)
-            fps += val;
-        fps = fps / average_fps.length;
-        return fps;
     }
 
     public void SetOnMainUpdate(IEvents iface) {
@@ -325,7 +185,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         running = false;
     }
 
-    // main loop
     public void Run(int fps) {
         running = true;
         long tick_expected = (long) (1000.0 / fps);
@@ -347,8 +206,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             long now = System.currentTimeMillis();
             double dt = (now - tick_prev) / 1000.0;
             tick_prev = now;
-            average_fps[average_fps_idx++] = dt;
-            average_fps_idx %= average_fps.length;
+            fps_data[fps_idx++] = dt;
+            fps_idx %= fps_data.length;
 
             // --- Del gobj and gobj.OnDelete
             ArrayList<GameObject> ondelete = new ArrayList<GameObject>();
@@ -465,7 +324,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
             // --- Rendering
             synchronized (screen) {
-                int vh = (int) camera.rect.getHeight();
                 Graphics2D g2d = screen.createGraphics();
                 g2d.setColor(bgColor);
                 g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
@@ -499,7 +357,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                                 int y = gobj.rect.y;
                                 // int w = gobj.width;
                                 int h = gobj.rect.height;
-                                g2d.drawImage(surface, x, vh - y - h, null);
+                                g2d.drawImage(surface, x, camera.rect.height - y - h, null);
                             }
                         }
                     }
@@ -531,13 +389,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         win.dispose();
     }
 
-    @Override
-    public void paintComponent(Graphics g) {
-        synchronized (screen) {
-            g.drawImage(screen, 0, 0, null);
-        }
-    }
-
     // sistema cartesiano y zona visible dada por la camara
     private Point Fix_XY(GameObject gobj) {
         int xo = gobj.rect.x;
@@ -559,9 +410,218 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         return new Point(x, y);
     }
 
-    // --- Recursos
+    // ------ window ------
+    @Override
+    public void paintComponent(Graphics g) {
+        synchronized (screen) {
+            g.drawImage(screen, 0, 0, null);
+        }
+    }
 
-    // fonts
+    @Override
+    public void windowClosing(WindowEvent e) {
+        running = false;
+    }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+    }
+
+    // ------ gobjects ------
+    public void AddGObject(GameObject gobj, int layer) {
+        assertion(gobj.layer < 0, "'gobj' ya fue agregado");
+        assertion(layer >= 0 && layer <= GUI_LAYER, "'layer' invalido");
+        gobj.layer = layer;
+        gObjects.put(gobj.name, gobj);
+        gObjectsToAdd.add(gobj);
+    }
+
+    public void AddGObjectGUI(GameObject gobj) {
+        AddGObject(gobj, GUI_LAYER);
+    }
+
+    public GameObject GetGObject(String name) {
+        return gObjects.get(name);
+    }
+
+    public int GetCountGObjects() {
+        return gObjects.size();
+    }
+
+    public GameObject[] GetGObjects(String pattern) {
+        ArrayList<GameObject> gobjs = new ArrayList<GameObject>();
+
+        pattern = pattern.replaceAll("[*]", ".*");
+        for (GameObject gobj : gObjects.values())
+            if (gobj.name.matches(pattern))
+                gobjs.add(gobj);
+
+        return gobjs.toArray(new GameObject[gobjs.size()]);
+    }
+
+    public void DelGObject(GameObject gobj) {
+        assertion(gobj.layer >= 0, "'gobj' no ha sido agregado");
+        gObjectsToDel.add(gobj);
+    }
+
+    public void DelGObjectByPattern(String pattern) {
+        pattern = pattern.replaceAll("[*]", ".*");
+        for (GameObject gobj : gObjects.values())
+            if (gobj.name.matches(pattern))
+                gObjectsToDel.add(gobj);
+    }
+
+    public ArrayList<GameObject> IntersectGObjects(GameObject gobj) {
+        ArrayList<GameObject> gobjs = new ArrayList<GameObject>();
+
+        if (gobj.use_colliders)
+            for (GameObject o : gLayers.get(gobj.layer))
+                if (gobj != o && o.use_colliders && gobj.rect.intersects(o.rect))
+                    gobjs.add(o);
+
+        return gobjs;
+    }
+
+    // ------ camera ------
+    public Point GetCameraPosition() {
+        return camera.GetPosition();
+    }
+
+    public Dimension GetCameraSize() {
+        return camera.GetSize();
+    }
+
+    public void SetCameraTarget(GameObject gobj) {
+        if (gobj == null)
+            camera.target = gobj;
+        else
+            SetCameraTarget(gobj, true);
+    }
+
+    public void SetCameraTarget(GameObject gobj, boolean center) {
+        assertion(gobj.layer >= 0, "'gobj' no ha sido agregado");
+        assertion(gobj.layer != GUI_LAYER, "'gobj' invalido");
+
+        camera.target = gobj;
+        camera.target_center = center;
+    }
+
+    public void SetCameraBounds(Rectangle bounds) {
+        camera.SetBounds(bounds);
+    }
+
+    public void SetCameraPosition(Point position) {
+        camera.SetPosition(position);
+    }
+
+    // ------ keys ------
+    public boolean KeyPressed(int key) {
+        synchronized (keys_pressed) {
+            return keys_pressed.getOrDefault(key, false);
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        synchronized (keys_pressed) {
+            keys_pressed.put(e.getKeyCode(), true);
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        synchronized (keys_pressed) {
+            keys_pressed.put(e.getKeyCode(), false);
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    // ------ mouse ------
+    public boolean[] GetMouseButtons() {
+        synchronized (mouse_events) {
+            return mouse_buttons;
+        }
+    }
+
+    public Point GetMousePosition() {
+        Point mouse_location = MouseInfo.getPointerInfo().getLocation();
+        Point win_location = win.getLocation();
+        Point canvas_location = this.getLocation();
+
+        int wh = lge.camera.rect.height;
+        int x = mouse_location.x - (win_location.x + canvas_location.x);
+        int y = wh - (mouse_location.y - (win_location.y + canvas_location.y));
+
+        return new Point(x, y);
+    }
+
+    public Point GetMouseClicked(int button) {
+        synchronized (mouse_events) {
+            for (MouseEvent e : mouse_events)
+                if (e.getID() == MouseEvent.MOUSE_CLICKED)
+                    if (e.getButton() == button + 1) {
+                        int wh = lge.camera.rect.height;
+                        Point p = new Point(e.getX(), e.getY());
+                        p.y = wh - p.y;
+                        return p;
+                    }
+        }
+        return null;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        synchronized (mouse_events) {
+            mouse_events.add(e);
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        synchronized (mouse_events) {
+            mouse_buttons[e.getButton() - 1] = true;
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        synchronized (mouse_events) {
+            mouse_buttons[e.getButton() - 1] = false;
+        }
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
+    // ------ fonts ------
     public String[] GetSysFonts() {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         Font[] fonts = ge.getAllFonts();
@@ -608,7 +668,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         return fonts.get(fname);
     }
 
-    // sonidos
+    // ------ sounds ------
     public void LoadSound(String name, String fname) {
         try {
             if (fname.charAt(2) == ':')
@@ -719,7 +779,15 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         return clip_data.level;
     }
 
-    // imagenes
+    // ------ images ------
+    BufferedImage CreateOpageImage(int width, int height) {
+        return gconfig.createCompatibleImage(width, height, Transparency.OPAQUE);
+    }
+
+    BufferedImage CreateTranslucentImage(int width, int height) {
+        return gconfig.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+    }
+
     public ArrayList<BufferedImage> GetImages(String iname) {
         return images.get(iname);
     }
@@ -835,84 +903,4 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         }
         return img;
     }
-
-    // ---
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        synchronized (mouse_events) {
-            mouse_events.add(e);
-        }
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        synchronized (mouse_events) {
-            mouse_buttons[e.getButton() - 1] = true;
-        }
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        synchronized (mouse_events) {
-            mouse_buttons[e.getButton() - 1] = false;
-        }
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
-
-    // ---
-    @Override
-    public void keyPressed(KeyEvent e) {
-        synchronized (keys_pressed) {
-            keys_pressed.put(e.getKeyCode(), true);
-        }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        synchronized (keys_pressed) {
-            keys_pressed.put(e.getKeyCode(), false);
-        }
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-    }
-
-    // ---
-    @Override
-    public void windowClosing(WindowEvent e) {
-        running = false;
-    }
-
-    @Override
-    public void windowOpened(WindowEvent e) {
-    }
-
-    @Override
-    public void windowClosed(WindowEvent e) {
-    }
-
-    @Override
-    public void windowIconified(WindowEvent e) {
-    }
-
-    @Override
-    public void windowDeiconified(WindowEvent e) {
-    }
-
-    @Override
-    public void windowActivated(WindowEvent e) {
-    }
-
-    @Override
-    public void windowDeactivated(WindowEvent e) {
-    }
-
 }

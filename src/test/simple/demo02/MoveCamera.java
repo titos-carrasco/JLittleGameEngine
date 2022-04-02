@@ -19,7 +19,7 @@ public class MoveCamera implements IEvents {
         // creamos el juego
         Dimension win_size = new Dimension(640, 480);
 
-        lge = LittleGameEngine.Init(win_size, "Move Camera", new Color(0xFFFF00));
+        lge = new LittleGameEngine(win_size, "Move Camera", new Color(0xFFFF00));
         lge.ShowColliders(new Color(0xFF0000));
         lge.SetOnMainUpdate(this);
 
@@ -27,7 +27,7 @@ public class MoveCamera implements IEvents {
         String resource_dir = lge.GetRealPath(this, "../../resources");
 
         lge.LoadImage("fondo", resource_dir + "/images/Backgrounds/FreeTileset/Fondo.png", false, false);
-        lge.LoadImage("heroe", resource_dir + "/images/Swordsman/Idle/Idle_00*.png", 0.16, false, false);
+        lge.LoadImage("heroe", resource_dir + "/images/Swordsman/Idle/Idle_000.png", 0.16, false, false);
         lge.LoadImage("mute", resource_dir + "/images/icons/sound-*.png", false, false);
         lge.LoadTTFFont("monospace.plain.16", resource_dir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
         lge.LoadSound("fondo", resource_dir + "/sounds/happy-and-sad.wav");
@@ -75,7 +75,7 @@ public class MoveCamera implements IEvents {
         Point mouse_position = lge.GetMousePosition();
         boolean[] mouse_buttons = lge.GetMouseButtons();
 
-        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", 1.0 / lge.GetFPS(),
+        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.GetFPS(),
                 lge.GetCountGObjects(), mouse_position.x, mouse_position.y, mouse_buttons[0] ? 1 : 0,
                 mouse_buttons[1] ? 1 : 0, mouse_buttons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.GetGObject("infobar");

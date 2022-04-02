@@ -18,7 +18,7 @@ public class Birds implements IEvents {
         // creamos el juego
         Dimension win_size = new Dimension(800, 440);
 
-        lge = LittleGameEngine.Init(win_size, "Birds", new Color(0xFFFF00));
+        lge = new LittleGameEngine(win_size, "Birds", new Color(0xFFFF00));
         lge.ShowColliders(new Color(0xFF0000));
         lge.SetOnMainUpdate(this);
         lge.SetOnEvents(LittleGameEngine.E_ON_UPDATE);
@@ -27,7 +27,7 @@ public class Birds implements IEvents {
         String resource_dir = lge.GetRealPath(this, "../resources");
 
         lge.LoadImage("fondo", resource_dir + "/images/Backgrounds/FreeTileset/Fondo.png", win_size, false, false);
-        lge.LoadImage("heroe", resource_dir + "/images/Swordsman/Idle/Idle_00*.png", 0.08, false, false);
+        lge.LoadImage("heroe", resource_dir + "/images/Swordsman/Idle/Idle_0*.png", 0.08, false, false);
         lge.LoadImage("mute", resource_dir + "/images/icons/sound-*.png", false, false);
         lge.LoadImage("bird", resource_dir + "/images/BlueBird/frame-*.png", 0.04, false, false);
         lge.LoadTTFFont("backlash.plain.40", resource_dir + "/fonts/backlash.ttf", Font.PLAIN, 40);
@@ -74,7 +74,7 @@ public class Birds implements IEvents {
         Point mouse_position = lge.GetMousePosition();
         boolean[] mouse_buttons = lge.GetMouseButtons();
 
-        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", 1.0 / lge.GetFPS(),
+        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.GetFPS(),
                 lge.GetCountGObjects(), mouse_position.x, mouse_position.y, mouse_buttons[0] ? 1 : 0,
                 mouse_buttons[1] ? 1 : 0, mouse_buttons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.GetGObject("infobar");

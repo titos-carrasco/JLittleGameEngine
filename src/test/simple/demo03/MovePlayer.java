@@ -19,7 +19,7 @@ public class MovePlayer implements IEvents {
         // creamos el juego
         Dimension win_size = new Dimension(640, 480);
 
-        lge = LittleGameEngine.Init(win_size, "Move Player", new Color(0xFFFF00));
+        lge = new LittleGameEngine(win_size, "Move Player", new Color(0xFFFF00));
         lge.ShowColliders(new Color(0xFF0000));
         lge.SetOnMainUpdate(this);
         lge.SetOnEvents(LittleGameEngine.E_ON_UPDATE);
@@ -72,7 +72,7 @@ public class MovePlayer implements IEvents {
         Point mouse_position = lge.GetMousePosition();
         boolean[] mouse_buttons = lge.GetMouseButtons();
 
-        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", 1.0 / dt,
+        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.GetFPS(),
                 lge.GetCountGObjects(), mouse_position.x, mouse_position.y, mouse_buttons[0] ? 1 : 0,
                 mouse_buttons[1] ? 1 : 0, mouse_buttons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.GetGObject("infobar");
