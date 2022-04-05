@@ -9,18 +9,16 @@ import rcr.lge.Sprite;
 
 public class MiHeroe extends Sprite {
     private LittleGameEngine lge;
-    private int heading;
 
     public MiHeroe() {
         super(new String[] { "heroe_right", "heroe_left" }, new Point(550, 346), "Heroe");
 
         // acceso al motor de juegos
-        lge = LittleGameEngine.GetLGE();
+        lge = GetLGE();
 
         // sus atributos
         SetOnEvents(LittleGameEngine.E_ON_UPDATE);
-        SetShape("heroe_right", 0);
-        heading = 1;
+        SetShape("heroe_right");
         SetBounds(new Rectangle(0, 0, 1920, 1056));
     }
 
@@ -29,6 +27,8 @@ public class MiHeroe extends Sprite {
         // velocity = pixeles por segundo
         int velocity = 240;
         double pixels = velocity * dt;
+        if (pixels < 1)
+            pixels = 1;
 
         // la posiciona actual del heroe
         int x = GetX();
@@ -37,16 +37,10 @@ public class MiHeroe extends Sprite {
         // cambiamos sus coordenadas segun la tecla presionada
         if (lge.KeyPressed(KeyEvent.VK_RIGHT)) {
             x = (int) (x + pixels);
-            if (heading != 1) {
-                SetShape("heroe_right", 0);
-                heading = 1;
-            }
+            SetShape("heroe_right");
         } else if (lge.KeyPressed(KeyEvent.VK_LEFT)) {
             x = (int) (x - pixels);
-            if (heading != -1) {
-                SetShape("heroe_left", 0);
-                heading = -1;
-            }
+            SetShape("heroe_left");
         }
 
         if (lge.KeyPressed(KeyEvent.VK_UP))

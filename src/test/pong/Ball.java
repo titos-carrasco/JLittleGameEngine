@@ -3,7 +3,6 @@ package test.pong;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.ArrayList;
 
 import rcr.lge.Canvas;
 import rcr.lge.GameObject;
@@ -17,7 +16,8 @@ public class Ball extends Canvas {
 
     public Ball(Point position, Dimension size, String name) {
         super(position, size, name);
-        SetOnEvents(LittleGameEngine.E_ON_UPDATE | LittleGameEngine.E_ON_COLLISION);
+        SetOnEvents(LittleGameEngine.E_ON_UPDATE);
+        SetOnEvents(LittleGameEngine.E_ON_COLLISION);
         UseColliders(true);
         Fill(Color.WHITE);
 
@@ -34,7 +34,7 @@ public class Ball extends Canvas {
     }
 
     @Override
-    public void OnCollision(double dt, ArrayList<GameObject> gobjs) {
+    public void OnCollision(double dt, GameObject[] gobjs) {
         int x = GetX();
         int y = GetY();
         double dx = speed_x * dt;

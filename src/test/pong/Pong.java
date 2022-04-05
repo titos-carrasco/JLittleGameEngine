@@ -20,7 +20,6 @@ public class Pong implements IEvents {
 
         lge = new LittleGameEngine(win_size, "Ping", new Color(0x000000));
         lge.SetOnMainUpdate(this);
-        lge.SetOnEvents(LittleGameEngine.E_ON_UPDATE | LittleGameEngine.E_ON_COLLISION);
 
         // cargamos los recursos que usaremos
         String resource_dir = lge.GetRealPath(this, "../resources");

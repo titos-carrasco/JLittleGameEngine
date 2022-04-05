@@ -9,7 +9,6 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 public class Canvas extends GameObject {
-    private LittleGameEngine lge;
 
     public Canvas(Point origin, Dimension size) {
         this(origin, size, null);
@@ -17,7 +16,6 @@ public class Canvas extends GameObject {
 
     public Canvas(Point origin, Dimension size, String name) {
         super(origin, size, name);
-        lge = LittleGameEngine.GetLGE();
         surface = lge.CreateTranslucentImage(size.width, size.height);
     }
 

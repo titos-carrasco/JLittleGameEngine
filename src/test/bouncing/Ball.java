@@ -3,25 +3,30 @@ package test.bouncing;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.ArrayList;
 
 import rcr.lge.Canvas;
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
 
 public class Ball extends Canvas {
+    private LittleGameEngine lge;
 
     private double vx, vy;
     private double g, e;
 
-    public Ball() {
-        super(new Point((int) (50 + Math.random() * 700), (int) (200 + Math.random() * 350)), new Dimension(20, 20));
-        SetOnEvents(LittleGameEngine.E_ON_UPDATE | LittleGameEngine.E_ON_COLLISION);
-        UseColliders(true);
-        vx = -10 + Math.random() * 20;
-        vy = 0;
+    public Ball(int x, int y, double vx, double vy) {
+        super(new Point(x, y), new Dimension(20, 20));
+
+        // acceso al motor de juegos
+        lge = GetLGE();
+
+        this.vx = vx;
+        this.vy = vy;
         g = 240;
-        e = 0.5;
+        e = 0.8;
+        UseColliders(true);
+        SetOnEvents(LittleGameEngine.E_ON_UPDATE);
+        SetOnEvents(LittleGameEngine.E_ON_COLLISION);
 
         Color fill_color = new Color(0, 255, 0, 64);
         Fill(fill_color);
@@ -29,20 +34,25 @@ public class Ball extends Canvas {
 
     @Override
     public void OnUpdate(double dt) {
-        int x = (int) (GetX() + vx * dt);
-        int y = (int) (GetY() + vy * dt);
-        vy = vy - g * dt;
+        double x = GetX() + vx * dt;
+        double y = GetY() + vy * dt;
 
-        SetPosition(x, y);
+        if (x < 0) {
+            lge.DelGObject(this);
+            return;
+        }
+
+        vy = vy - g * dt;
+        SetPosition((int) x, (int) y);
     }
 
     @Override
-    public void OnCollision(double dt, ArrayList<GameObject> gobjs) {
+    public void OnCollision(double dt, GameObject[] gobjs) {
         for (GameObject gobj : gobjs) {
             if (gobj.GetTag().equals("ground")) {
-                int x = GetX();
-                int y = gobj.GetY() + gobj.GetHeight();
-                SetPosition(x, y);
+                double x = GetX();
+                double y = gobj.GetY() + gobj.GetHeight();
+                SetPosition((int) x, (int) y);
 
                 vy = -vy * e;
                 if (Math.abs(vy) < 30) {

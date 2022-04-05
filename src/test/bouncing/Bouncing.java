@@ -21,7 +21,6 @@ public class Bouncing implements IEvents {
         lge = new LittleGameEngine(win_size, "Bouncing Balls", new Color(0xFFFFFF));
         lge.ShowColliders(new Color(0xFF0000));
         lge.SetOnMainUpdate(this);
-        lge.SetOnEvents(LittleGameEngine.E_ON_UPDATE | LittleGameEngine.E_ON_COLLISION);
 
         // cargamos los recursos que usaremos
         String resource_dir = lge.GetRealPath(this, "../resources");
@@ -37,7 +36,11 @@ public class Bouncing implements IEvents {
 
         // los objetos a rebotar
         for (int i = 0; i < 50; i++) {
-            Ball gobj = new Ball();
+            int x = (int)(50 + Math.random()*700);
+            int y = (int)(200 + Math.random()*200);
+            double vx = -50 + Math.random()*100;
+            double vy = 0;
+            Ball gobj = new Ball(x,y,vx,vy);
             lge.AddGObject(gobj, 1);
         }
 

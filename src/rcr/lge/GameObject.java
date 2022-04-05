@@ -4,17 +4,18 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class GameObject {
+    LittleGameEngine lge;
+
     Rectangle rect;
-    Rectangle bounds = null;
+    String name;
     BufferedImage surface = null;
+    Rectangle bounds = null;
+    String tag = "";
     boolean use_colliders = false;
     int layer = -1;
-    String name;
-    String tag = "";
     int on_events_enabled = 0x00;
 
     public GameObject(Point origin, Dimension size) {
@@ -30,10 +31,16 @@ public class GameObject {
     }
 
     public GameObject(int x, int y, int width, int height, String name) {
+        lge = LittleGameEngine.GetLGE();
+
+        rect = new Rectangle(x, y, width, height);
         if (name == null)
             name = "__no_name__" + UUID.randomUUID().toString();
-        rect = new Rectangle(x, y, width, height);
         this.name = name;
+    }
+
+    public LittleGameEngine GetLGE() {
+        return lge;
     }
 
     public Point GetPosition() {
@@ -65,11 +72,11 @@ public class GameObject {
     }
 
     public String GetName() {
-        return new String(name);
+        return name;
     }
 
     public String GetTag() {
-        return new String(tag);
+        return tag;
     }
 
     public void SetBounds(Rectangle bounds) {
@@ -109,7 +116,7 @@ public class GameObject {
 
     // manejo de eventos
     public void SetOnEvents(int on_events_enabled) {
-        this.on_events_enabled = on_events_enabled;
+        this.on_events_enabled |= on_events_enabled;
     }
 
     public void OnDelete() {
@@ -127,7 +134,7 @@ public class GameObject {
     public void OnPostUpdate(double dt) {
     };
 
-    public void OnCollision(double dt, ArrayList<GameObject> gobjs) {
+    public void OnCollision(double dt, GameObject[] gobjs) {
     };
 
     public void OnPreRender(double dt) {

@@ -22,7 +22,6 @@ public class AnimatedPlayer implements IEvents {
         lge = new LittleGameEngine(win_size, "Animated Player", new Color(0xFFFF00));
         lge.ShowColliders(new Color(0xFF0000));
         lge.SetOnMainUpdate(this);
-        lge.SetOnEvents(LittleGameEngine.E_ON_UPDATE);
 
         // cargamos los recursos que usaremos
         String resource_dir = lge.GetRealPath(this, "../../resources");
@@ -53,7 +52,6 @@ public class AnimatedPlayer implements IEvents {
         lge.AddGObjectGUI(mute);
 
         MiHeroe heroe = new MiHeroe();
-        heroe.UseColliders(true);
         lge.AddGObject(heroe, 1);
 
         // # configuramos la camara
@@ -83,13 +81,15 @@ public class AnimatedPlayer implements IEvents {
         // mute on/mute off
         mouse_position = lge.GetMouseClicked(0);
         if (mouse_position != null) {
-            if (mouse_position.x >= 8 && mouse_position.x <= 20 && mouse_position.y >= 463 && mouse_position.y <= 475) {
-                Sprite mute = (Sprite) lge.GetGObject("mute");
-                mute.NextShape(0, 0);
-                if (mute.GetCurrentIdx() == 0)
+            Sprite mute = (Sprite) lge.GetGObject("mute");
+            Rectangle r = mute.GetRectangle();
+            if (r.contains(mouse_position)) {
+                int idx = mute.GetCurrentIdx();
+                if (idx == 1)
                     lge.SetSoundVolume("fondo", 0);
                 else
                     lge.SetSoundVolume("fondo", 50);
+                mute.NextShape();
             }
         }
     }

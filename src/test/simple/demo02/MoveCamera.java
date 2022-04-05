@@ -20,7 +20,6 @@ public class MoveCamera implements IEvents {
         Dimension win_size = new Dimension(640, 480);
 
         lge = new LittleGameEngine(win_size, "Move Camera", new Color(0xFFFF00));
-        lge.ShowColliders(new Color(0xFF0000));
         lge.SetOnMainUpdate(this);
 
         // cargamos los recursos que usaremos
@@ -48,9 +47,8 @@ public class MoveCamera implements IEvents {
         mute.SetShape("mute", 1);
         lge.AddGObjectGUI(mute);
 
-        // agregamos un Sprite
+        // agregamos al heroe
         Sprite heroe = new Sprite("heroe", new Point(550, 346), "Heroe");
-        heroe.UseColliders(true);
         lge.AddGObject(heroe, 1);
 
         // # configuramos la camara
@@ -82,22 +80,26 @@ public class MoveCamera implements IEvents {
         infobar.Fill(new Color(0x10202020, true));
         infobar.DrawText(info, new Point(50, 5), "monospace.plain.16", Color.BLACK);
 
-        // mute on/mute off
+        // mute on/off
         mouse_position = lge.GetMouseClicked(0);
         if (mouse_position != null) {
-            if (mouse_position.x >= 8 && mouse_position.x <= 20 && mouse_position.y >= 463 && mouse_position.y <= 475) {
-                Sprite mute = (Sprite) lge.GetGObject("mute");
-                mute.NextShape(0, 0);
-                if (mute.GetCurrentIdx() == 0)
+            Sprite mute = (Sprite) lge.GetGObject("mute");
+            Rectangle r = mute.GetRectangle();
+            if (r.contains(mouse_position)) {
+                int idx = mute.GetCurrentIdx();
+                if (idx == 1)
                     lge.SetSoundVolume("fondo", 0);
                 else
                     lge.SetSoundVolume("fondo", 50);
+                mute.NextShape();
             }
         }
 
         // velocity = pixeles por segundo
         int velocity = 240;
         double pixels = velocity * dt;
+        if (pixels < 1)
+            pixels = 1;
 
         // la posiciona actual de la camara
         Point camera_position = lge.GetCameraPosition();

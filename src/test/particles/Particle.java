@@ -4,12 +4,12 @@ public class Particle {
 
     protected double x, y, vx, vy, m;
 
-    public Particle() {
-        x = 100 + Math.random() * 600;
-        y = 300 + Math.random() * 200;
-        vx = -60 + Math.random() * 120;
-        vy = -60 + Math.random() * 240;
-        m = 0.1 + Math.random();
+    public Particle( double x, double y, double vx, double vy, double m) {
+        this.x = 100 + Math.random() * 600;
+        this.y = 300 + Math.random() * 200;
+        this.vx = -60 + Math.random() * 120;
+        this.vy = -60 + Math.random() * 240;
+        this.m = 0.1 + Math.random();
     }
 
     public double ComputeYForce() {

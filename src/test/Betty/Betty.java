@@ -3,7 +3,6 @@ package test.Betty;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
@@ -21,13 +20,14 @@ public class Betty extends Sprite {
                 name);
 
         // acceso al motor de juegos
-        lge = LittleGameEngine.GetLGE();
+        lge = GetLGE();
 
-        SetOnEvents(LittleGameEngine.E_ON_UPDATE | LittleGameEngine.E_ON_COLLISION);
-        SetShape("betty_idle", 0);
+        SetOnEvents(LittleGameEngine.E_ON_UPDATE);
+        SetOnEvents(LittleGameEngine.E_ON_COLLISION);
+        SetShape("betty_idle");
         SetTag("Betty");
-        alive = false;
         UseColliders(true);
+        alive = true;
         this.win_size = win_size;
     }
 
@@ -37,7 +37,7 @@ public class Betty extends Sprite {
 
     public void SetAlive(boolean alive) {
         this.alive = alive;
-        SetShape("betty_idle", 0);
+        SetShape("betty_idle");
     }
 
     @Override
@@ -94,7 +94,16 @@ public class Betty extends Sprite {
     }
 
     @Override
-    public void OnCollision(double dt, ArrayList<GameObject> gobjs) {
+    public void OnCollision(double dt, GameObject[] gobjs) {
+        if (!alive)
+            return;
+
+        for (GameObject gobj : gobjs)
+            if (gobj.GetTag().equals("zombie")) {
+                alive = false;
+                System.out.println("Un zombie me mato");
+                return;
+            }
         SetPosition(last_point);
     }
 }

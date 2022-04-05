@@ -3,12 +3,11 @@ package rcr.lge;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map.Entry;
 
 public class Sprite extends GameObject {
-    LinkedHashMap<String, ArrayList<BufferedImage>> surfaces;
+    HashMap<String, BufferedImage[]> surfaces;
     String iname;
     int idx;
     double elapsed = 0;
@@ -27,15 +26,15 @@ public class Sprite extends GameObject {
 
     public Sprite(String[] inames, Point position, String name) {
         super(position, new Dimension(0, 0), name);
-        surfaces = new LinkedHashMap<String, ArrayList<BufferedImage>>();
+        surfaces = new HashMap<String, BufferedImage[]>();
 
         for (String iname : inames)
             surfaces.put(iname, LittleGameEngine.GetLGE().GetImages(iname));
 
-        Entry<String, ArrayList<BufferedImage>> elem = surfaces.entrySet().iterator().next();
+        Entry<String, BufferedImage[]> elem = surfaces.entrySet().iterator().next();
         this.iname = elem.getKey();
         this.idx = 0;
-        this.surface = elem.getValue().get(0);
+        this.surface = elem.getValue()[0];
         this.rect.setSize(this.surface.getWidth(), this.surface.getHeight());
     }
 
@@ -47,6 +46,14 @@ public class Sprite extends GameObject {
         return idx;
     }
 
+    public void NextShape() {
+        NextShape(0, 0);
+    }
+
+    public void NextShape(double dt) {
+        NextShape(dt, 0);
+    }
+
     public void NextShape(double dt, double delay) {
         elapsed = elapsed + dt;
         if (elapsed < delay)
@@ -54,22 +61,23 @@ public class Sprite extends GameObject {
 
         elapsed = 0;
         idx = idx + 1;
-        if (idx >= surfaces.get(iname).size())
+        if (idx >= surfaces.get(iname).length)
             idx = 0;
 
-        surface = surfaces.get(iname).get(idx);
+        surface = surfaces.get(iname)[idx];
         this.rect.setSize(this.surface.getWidth(), this.surface.getHeight());
     }
 
-    public void SetShape(String iname, int idx) {
-        // this.elapsed = 0;
-        this.iname = iname;
+    public void SetShape(String iname) {
+        SetShape(iname, 0);
+    }
 
-        if (idx >= surfaces.get(iname).size())
+    public void SetShape(String iname, int idx) {
+        this.iname = iname;
+        if (idx >= surfaces.get(iname).length)
             idx = 0;
         this.idx = idx;
-
-        surface = surfaces.get(iname).get(idx);
+        surface = surfaces.get(iname)[idx];
         this.rect.setSize(this.surface.getWidth(), this.surface.getHeight());
     }
 }

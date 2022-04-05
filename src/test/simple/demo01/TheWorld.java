@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 import rcr.lge.Canvas;
@@ -19,7 +20,6 @@ public class TheWorld implements IEvents {
         Dimension win_size = new Dimension(800, 440);
 
         lge = new LittleGameEngine(win_size, "The World", new Color(0xFFFF00));
-        lge.ShowColliders(new Color(0xFF0000));
         lge.SetOnMainUpdate(this);
 
         // cargamos los recursos que usaremos
@@ -36,7 +36,7 @@ public class TheWorld implements IEvents {
         lge.PlaySound("fondo", true, 50);
 
         // agregamos el fondo
-        Sprite fondo = new Sprite("fondo", new Point(0, 0), "fondo");
+        Sprite fondo = new Sprite("fondo", new Point(0, 0));
         lge.AddGObject(fondo, 0);
 
         // agregamos la barra de info
@@ -50,7 +50,6 @@ public class TheWorld implements IEvents {
 
         // agregamos al heroe
         Sprite heroe = new Sprite("heroe", new Point(226, 142), "Heroe");
-        heroe.UseColliders(true);
         lge.AddGObject(heroe, 1);
 
         // agregamos un texto con transparencia
@@ -79,13 +78,15 @@ public class TheWorld implements IEvents {
         // sonido on/off
         mouse_position = lge.GetMouseClicked(0);
         if (mouse_position != null) {
-            if (mouse_position.x >= 8 && mouse_position.x <= 20 && mouse_position.y >= 423 && mouse_position.y <= 435) {
-                Sprite mute = (Sprite) lge.GetGObject("mute");
-                mute.NextShape(0, 0);
-                if (mute.GetCurrentIdx() == 0)
+            Sprite mute = (Sprite) lge.GetGObject("mute");
+            Rectangle r = mute.GetRectangle();
+            if (r.contains(mouse_position)) {
+                int idx = mute.GetCurrentIdx();
+                if (idx == 1)
                     lge.SetSoundVolume("fondo", 0);
                 else
                     lge.SetSoundVolume("fondo", 50);
+                mute.NextShape();
             }
         }
 

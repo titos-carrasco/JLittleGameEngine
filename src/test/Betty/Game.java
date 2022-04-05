@@ -25,9 +25,8 @@ public class Game implements IEvents {
         Dimension win_size = new Dimension(608, 736);
 
         lge = new LittleGameEngine(win_size, "Betty", new Color(0xFFFF00));
-        lge.ShowColliders(new Color(0xFF0000));
+        //lge.ShowColliders(new Color(0xFF0000));
         lge.SetOnMainUpdate(this);
-        lge.SetOnEvents(LittleGameEngine.E_ON_UPDATE | LittleGameEngine.E_ON_COLLISION);
 
         // cargamos los recursos que usaremos
         String resource_dir = lge.GetRealPath(this, "../resources");
@@ -85,18 +84,11 @@ public class Game implements IEvents {
         for (int y = 0; y < mapa.length; y++)
             for (int x = 0; x < mapa[y].length; x++)
                 if (mapa[y][x] == 1) {
-                    GameObject muro = new GameObject(new Point(x * 32, y * 32),
-                            new Dimension(32, 32));
+                    GameObject muro = new GameObject(new Point(x * 32, y * 32), new Dimension(32, 32));
                     muro.UseColliders(true);
+                    muro.SetTag("muro");
                     lge.AddGObject(muro, 1);
                 }
-
-        // comenzamos
-        betty.SetAlive(true);
-        for (GameObject gobj : lge.GetGObjects("Zombie-*")) {
-            Zombie zombie = (Zombie) gobj;
-            zombie.SetActive(true);
-        }
     }
 
     @Override

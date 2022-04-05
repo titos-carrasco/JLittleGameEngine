@@ -16,7 +16,7 @@ public class MiHeroe extends Sprite {
                 new Point(550, 346), "Heroe");
 
         // acceso al motor de juegos
-        lge = LittleGameEngine.GetLGE();
+        lge = GetLGE();
 
         // sus atributos
         SetOnEvents(LittleGameEngine.E_ON_UPDATE);
@@ -30,6 +30,8 @@ public class MiHeroe extends Sprite {
         // velocity = pixeles por segundo
         int velocity = 240;
         double pixels = velocity * dt;
+        if (pixels < 1)
+            pixels = 1;
 
         // la posiciona actual del heroe
         int x = GetX();
@@ -39,23 +41,23 @@ public class MiHeroe extends Sprite {
         if (lge.KeyPressed(KeyEvent.VK_RIGHT)) {
             x = (int) (x + pixels);
             if (state != 2) {
-                SetShape("heroe_run_right", 0);
+                SetShape("heroe_run_right");
                 state = 2;
             }
         } else if (lge.KeyPressed(KeyEvent.VK_LEFT)) {
             x = (int) (x - pixels);
             if (state != -2) {
-                SetShape("heroe_run_left", 0);
+                SetShape("heroe_run_left");
                 state = -2;
             }
         } else if (state == 2) {
             if (state != 1) {
-                SetShape("heroe_idle_right", 0);
+                SetShape("heroe_idle_right");
                 state = 1;
             }
         } else if (state == -2) {
             if (state != -1) {
-                SetShape("heroe_idle_left", 0);
+                SetShape("heroe_idle_left");
                 state = -1;
             }
         }

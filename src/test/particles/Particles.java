@@ -21,7 +21,6 @@ public class Particles implements IEvents {
         Dimension win_size = new Dimension(800, 600);
 
         lge = new LittleGameEngine(win_size, "Particles", new Color(0xFFFFFF));
-        lge.ShowColliders(new Color(0xFF0000));
         lge.SetOnMainUpdate(this);
 
         // cargamos los recursos que usaremos
@@ -41,8 +40,14 @@ public class Particles implements IEvents {
         // las particulas
         num_particles = 500;
         particles = new Particle[num_particles];
-        for (int i = 0; i < num_particles; i++)
-            particles[i] = new Particle();
+        for (int i = 0; i < num_particles; i++) {
+            double x = (int) (100 + Math.random() * 600);
+            double y = (int) (300 + Math.random() * 200);
+            double vx = -60 + Math.random() * 120;
+            double vy = -120 + Math.random() * 240;
+            double m = 0.1 + Math.random();
+            particles[i] = new Particle(x, y, vx, vy, m);
+        }
     }
 
     @Override

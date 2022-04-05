@@ -2,7 +2,6 @@ package test.Betty;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.ArrayList;
 
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
@@ -19,14 +18,13 @@ public class Zombie extends Sprite {
         super("zombie", new Point(0, 0), name);
 
         // acceso al motor de juegos
-        lge = LittleGameEngine.GetLGE();
+        lge = GetLGE();
 
         SetOnEvents(LittleGameEngine.E_ON_UPDATE);
         SetShape("zombie", 0);
         SetTag("zombie");
         UseColliders(true);
-
-        active = false;
+        active = true;
         this.win_size = win_size;
 
         // direccion inicial - Right, Down, Left, Up
@@ -47,7 +45,7 @@ public class Zombie extends Sprite {
         // int pixels = (int)(velocity*dt);
         int pixels = 2;
 
-        // las coestrategiaadas de Betty
+        // las coordenadas de Betty
         Betty betty = (Betty) lge.GetGObject("Betty");
         int bx = betty.GetX();
         int by = betty.GetY();
@@ -137,8 +135,8 @@ public class Zombie extends Sprite {
 
         // probamos cada movimiento de la estrategia
         for (int i = 0; i < estrategia.length(); i++) {
-            int nx = x, ny = y;
             char c = estrategia.charAt(i);
+            int nx = x, ny = y;
 
             if (c == 'R')
                 nx += pixels;
@@ -149,10 +147,19 @@ public class Zombie extends Sprite {
             else if (c == 'D')
                 ny -= pixels;
 
-            // verificamos que no colisionemos con este movimiento
+            // verificamos que no colisionemos con un muro u otro zombie
             SetPosition(nx, ny);
-            ArrayList<GameObject> gobjs = lge.IntersectGObjects(this);
-            if (gobjs.size() == 0) {
+            GameObject[] gobjs = lge.IntersectGObjects(this);
+            boolean collision = false;
+            for (GameObject gobj : gobjs) {
+                String tag = gobj.GetTag();
+                if (tag.equals("zombie") || tag.equals("muro")) {
+                    collision = true;
+                    break;
+                }
+            }
+
+            if (!collision) {
                 dir = c;
 
                 // tunel?
@@ -171,5 +178,4 @@ public class Zombie extends Sprite {
         // siguiente imagen de la secuencia
         NextShape(dt, 0.1);
     }
-
 }
