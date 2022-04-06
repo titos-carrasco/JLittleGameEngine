@@ -14,16 +14,16 @@ public class MiHeroe extends Sprite {
         super(new String[] { "heroe_right", "heroe_left" }, new Point(550, 346), "Heroe");
 
         // acceso al motor de juegos
-        lge = GetLGE();
+        lge = LittleGameEngine.getInstance();
 
         // sus atributos
-        SetOnEvents(LittleGameEngine.E_ON_UPDATE);
-        SetShape("heroe_right");
-        SetBounds(new Rectangle(0, 0, 1920, 1056));
+        setOnEvents(LittleGameEngine.E_ON_UPDATE);
+        setShape("heroe_right");
+        setBounds(new Rectangle(0, 0, 1920, 1056));
     }
 
     @Override
-    public void OnUpdate(double dt) {
+    public void onUpdate(double dt) {
         // velocity = pixeles por segundo
         int velocity = 240;
         double pixels = velocity * dt;
@@ -31,24 +31,24 @@ public class MiHeroe extends Sprite {
             pixels = 1;
 
         // la posiciona actual del heroe
-        int x = GetX();
-        int y = GetY();
+        int x = getX();
+        int y = getY();
 
         // cambiamos sus coordenadas segun la tecla presionada
-        if (lge.KeyPressed(KeyEvent.VK_RIGHT)) {
+        if (lge.keyPressed(KeyEvent.VK_RIGHT)) {
             x = (int) (x + pixels);
-            SetShape("heroe_right");
-        } else if (lge.KeyPressed(KeyEvent.VK_LEFT)) {
+            setShape("heroe_right");
+        } else if (lge.keyPressed(KeyEvent.VK_LEFT)) {
             x = (int) (x - pixels);
-            SetShape("heroe_left");
+            setShape("heroe_left");
         }
 
-        if (lge.KeyPressed(KeyEvent.VK_UP))
+        if (lge.keyPressed(KeyEvent.VK_UP))
             y = (int) (y + pixels);
-        else if (lge.KeyPressed(KeyEvent.VK_DOWN))
+        else if (lge.keyPressed(KeyEvent.VK_DOWN))
             y = (int) (y - pixels);
 
         // lo posicionamos
-        SetPosition(x, y);
+        setPosition(x, y);
     }
 }

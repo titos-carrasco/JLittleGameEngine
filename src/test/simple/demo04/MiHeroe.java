@@ -16,17 +16,17 @@ public class MiHeroe extends Sprite {
                 new Point(550, 346), "Heroe");
 
         // acceso al motor de juegos
-        lge = GetLGE();
+        lge = LittleGameEngine.getInstance();
 
         // sus atributos
-        SetOnEvents(LittleGameEngine.E_ON_UPDATE);
-        SetShape("heroe_idle_right", 0);
+        setOnEvents(LittleGameEngine.E_ON_UPDATE);
+        setShape("heroe_idle_right", 0);
         state = 1;
-        SetBounds(new Rectangle(0, 0, 1920, 1056));
+        setBounds(new Rectangle(0, 0, 1920, 1056));
     }
 
     @Override
-    public void OnUpdate(double dt) {
+    public void onUpdate(double dt) {
         // velocity = pixeles por segundo
         int velocity = 240;
         double pixels = velocity * dt;
@@ -34,43 +34,43 @@ public class MiHeroe extends Sprite {
             pixels = 1;
 
         // la posiciona actual del heroe
-        int x = GetX();
-        int y = GetY();
+        int x = getX();
+        int y = getY();
 
         // cambiamos sus coordenadas, orientacion e imagen segun la tecla presionada
-        if (lge.KeyPressed(KeyEvent.VK_RIGHT)) {
+        if (lge.keyPressed(KeyEvent.VK_RIGHT)) {
             x = (int) (x + pixels);
             if (state != 2) {
-                SetShape("heroe_run_right");
+                setShape("heroe_run_right");
                 state = 2;
             }
-        } else if (lge.KeyPressed(KeyEvent.VK_LEFT)) {
+        } else if (lge.keyPressed(KeyEvent.VK_LEFT)) {
             x = (int) (x - pixels);
             if (state != -2) {
-                SetShape("heroe_run_left");
+                setShape("heroe_run_left");
                 state = -2;
             }
         } else if (state == 2) {
             if (state != 1) {
-                SetShape("heroe_idle_right");
+                setShape("heroe_idle_right");
                 state = 1;
             }
         } else if (state == -2) {
             if (state != -1) {
-                SetShape("heroe_idle_left");
+                setShape("heroe_idle_left");
                 state = -1;
             }
         }
 
-        if (lge.KeyPressed(KeyEvent.VK_UP))
+        if (lge.keyPressed(KeyEvent.VK_UP))
             y = (int) (y + pixels);
-        else if (lge.KeyPressed(KeyEvent.VK_DOWN))
+        else if (lge.keyPressed(KeyEvent.VK_DOWN))
             y = (int) (y - pixels);
 
         // siguiente imagen de la secuencia
-        NextShape(dt, 0.050);
+        nextShape(dt, 0.050);
 
         // lo posicionamos
-        SetPosition(x, y);
+        setPosition(x, y);
     }
 }

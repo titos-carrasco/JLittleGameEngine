@@ -12,123 +12,123 @@ import rcr.lge.LittleGameEngine;
 
 public class Pong implements IEvents {
     private LittleGameEngine lge;
-    private int paddle_speed = 240;
+    private int paddleSpeed = 240;
 
     public Pong() {
         // creamos el juego
-        Dimension win_size = new Dimension(640, 640);
+        Dimension winSize = new Dimension(640, 640);
 
-        lge = new LittleGameEngine(win_size, "Ping", new Color(0x000000));
-        lge.SetOnMainUpdate(this);
+        lge = new LittleGameEngine(winSize, "Ping", new Color(0x000000));
+        lge.setOnMainUpdate(this);
 
         // cargamos los recursos que usaremos
-        String resource_dir = lge.GetRealPath(this, "../resources");
+        String resourceDir = lge.getRealPath(this, "../resources");
 
-        lge.LoadTTFFont("monospace.plain.16", resource_dir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos la barra de info
         Canvas infobar = new Canvas(new Point(0, 620), new Dimension(640, 20), "infobar");
-        lge.AddGObjectGUI(infobar);
+        lge.addGObjectGUI(infobar);
 
         // el campo de juego
         Canvas field = new Canvas(new Point(24, 34), new Dimension(592, 526), "field");
-        field.Fill(new Color(0, 0, 100));
-        lge.AddGObject(field, 0);
+        field.fill(new Color(0, 0, 100));
+        lge.addGObject(field, 0);
 
         // los bordes
         Canvas wall = new Canvas(new Point(0, 560), new Dimension(640, 4));
-        wall.Fill(Color.WHITE);
-        wall.SetTag("wall-horizontal");
-        wall.UseColliders(true);
-        lge.AddGObject(wall, 1);
+        wall.fill(Color.WHITE);
+        wall.setTag("wall-horizontal");
+        wall.useColliders(true);
+        lge.addGObject(wall, 1);
 
         wall = new Canvas(new Point(0, 30), new Dimension(640, 4));
-        wall.Fill(Color.WHITE);
-        wall.SetTag("wall-horizontal");
-        wall.UseColliders(true);
-        lge.AddGObject(wall, 1);
+        wall.fill(Color.WHITE);
+        wall.setTag("wall-horizontal");
+        wall.useColliders(true);
+        lge.addGObject(wall, 1);
 
         wall = new Canvas(new Point(20, 34), new Dimension(4, 526));
-        wall.Fill(Color.WHITE);
-        wall.SetTag("wall-vertical");
-        wall.UseColliders(true);
-        lge.AddGObject(wall, 1);
+        wall.fill(Color.WHITE);
+        wall.setTag("wall-vertical");
+        wall.useColliders(true);
+        lge.addGObject(wall, 1);
 
         wall = new Canvas(new Point(616, 34), new Dimension(4, 526));
-        wall.Fill(Color.WHITE);
-        wall.SetTag("wall-vertical");
-        wall.UseColliders(true);
-        lge.AddGObject(wall, 1);
+        wall.fill(Color.WHITE);
+        wall.setTag("wall-vertical");
+        wall.useColliders(true);
+        lge.addGObject(wall, 1);
 
         // los actores
         Ball ball = new Ball(new Point(320, 400), new Dimension(8, 8), "ball");
-        lge.AddGObject(ball, 1);
+        lge.addGObject(ball, 1);
 
         Canvas paddle = new Canvas(new Point(90, 270), new Dimension(8, 60), "user-paddle");
-        paddle.Fill(Color.WHITE);
-        paddle.SetTag("paddle");
-        paddle.UseColliders(true);
-        paddle.SetBounds(field.GetRectangle());
-        lge.AddGObject(paddle, 1);
+        paddle.fill(Color.WHITE);
+        paddle.setTag("paddle");
+        paddle.useColliders(true);
+        paddle.setBounds(field.getRectangle());
+        lge.addGObject(paddle, 1);
 
         paddle = new Canvas(new Point(540, 270), new Dimension(8, 60), "system-paddle");
-        paddle.Fill(Color.WHITE);
-        paddle.SetTag("paddle");
-        paddle.UseColliders(true);
-        paddle.SetBounds(field.GetRectangle());
-        lge.AddGObject(paddle, 1);
+        paddle.fill(Color.WHITE);
+        paddle.setTag("paddle");
+        paddle.useColliders(true);
+        paddle.setBounds(field.getRectangle());
+        lge.addGObject(paddle, 1);
     }
 
     @Override
-    public void OnMainUpdate(double dt) {
+    public void onMainUpdate(double dt) {
         // abortamos con la tecla Escape
-        if (lge.KeyPressed(KeyEvent.VK_ESCAPE))
-            lge.Quit();
+        if (lge.keyPressed(KeyEvent.VK_ESCAPE))
+            lge.quit();
 
         // mostramos la info
-        Point mouse_position = lge.GetMousePosition();
-        boolean[] mouse_buttons = lge.GetMouseButtons();
+        Point mousePosition = lge.getMousePosition();
+        boolean[] mouseButtons = lge.getMouseButtons();
 
-        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.GetFPS(),
-                lge.GetCountGObjects(), mouse_position.x, mouse_position.y, mouse_buttons[0] ? 1 : 0,
-                mouse_buttons[1] ? 1 : 0, mouse_buttons[2] ? 1 : 0);
-        Canvas infobar = (Canvas) lge.GetGObject("infobar");
-        infobar.Fill(new Color(0x80808080, true));
-        infobar.DrawText(info, new Point(50, 5), "monospace.plain.16", Color.WHITE);
+        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.getFPS(),
+                lge.getCountGObjects(), mousePosition.x, mousePosition.y, mouseButtons[0] ? 1 : 0,
+                mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
+        Canvas infobar = (Canvas) lge.getGObject("infobar");
+        infobar.fill(new Color(0x80808080, true));
+        infobar.drawText(info, new Point(50, 5), "monospace.plain.16", Color.WHITE);
 
         // user paddle
-        Canvas user_paddle = (Canvas) lge.GetGObject("user-paddle");
-        double speed = paddle_speed * dt;
-        int x = user_paddle.GetX();
-        int y = user_paddle.GetY();
+        Canvas userPaddle = (Canvas) lge.getGObject("user-paddle");
+        double speed = paddleSpeed * dt;
+        int x = userPaddle.getX();
+        int y = userPaddle.getY();
 
-        if (lge.KeyPressed(KeyEvent.VK_UP))
-            user_paddle.SetPosition(x, (int) (y + speed));
-        else if (lge.KeyPressed(KeyEvent.VK_DOWN))
-            user_paddle.SetPosition(x, (int) (y - speed));
+        if (lge.keyPressed(KeyEvent.VK_UP))
+            userPaddle.setPosition(x, (int) (y + speed));
+        else if (lge.keyPressed(KeyEvent.VK_DOWN))
+            userPaddle.setPosition(x, (int) (y - speed));
 
         // la pelota
-        Ball ball = (Ball) lge.GetGObject("ball");
-        //int bx = ball.GetX();
-        int by = ball.GetY();
+        Ball ball = (Ball) lge.getGObject("ball");
+        // int bx = ball.getX();
+        int by = ball.getY();
 
         // system paddle
-        Canvas system_paddle = (Canvas) lge.GetGObject("system-paddle");
-        int px = system_paddle.GetX();
-        int py = system_paddle.GetY();
-        //int pw = system_paddle.GetWidth();
-        int ph = system_paddle.GetHeight();
+        Canvas systemPaddle = (Canvas) lge.getGObject("system-paddle");
+        int px = systemPaddle.getX();
+        int py = systemPaddle.getY();
+        // int pw = systemPaddle.getWidth();
+        int ph = systemPaddle.getHeight();
 
         if (py + ph / 2 < by)
-            py = (int)(py + speed);
+            py = (int) (py + speed);
         else if (py + ph / 2 > by)
-            py = (int)(py - speed);
-        system_paddle.SetPosition(px, py);
+            py = (int) (py - speed);
+        systemPaddle.setPosition(px, py);
     }
 
     // main loop
     public void Run(int fps) {
-        lge.Run(fps);
+        lge.run(fps);
     }
 
     // show time

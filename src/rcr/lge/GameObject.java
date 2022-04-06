@@ -7,16 +7,14 @@ import java.awt.image.BufferedImage;
 import java.util.UUID;
 
 public class GameObject {
-    LittleGameEngine lge;
-
     Rectangle rect;
     String name;
     BufferedImage surface = null;
     Rectangle bounds = null;
     String tag = "";
-    boolean use_colliders = false;
+    boolean useColliders = false;
     int layer = -1;
-    int on_events_enabled = 0x00;
+    int onEventsEnabled = 0x00;
 
     public GameObject(Point origin, Dimension size) {
         this(origin.x, origin.y, size.width, size.height, null);
@@ -31,63 +29,57 @@ public class GameObject {
     }
 
     public GameObject(int x, int y, int width, int height, String name) {
-        lge = LittleGameEngine.GetLGE();
-
         rect = new Rectangle(x, y, width, height);
         if (name == null)
             name = "__no_name__" + UUID.randomUUID().toString();
         this.name = name;
     }
 
-    public LittleGameEngine GetLGE() {
-        return lge;
-    }
-
-    public Point GetPosition() {
+    public Point getPosition() {
         return new Point(rect.getLocation());
     }
 
-    public int GetX() {
+    public int getX() {
         return rect.x;
     }
 
-    public int GetY() {
+    public int getY() {
         return rect.y;
     }
 
-    public Dimension GetSize() {
+    public Dimension getSize() {
         return new Dimension(rect.getSize());
     }
 
-    public int GetWidth() {
+    public int getWidth() {
         return rect.width;
     }
 
-    public int GetHeight() {
+    public int getHeight() {
         return rect.height;
     }
 
-    public Rectangle GetRectangle() {
+    public Rectangle getRectangle() {
         return new Rectangle(rect);
     }
 
-    public String GetName() {
+    public String getName() {
         return name;
     }
 
-    public String GetTag() {
+    public String getTag() {
         return tag;
     }
 
-    public void SetBounds(Rectangle bounds) {
+    public void setBounds(Rectangle bounds) {
         this.bounds = new Rectangle(bounds);
     }
 
-    public void SetPosition(Point position) {
-        SetPosition(position.x, position.y);
+    public void setPosition(Point position) {
+        setPosition(position.x, position.y);
     }
 
-    public void SetPosition(int x, int y) {
+    public void setPosition(int x, int y) {
         rect.x = x;
         rect.y = y;
 
@@ -106,41 +98,41 @@ public class GameObject {
         }
     }
 
-    public void SetTag(String tag) {
+    public void setTag(String tag) {
         this.tag = new String(tag);
     }
 
-    public void UseColliders(boolean use_colliders) {
-        this.use_colliders = use_colliders;
+    public void useColliders(boolean useColliders) {
+        this.useColliders = useColliders;
     }
 
     // manejo de eventos
-    public void SetOnEvents(int on_events_enabled) {
-        this.on_events_enabled |= on_events_enabled;
+    public void setOnEvents(int onEventsEnabled) {
+        this.onEventsEnabled |= onEventsEnabled;
     }
 
-    public void OnDelete() {
+    public void onDelete() {
     };
 
-    public void OnStart() {
+    public void onStart() {
     };
 
-    public void OnPreUpdate(double dt) {
+    public void onPreUpdate(double dt) {
     };
 
-    public void OnUpdate(double dt) {
+    public void onUpdate(double dt) {
     };
 
-    public void OnPostUpdate(double dt) {
+    public void onPostUpdate(double dt) {
     };
 
-    public void OnCollision(double dt, GameObject[] gobjs) {
+    public void onCollision(double dt, GameObject[] gobjs) {
     };
 
-    public void OnPreRender(double dt) {
+    public void onPreRender(double dt) {
     };
 
-    public void OnQuit() {
+    public void onQuit() {
     };
 
 }

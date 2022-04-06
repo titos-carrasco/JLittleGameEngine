@@ -67,14 +67,14 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     private ArrayList<GameObject> gObjectsToDel;
     private Camera camera;
 
-    private double[] fps_data;
-    private int fps_idx;
+    private double[] fpsData;
+    private int fpsIdx;
     private boolean running = false;
 
-    private IEvents on_main_update = null;
-    private HashMap<Integer, Boolean> keys_pressed;
-    private ArrayList<MouseEvent> mouse_events;
-    private boolean[] mouse_buttons;
+    private IEvents onMainUpdate = null;
+    private HashMap<Integer, Boolean> keysPressed;
+    private ArrayList<MouseEvent> mouseEvents;
+    private boolean[] mouseButtons;
 
     private HashMap<String, BufferedImage[]> images;
     private HashMap<String, Font> fonts;
@@ -86,13 +86,13 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     private Color collidersColor = null;
 
     // ------ game engine ------
-    public LittleGameEngine(Dimension win_size, String title, Color bgColor) {
+    public LittleGameEngine(Dimension winSize, String title, Color bgColor) {
         assertion(LittleGameEngine.lge == null, "LittleGameEngine ya se encuentra activa");
         lge = this;
 
         gconfig = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-        fps_data = new double[30];
-        fps_idx = 0;
+        fpsData = new double[30];
+        fpsIdx = 0;
 
         this.bgColor = bgColor;
 
@@ -105,18 +105,18 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         gObjectsToAdd = new ArrayList<GameObject>();
         gObjectsToDel = new ArrayList<GameObject>();
 
-        screen = CreateOpageImage(win_size.width, win_size.height);
-        camera = new Camera(new Point(0, 0), win_size);
+        screen = createOpageImage(winSize.width, winSize.height);
+        camera = new Camera(new Point(0, 0), winSize);
 
-        keys_pressed = new HashMap<Integer, Boolean>();
-        mouse_events = new ArrayList<MouseEvent>();
-        mouse_buttons = new boolean[] { false, false, false };
+        keysPressed = new HashMap<Integer, Boolean>();
+        mouseEvents = new ArrayList<MouseEvent>();
+        mouseButtons = new boolean[] { false, false, false };
 
         addKeyListener(this);
         addMouseListener(this);
         setFocusable(true);
-        setSize(win_size);
-        setPreferredSize(win_size);
+        setSize(winSize);
+        setPreferredSize(winSize);
 
         win = new JFrame();
         win.addWindowListener(this);
@@ -132,13 +132,13 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
         g2d.setColor(Color.BLACK);
         g2d.setFont(f);
-        g2d.drawString("Loading...", (win_size.width - 160) / 2, (win_size.height - 8) / 2);
+        g2d.drawString("Loading...", (winSize.width - 160) / 2, (winSize.height - 8) / 2);
         g2d.dispose();
 
         this.repaint();
     }
 
-    public static LittleGameEngine GetLGE() {
+    public static LittleGameEngine getInstance() {
         return lge;
     }
 
@@ -149,10 +149,10 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         }
     }
 
-    public String GetRealPath(Object obj_class, String path) {
+    public String getRealPath(Object objClass, String path) {
         String p = null;
         try {
-            p = new URI(obj_class.getClass().getResource(path).getPath()).getPath();
+            p = new URI(objClass.getClass().getResource(path).getPath()).getPath();
         } catch (URISyntaxException e) {
             e.printStackTrace();
             System.exit(1);
@@ -160,49 +160,49 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         return p;
     }
 
-    public double GetFPS() {
+    public double getFPS() {
         double dt = 0;
-        for (double val : fps_data)
+        for (double val : fpsData)
             dt += val;
-        dt = dt / fps_data.length;
+        dt = dt / fpsData.length;
         return dt == 0 ? 0 : 1 / dt;
     }
 
-    public void ShowColliders(Color color) {
+    public void showColliders(Color color) {
         collidersColor = color;
     }
 
-    public void SetOnMainUpdate(IEvents iface) {
-        this.on_main_update = iface;
+    public void setOnMainUpdate(IEvents iface) {
+        this.onMainUpdate = iface;
     }
 
-    public void Quit() {
+    public void quit() {
         running = false;
     }
 
-    public void Run(int fps) {
+    public void run(int fps) {
         running = true;
-        long tick_expected = (long) (1000.0 / fps);
-        long tick_prev = System.currentTimeMillis();
+        long tickExpected = (long) (1000.0 / fps);
+        long tickPrev = System.currentTimeMillis();
         while (running) {
             // events
-            synchronized (mouse_events) {
-                mouse_events.clear();
+            synchronized (mouseEvents) {
+                mouseEvents.clear();
             }
 
             // --- tiempo en ms desde el ciclo anterior
-            long tick_elapsed = System.currentTimeMillis() - tick_prev;
-            if (tick_elapsed < tick_expected)
+            long tickElapsed = System.currentTimeMillis() - tickPrev;
+            if (tickElapsed < tickExpected)
                 try {
-                    Thread.sleep(tick_expected - tick_elapsed);
+                    Thread.sleep(tickExpected - tickElapsed);
                 } catch (InterruptedException e) {
                 }
 
             long now = System.currentTimeMillis();
-            double dt = (now - tick_prev) / 1000.0;
-            tick_prev = now;
-            fps_data[fps_idx++] = dt;
-            fps_idx %= fps_data.length;
+            double dt = (now - tickPrev) / 1000.0;
+            tickPrev = now;
+            fpsData[fpsIdx++] = dt;
+            fpsIdx %= fpsData.length;
 
             // --- Del gobj and gobj.OnDelete
             ArrayList<GameObject> ondelete = new ArrayList<GameObject>();
@@ -211,12 +211,12 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                 gLayers.get(gobj.layer).remove(gobj);
                 if (camera.target == gobj)
                     camera.target = null;
-                if ((gobj.on_events_enabled & E_ON_DELETE) != 0x00)
+                if ((gobj.onEventsEnabled & E_ON_DELETE) != 0x00)
                     ondelete.add(gobj);
             }
             gObjectsToDel.clear();
             for (GameObject gobj : ondelete)
-                gobj.OnDelete();
+                gobj.onDelete();
             ondelete = null;
 
             // --- Add Gobj and gobj.OnStart
@@ -230,42 +230,42 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                 }
                 if (!gobjs.contains(gobj)) {
                     gobjs.add(gobj);
-                    if ((gobj.on_events_enabled & E_ON_START) != 0x00)
+                    if ((gobj.onEventsEnabled & E_ON_START) != 0x00)
                         onstart.add(gobj);
                 }
             }
             gObjectsToAdd.clear();
             for (GameObject gobj : onstart)
-                gobj.OnStart();
+                gobj.onStart();
             onstart = null;
 
             // --- gobj.OnPreUpdate
             for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
                 for (GameObject gobj : elem.getValue()) {
-                    if ((gobj.on_events_enabled & E_ON_PRE_UPDATE) != 0x00)
-                        gobj.OnPreUpdate(dt);
+                    if ((gobj.onEventsEnabled & E_ON_PRE_UPDATE) != 0x00)
+                        gobj.onPreUpdate(dt);
                 }
             }
 
             // --- gobj.OnUpdate
             for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
                 for (GameObject gobj : elem.getValue()) {
-                    if ((gobj.on_events_enabled & E_ON_UPDATE) != 0x00)
-                        gobj.OnUpdate(dt);
+                    if ((gobj.onEventsEnabled & E_ON_UPDATE) != 0x00)
+                        gobj.onUpdate(dt);
                 }
             }
 
             // --- gobj.OnPostUpdate
             for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
                 for (GameObject gobj : elem.getValue()) {
-                    if ((gobj.on_events_enabled & E_ON_POST_UPDATE) != 0x00)
-                        gobj.OnPostUpdate(dt);
+                    if ((gobj.onEventsEnabled & E_ON_POST_UPDATE) != 0x00)
+                        gobj.onPostUpdate(dt);
                 }
             }
 
             // --- game.OnMainUpdate
-            if (on_main_update != null)
-                on_main_update.OnMainUpdate(dt);
+            if (onMainUpdate != null)
+                onMainUpdate.onMainUpdate(dt);
 
             // --- gobj.OnCollision
             LinkedHashMap<GameObject, ArrayList<GameObject>> oncollisions = new LinkedHashMap<GameObject, ArrayList<GameObject>>();
@@ -273,17 +273,17 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                 int layer = elem.getKey();
                 if (layer != GUI_LAYER) {
                     for (GameObject gobj1 : elem.getValue()) {
-                        if ((gobj1.on_events_enabled & E_ON_COLLISION) == 0)
+                        if ((gobj1.onEventsEnabled & E_ON_COLLISION) == 0)
                             continue;
 
-                        if (!gobj1.use_colliders)
+                        if (!gobj1.useColliders)
                             continue;
 
                         ArrayList<GameObject> colliders = new ArrayList<GameObject>();
                         for (GameObject gobj2 : elem.getValue()) {
                             if (gobj1 == gobj2)
                                 continue;
-                            if (!gobj2.use_colliders)
+                            if (!gobj2.useColliders)
                                 continue;
                             if (!gobj1.rect.intersects(gobj2.rect))
                                 continue;
@@ -298,19 +298,19 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             for (Entry<GameObject, ArrayList<GameObject>> elem : oncollisions.entrySet()) {
                 GameObject gobj = elem.getKey();
                 ArrayList<GameObject> gobjs = elem.getValue();
-                gobj.OnCollision(dt, gobjs.toArray(new GameObject[gobjs.size()]));
+                gobj.onCollision(dt, gobjs.toArray(new GameObject[gobjs.size()]));
             }
 
             // --- gobj.OnPreRender
             for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
                 for (GameObject gobj : elem.getValue()) {
-                    if ((gobj.on_events_enabled & E_ON_PRE_RENDER) != 0x00)
-                        gobj.OnPreRender(dt);
+                    if ((gobj.onEventsEnabled & E_ON_PRE_RENDER) != 0x00)
+                        gobj.onPreRender(dt);
                 }
             }
 
             // --- Camera Tracking
-            camera.FollowTarget();
+            camera.followTarget();
 
             // --- Rendering
             synchronized (screen) {
@@ -325,12 +325,12 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                         for (GameObject gobj : elem.getValue()) {
                             if (!gobj.rect.intersects(camera.rect))
                                 continue;
-                            Point p = Fix_XY(gobj);
+                            Point p = fixXY(gobj);
                             BufferedImage surface = gobj.surface;
                             if (surface != null)
                                 g2d.drawImage(surface, p.x, p.y, null);
 
-                            if (collidersColor != null && gobj.use_colliders) {
+                            if (collidersColor != null && gobj.useColliders) {
                                 g2d.setColor(collidersColor);
                                 g2d.drawRect(p.x, p.y, gobj.rect.width - 1, gobj.rect.height - 1);
                             }
@@ -364,16 +364,16 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         // --- gobj.OnQuit
         for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
             for (GameObject gobj : elem.getValue()) {
-                if ((gobj.on_events_enabled & E_ON_PRE_UPDATE) != 0x00)
-                    gobj.OnQuit();
+                if ((gobj.onEventsEnabled & E_ON_PRE_UPDATE) != 0x00)
+                    gobj.onQuit();
             }
         }
 
         // apagamos los sonidos
         for (Entry<String, ClipData> elem : sounds.entrySet()) {
-            ClipData clip_data = elem.getValue();
-            if (clip_data.clip != null)
-                clip_data.clip.stop();
+            ClipData clipData = elem.getValue();
+            if (clipData.clip != null)
+                clipData.clip.stop();
         }
 
         // eso es todo
@@ -381,7 +381,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     // sistema cartesiano y zona visible dada por la camara
-    private Point Fix_XY(GameObject gobj) {
+    private Point fixXY(GameObject gobj) {
         int xo = gobj.rect.x;
         int yo = gobj.rect.y;
         // int wo = (int)gobj.rect.width;
@@ -402,7 +402,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     // ------ gobjects ------
-    public void AddGObject(GameObject gobj, int layer) {
+    public void addGObject(GameObject gobj, int layer) {
         assertion(gobj.layer < 0, "'gobj' ya fue agregado");
         assertion(layer >= 0 && layer <= GUI_LAYER, "'layer' invalido");
         gobj.layer = layer;
@@ -410,84 +410,84 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         gObjectsToAdd.add(gobj);
     }
 
-    public void AddGObjectGUI(GameObject gobj) {
-        AddGObject(gobj, GUI_LAYER);
+    public void addGObjectGUI(GameObject gobj) {
+        addGObject(gobj, GUI_LAYER);
     }
 
-    public GameObject GetGObject(String name) {
+    public GameObject getGObject(String name) {
         return gObjects.get(name);
     }
 
-    public int GetCountGObjects() {
+    public int getCountGObjects() {
         return gObjects.size();
     }
 
-    public void DelGObject(GameObject gobj) {
+    public void delGObject(GameObject gobj) {
         assertion(gobj.layer >= 0, "'gobj' no ha sido agregado");
         gObjectsToDel.add(gobj);
     }
 
-    public GameObject[] IntersectGObjects(GameObject gobj) {
+    public GameObject[] intersectGObjects(GameObject gobj) {
         ArrayList<GameObject> gobjs = new ArrayList<GameObject>();
 
-        if (gobj.use_colliders)
+        if (gobj.useColliders)
             for (GameObject o : gLayers.get(gobj.layer))
-                if (gobj != o && o.use_colliders && gobj.rect.intersects(o.rect))
+                if (gobj != o && o.useColliders && gobj.rect.intersects(o.rect))
                     gobjs.add(o);
 
         return gobjs.toArray(new GameObject[gobjs.size()]);
     }
 
     // ------ camera ------
-    public Point GetCameraPosition() {
-        return camera.GetPosition();
+    public Point getCameraPosition() {
+        return camera.getPosition();
     }
 
-    public Dimension GetCameraSize() {
-        return camera.GetSize();
+    public Dimension getCameraSize() {
+        return camera.getSize();
     }
 
-    public void SetCameraTarget(GameObject gobj) {
+    public void setCameraTarget(GameObject gobj) {
         if (gobj == null)
             camera.target = gobj;
         else
-            SetCameraTarget(gobj, true);
+            setCameraTarget(gobj, true);
     }
 
-    public void SetCameraTarget(GameObject gobj, boolean center) {
+    public void setCameraTarget(GameObject gobj, boolean center) {
         assertion(gobj.layer >= 0, "'gobj' no ha sido agregado");
         assertion(gobj.layer != GUI_LAYER, "'gobj' invalido");
 
         camera.target = gobj;
-        camera.target_center = center;
+        camera.targetInCenter = center;
     }
 
-    public void SetCameraBounds(Rectangle bounds) {
-        camera.SetBounds(bounds);
+    public void setCameraBounds(Rectangle bounds) {
+        camera.setBounds(bounds);
     }
 
-    public void SetCameraPosition(Point position) {
-        camera.SetPosition(position);
+    public void setCameraPosition(Point position) {
+        camera.setPosition(position);
     }
 
     // ------ keys ------
-    public boolean KeyPressed(int key) {
-        synchronized (keys_pressed) {
-            return keys_pressed.getOrDefault(key, false);
+    public boolean keyPressed(int key) {
+        synchronized (keysPressed) {
+            return keysPressed.getOrDefault(key, false);
         }
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        synchronized (keys_pressed) {
-            keys_pressed.put(e.getKeyCode(), true);
+        synchronized (keysPressed) {
+            keysPressed.put(e.getKeyCode(), true);
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        synchronized (keys_pressed) {
-            keys_pressed.put(e.getKeyCode(), false);
+        synchronized (keysPressed) {
+            keysPressed.put(e.getKeyCode(), false);
         }
     }
 
@@ -496,27 +496,28 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     // ------ mouse ------
-    public boolean[] GetMouseButtons() {
-        synchronized (mouse_events) {
-            return mouse_buttons;
+    public boolean[] getMouseButtons() {
+        synchronized (mouseEvents) {
+            return mouseButtons;
         }
     }
 
-    public Point GetMousePosition() {
-        Point mouse_location = MouseInfo.getPointerInfo().getLocation();
-        Point win_location = win.getLocation();
-        Point canvas_location = this.getLocation();
+    @Override
+    public Point getMousePosition() {
+        Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+        Point winLocation = win.getLocation();
+        Point canvasLocation = this.getLocation();
 
         int wh = lge.camera.rect.height;
-        int x = mouse_location.x - (win_location.x + canvas_location.x);
-        int y = wh - (mouse_location.y - (win_location.y + canvas_location.y));
+        int x = mouseLocation.x - (winLocation.x + canvasLocation.x);
+        int y = wh - (mouseLocation.y - (winLocation.y + canvasLocation.y));
 
         return new Point(x, y);
     }
 
-    public Point GetMouseClicked(int button) {
-        synchronized (mouse_events) {
-            for (MouseEvent e : mouse_events)
+    public Point getMouseClicked(int button) {
+        synchronized (mouseEvents) {
+            for (MouseEvent e : mouseEvents)
                 if (e.getID() == MouseEvent.MOUSE_CLICKED)
                     if (e.getButton() == button + 1) {
                         int wh = lge.camera.rect.height;
@@ -530,22 +531,22 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        synchronized (mouse_events) {
-            mouse_events.add(e);
+        synchronized (mouseEvents) {
+            mouseEvents.add(e);
         }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        synchronized (mouse_events) {
-            mouse_buttons[e.getButton() - 1] = true;
+        synchronized (mouseEvents) {
+            mouseButtons[e.getButton() - 1] = true;
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        synchronized (mouse_events) {
-            mouse_buttons[e.getButton() - 1] = false;
+        synchronized (mouseEvents) {
+            mouseButtons[e.getButton() - 1] = false;
         }
     }
 
@@ -558,24 +559,24 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     // ------ fonts ------
-    public String[] GetSysFonts() {
+    public String[] getSysFonts() {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         Font[] fonts = ge.getAllFonts();
 
-        String[] sys_fonts = new String[fonts.length];
+        String[] sysFonts = new String[fonts.length];
         for (int i = 0; i < fonts.length; i++)
-            sys_fonts[i] = fonts[i].getFontName();
-        return sys_fonts;
+            sysFonts[i] = fonts[i].getFontName();
+        return sysFonts;
     }
 
-    public void LoadSysFont(String name, String fname, int fstyle, int fsize) {
+    public void loadSysFont(String name, String fname, int fstyle, int fsize) {
         if (fonts.get(name) == null) {
             Font f = new Font(fname, fstyle, fsize);
             fonts.put(name, f);
         }
     }
 
-    public void LoadTTFFont(String name, String fname, int fstyle, int fsize) {
+    public void loadTTFFont(String name, String fname, int fstyle, int fsize) {
         try {
             if (fname.charAt(2) == ':')
                 fname = fname.substring(3);
@@ -600,12 +601,12 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         }
     }
 
-    public Font GetFont(String fname) {
+    public Font getFont(String fname) {
         return fonts.get(fname);
     }
 
     // ------ sounds ------
-    public void LoadSound(String name, String fname) {
+    public void loadSound(String name, String fname) {
         try {
             if (fname.charAt(2) == ':')
                 fname = fname.substring(3);
@@ -614,15 +615,15 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             System.exit(1);
         }
 
-        ClipData clip_data = sounds.get(name);
-        if (clip_data == null) {
+        ClipData clipData = sounds.get(name);
+        if (clipData == null) {
             try {
                 FileInputStream fis = new FileInputStream(fname);
-                clip_data = new ClipData();
-                clip_data.clip = null;
-                clip_data.data = fis.readAllBytes();
-                clip_data.level = 50;
-                sounds.put(name, clip_data);
+                clipData = new ClipData();
+                clipData.clip = null;
+                clipData.data = fis.readAllBytes();
+                clipData.level = 50;
+                sounds.put(name, clipData);
                 fis.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -631,156 +632,156 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         }
     }
 
-    public void PlaySound(String name, boolean loop, double level) {
-        ClipData clip_data = sounds.get(name);
+    public void playSound(String name, boolean loop, double level) {
+        ClipData clipData = sounds.get(name);
 
-        if (clip_data == null)
+        if (clipData == null)
             return;
 
-        if (clip_data.clip != null)
+        if (clipData.clip != null)
             return;
 
         try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(clip_data.data);
+            ByteArrayInputStream bis = new ByteArrayInputStream(clipData.data);
             AudioInputStream ais = AudioSystem.getAudioInputStream(bis);
 
-            clip_data.clip = AudioSystem.getClip();
+            clipData.clip = AudioSystem.getClip();
 
-            clip_data.level = level;
-            SetSoundVolume(clip_data);
+            clipData.level = level;
+            setSoundVolume(clipData);
 
-            clip_data.clip.addLineListener(new LineListener() {
-                private ClipData the_clip_data = clip_data;
+            clipData.clip.addLineListener(new LineListener() {
+                private ClipData TheClipData = clipData;
 
                 @Override
                 public void update(LineEvent event) {
                     if (event.getType() == LineEvent.Type.STOP) {
-                        the_clip_data.clip.close();
-                        the_clip_data.clip = null;
+                        TheClipData.clip.close();
+                        TheClipData.clip = null;
                     }
                 }
             });
-            clip_data.clip.open(ais);
+            clipData.clip.open(ais);
             if (loop)
-                clip_data.clip.loop(Clip.LOOP_CONTINUOUSLY);
+                clipData.clip.loop(Clip.LOOP_CONTINUOUSLY);
             else
-                clip_data.clip.start();
+                clipData.clip.start();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
     }
 
-    public void StopSound(String name) {
-        ClipData clip_data = sounds.get(name);
+    public void stopSound(String name) {
+        ClipData clipData = sounds.get(name);
 
-        if (clip_data == null)
+        if (clipData == null)
             return;
 
-        if (clip_data.clip == null)
+        if (clipData.clip == null)
             return;
 
-        clip_data.clip.stop();
+        clipData.clip.stop();
     }
 
-    public void SetSoundVolume(String name, double level) {
-        ClipData clip_data = sounds.get(name);
+    public void setSoundVolume(String name, double level) {
+        ClipData clipData = sounds.get(name);
 
-        if (clip_data == null)
+        if (clipData == null)
             return;
 
-        clip_data.level = level;
+        clipData.level = level;
 
-        if (clip_data.clip == null)
+        if (clipData.clip == null)
             return;
 
-        SetSoundVolume(clip_data);
+        setSoundVolume(clipData);
     }
 
-    private void SetSoundVolume(ClipData clip_data) {
+    private void setSoundVolume(ClipData clipData) {
         try {
-            FloatControl volume = (FloatControl) clip_data.clip.getControl(FloatControl.Type.VOLUME);
-            volume.setValue((float) (clip_data.level / 100.0));
+            FloatControl volume = (FloatControl) clipData.clip.getControl(FloatControl.Type.VOLUME);
+            volume.setValue((float) (clipData.level / 100.0));
         } catch (Exception e) {
             // System.out.println("SetSoundVolume(): " + e);
         }
     }
 
-    public double GetSoundVolume(String name) {
-        ClipData clip_data = sounds.get(name);
+    public double getSoundVolume(String name) {
+        ClipData clipData = sounds.get(name);
 
-        if (clip_data == null)
+        if (clipData == null)
             return 0;
 
-        return clip_data.level * 100;
+        return clipData.level * 100;
     }
 
     // ------ images ------
-    BufferedImage CreateOpageImage(int width, int height) {
+    BufferedImage createOpageImage(int width, int height) {
         return gconfig.createCompatibleImage(width, height, Transparency.OPAQUE);
     }
 
-    BufferedImage CreateTranslucentImage(int width, int height) {
+    BufferedImage createTranslucentImage(int width, int height) {
         return gconfig.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
     }
 
-    public BufferedImage[] GetImages(String iname) {
+    public BufferedImage[] getImages(String iname) {
         return images.get(iname);
     }
 
-    public void LoadImage(String iname, String pattern, boolean flipX, boolean flipY) {
-        LoadImage(iname, pattern, 1, new Dimension(0, 0), flipX, flipY);
+    public void loadImage(String iname, String pattern, boolean flipX, boolean flipY) {
+        loadImage(iname, pattern, 1, new Dimension(0, 0), flipX, flipY);
     }
 
-    public void LoadImage(String iname, String pattern, Dimension size, boolean flipX, boolean flipY) {
-        LoadImage(iname, pattern, 0, size, flipX, flipY);
+    public void loadImage(String iname, String pattern, Dimension size, boolean flipX, boolean flipY) {
+        loadImage(iname, pattern, 0, size, flipX, flipY);
     }
 
-    public void LoadImage(String iname, String pattern, double scale, boolean flipX, boolean flipY) {
-        LoadImage(iname, pattern, scale, new Dimension(0, 0), flipX, flipY);
+    public void loadImage(String iname, String pattern, double scale, boolean flipX, boolean flipY) {
+        loadImage(iname, pattern, scale, new Dimension(0, 0), flipX, flipY);
     }
 
-    private void LoadImage(String iname, String pattern, double scale, Dimension size, boolean flipX, boolean flipY) {
-        ArrayList<BufferedImage> images = ReadImages(pattern);
+    private void loadImage(String iname, String pattern, double scale, Dimension size, boolean flipX, boolean flipY) {
+        ArrayList<BufferedImage> images = readImages(pattern);
 
         if (size.width > 0 && size.height > 0) {
-            int img_size = images.size();
-            for (int i = 0; i < img_size; i++) {
+            int imgSize = images.size();
+            for (int i = 0; i < imgSize; i++) {
                 BufferedImage img = images.get(i);
-                Image scaled_image = img.getScaledInstance(size.width, size.height, BufferedImage.SCALE_SMOOTH);
-                BufferedImage bi = CreateTranslucentImage(size.width, size.height);
+                Image scaledImage = img.getScaledInstance(size.width, size.height, BufferedImage.SCALE_SMOOTH);
+                BufferedImage bi = createTranslucentImage(size.width, size.height);
                 Graphics2D g2d = bi.createGraphics();
 
-                int w = scaled_image.getWidth(null);
-                int h = scaled_image.getHeight(null);
+                int w = scaledImage.getWidth(null);
+                int h = scaledImage.getHeight(null);
                 if (flipX)
-                    g2d.drawImage(scaled_image, w, 0, -w, h, null);
+                    g2d.drawImage(scaledImage, w, 0, -w, h, null);
                 if (flipY)
-                    g2d.drawImage(scaled_image, 0, h, w, -h, null);
+                    g2d.drawImage(scaledImage, 0, h, w, -h, null);
                 if (!flipX && !flipY)
-                    g2d.drawImage(scaled_image, 0, 0, null);
+                    g2d.drawImage(scaledImage, 0, 0, null);
 
                 g2d.dispose();
                 images.set(i, bi);
             }
         } else if (scale > 0 && scale != 1) {
-            int img_size = images.size();
-            for (int i = 0; i < img_size; i++) {
+            int imgSize = images.size();
+            for (int i = 0; i < imgSize; i++) {
                 BufferedImage img = images.get(i);
                 int width = (int) Math.round(img.getWidth() * scale);
                 int height = (int) Math.round(img.getHeight() * scale);
-                Image scaled_image = img.getScaledInstance(width, height, BufferedImage.SCALE_SMOOTH);
-                BufferedImage bi = CreateTranslucentImage(width, height);
+                Image scaledImage = img.getScaledInstance(width, height, BufferedImage.SCALE_SMOOTH);
+                BufferedImage bi = createTranslucentImage(width, height);
                 Graphics2D g2d = bi.createGraphics();
 
-                int w = scaled_image.getWidth(null);
-                int h = scaled_image.getHeight(null);
+                int w = scaledImage.getWidth(null);
+                int h = scaledImage.getHeight(null);
                 if (flipX)
-                    g2d.drawImage(scaled_image, w, 0, -w, h, null);
+                    g2d.drawImage(scaledImage, w, 0, -w, h, null);
                 if (flipY)
-                    g2d.drawImage(scaled_image, 0, h, w, -h, null);
+                    g2d.drawImage(scaledImage, 0, h, w, -h, null);
                 if (!flipX && !flipY)
-                    g2d.drawImage(scaled_image, 0, 0, null);
+                    g2d.drawImage(scaledImage, 0, 0, null);
 
                 g2d.dispose();
                 images.set(i, bi);
@@ -790,7 +791,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         this.images.put(iname, images.toArray(new BufferedImage[images.size()]));
     }
 
-    private ArrayList<BufferedImage> ReadImages(String pattern) {
+    private ArrayList<BufferedImage> readImages(String pattern) {
         try {
             if (pattern.charAt(2) == ':')
                 pattern = pattern.substring(3);
@@ -822,13 +823,13 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
         Collections.sort(fnames);
         for (String fname : fnames) {
-            BufferedImage img = ReadImage(fname);
+            BufferedImage img = readImage(fname);
             images.add(img);
         }
         return images;
     }
 
-    private BufferedImage ReadImage(String fname) {
+    private BufferedImage readImage(String fname) {
         File f = new File(fname);
         BufferedImage img = null;
         try {

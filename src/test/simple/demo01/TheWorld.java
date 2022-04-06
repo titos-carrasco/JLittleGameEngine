@@ -17,87 +17,87 @@ public class TheWorld implements IEvents {
 
     public TheWorld() {
         // creamos el juego
-        Dimension win_size = new Dimension(800, 440);
+        Dimension winSize = new Dimension(800, 440);
 
-        lge = new LittleGameEngine(win_size, "The World", new Color(0xFFFF00));
-        lge.SetOnMainUpdate(this);
+        lge = new LittleGameEngine(winSize, "The World", new Color(0xFFFF00));
+        lge.setOnMainUpdate(this);
 
         // cargamos los recursos que usaremos
-        String resource_dir = lge.GetRealPath(this, "../../resources");
+        String resourceDir = lge.getRealPath(this, "../../resources");
 
-        lge.LoadImage("fondo", resource_dir + "/images/Backgrounds/FreeTileset/Fondo.png", win_size, false, false);
-        lge.LoadImage("heroe", resource_dir + "/images/Swordsman/Idle/Idle_0*.png", 0.08, false, false);
-        lge.LoadImage("mute", resource_dir + "/images/icons/sound-*.png", false, false);
-        lge.LoadTTFFont("backlash.plain.40", resource_dir + "/fonts/backlash.ttf", Font.PLAIN, 40);
-        lge.LoadTTFFont("monospace.plain.16", resource_dir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
-        lge.LoadSound("fondo", resource_dir + "/sounds/happy-and-sad.wav");
+        lge.loadImage("fondo", resourceDir + "/images/Backgrounds/FreeTileset/Fondo.png", winSize, false, false);
+        lge.loadImage("heroe", resourceDir + "/images/Swordsman/Idle/Idle_0*.png", 0.08, false, false);
+        lge.loadImage("mute", resourceDir + "/images/icons/sound-*.png", false, false);
+        lge.loadTTFFont("backlash.plain.40", resourceDir + "/fonts/backlash.ttf", Font.PLAIN, 40);
+        lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
 
         // activamos la musica de fondo
-        lge.PlaySound("fondo", true, 50);
+        lge.playSound("fondo", true, 50);
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new Point(0, 0));
-        lge.AddGObject(fondo, 0);
+        lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
         Canvas infobar = new Canvas(new Point(0, 420), new Dimension(800, 20), "infobar");
-        lge.AddGObjectGUI(infobar);
+        lge.addGObjectGUI(infobar);
 
         // agregamos el icono del sonido
         Sprite mute = new Sprite("mute", new Point(8, 423), "mute");
-        mute.SetShape("mute", 1);
-        lge.AddGObjectGUI(mute);
+        mute.setShape("mute", 1);
+        lge.addGObjectGUI(mute);
 
         // agregamos al heroe
         Sprite heroe = new Sprite("heroe", new Point(226, 142), "Heroe");
-        lge.AddGObject(heroe, 1);
+        lge.addGObject(heroe, 1);
 
         // agregamos un texto con transparencia
         Canvas canvas = new Canvas(new Point(200, 110), new Dimension(400, 200));
-        canvas.DrawText("Little Game Engine", new Point(30, 90), "backlash.plain.40", new Color(20, 20, 20));
-        lge.AddGObjectGUI(canvas);
+        canvas.drawText("Little Game Engine", new Point(30, 90), "backlash.plain.40", new Color(20, 20, 20));
+        lge.addGObjectGUI(canvas);
     }
 
     @Override
-    public void OnMainUpdate(double dt) {
+    public void onMainUpdate(double dt) {
         // abortamos con la tecla Escape
-        if (lge.KeyPressed(KeyEvent.VK_ESCAPE))
-            lge.Quit();
+        if (lge.keyPressed(KeyEvent.VK_ESCAPE))
+            lge.quit();
 
         // mostramos la info
-        Point mouse_position = lge.GetMousePosition();
-        boolean[] mouse_buttons = lge.GetMouseButtons();
+        Point mousePosition = lge.getMousePosition();
+        boolean[] mouseButtons = lge.getMouseButtons();
 
-        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.GetFPS(),
-                lge.GetCountGObjects(), mouse_position.x, mouse_position.y, mouse_buttons[0] ? 1 : 0,
-                mouse_buttons[1] ? 1 : 0, mouse_buttons[2] ? 1 : 0);
-        Canvas infobar = (Canvas) lge.GetGObject("infobar");
-        infobar.Fill(new Color(0x10202020, true));
-        infobar.DrawText(info, new Point(140, 5), "monospace.plain.16", Color.BLACK);
+        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.getFPS(),
+                lge.getCountGObjects(), mousePosition.x, mousePosition.y, mouseButtons[0] ? 1 : 0,
+                mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
+        Canvas infobar = (Canvas) lge.getGObject("infobar");
+        infobar.fill(new Color(0x10202020, true));
+        infobar.drawText(info, new Point(140, 5), "monospace.plain.16", Color.BLACK);
 
         // sonido on/off
-        mouse_position = lge.GetMouseClicked(0);
-        if (mouse_position != null) {
-            Sprite mute = (Sprite) lge.GetGObject("mute");
-            Rectangle r = mute.GetRectangle();
-            if (r.contains(mouse_position)) {
-                int idx = mute.GetCurrentIdx();
+        mousePosition = lge.getMouseClicked(0);
+        if (mousePosition != null) {
+            Sprite mute = (Sprite) lge.getGObject("mute");
+            Rectangle r = mute.getRectangle();
+            if (r.contains(mousePosition)) {
+                int idx = mute.getCurrentIdx();
                 if (idx == 1)
-                    lge.SetSoundVolume("fondo", 0);
+                    lge.setSoundVolume("fondo", 0);
                 else
-                    lge.SetSoundVolume("fondo", 50);
-                mute.NextShape();
+                    lge.setSoundVolume("fondo", 50);
+                mute.nextShape();
             }
         }
 
         // animamos al heroe
-        Sprite heroe = (Sprite) lge.GetGObject("Heroe");
-        heroe.NextShape(dt, 0.060);
+        Sprite heroe = (Sprite) lge.getGObject("Heroe");
+        heroe.nextShape(dt, 0.060);
     }
 
     // main loop
     public void Run(int fps) {
-        lge.Run(fps);
+        lge.run(fps);
     }
 
     // show time

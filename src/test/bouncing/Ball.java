@@ -18,41 +18,41 @@ public class Ball extends Canvas {
         super(new Point(x, y), new Dimension(20, 20));
 
         // acceso al motor de juegos
-        lge = GetLGE();
+        lge = LittleGameEngine.getInstance();
 
         this.vx = vx;
         this.vy = vy;
         g = 240;
         e = 0.8;
-        UseColliders(true);
-        SetOnEvents(LittleGameEngine.E_ON_UPDATE);
-        SetOnEvents(LittleGameEngine.E_ON_COLLISION);
+        useColliders(true);
+        setOnEvents(LittleGameEngine.E_ON_UPDATE);
+        setOnEvents(LittleGameEngine.E_ON_COLLISION);
 
-        Color fill_color = new Color(0, 255, 0, 64);
-        Fill(fill_color);
+        Color fillColor = new Color(0, 255, 0, 64);
+        fill(fillColor);
     }
 
     @Override
-    public void OnUpdate(double dt) {
-        double x = GetX() + vx * dt;
-        double y = GetY() + vy * dt;
+    public void onUpdate(double dt) {
+        double x = getX() + vx * dt;
+        double y = getY() + vy * dt;
 
         if (x < 0) {
-            lge.DelGObject(this);
+            lge.delGObject(this);
             return;
         }
 
         vy = vy - g * dt;
-        SetPosition((int) x, (int) y);
+        setPosition((int) x, (int) y);
     }
 
     @Override
-    public void OnCollision(double dt, GameObject[] gobjs) {
+    public void onCollision(double dt, GameObject[] gobjs) {
         for (GameObject gobj : gobjs) {
-            if (gobj.GetTag().equals("ground")) {
-                double x = GetX();
-                double y = gobj.GetY() + gobj.GetHeight();
-                SetPosition((int) x, (int) y);
+            if (gobj.getTag().equals("ground")) {
+                double x = getX();
+                double y = gobj.getY() + gobj.getHeight();
+                setPosition((int) x, (int) y);
 
                 vy = -vy * e;
                 if (Math.abs(vy) < 30) {

@@ -22,36 +22,36 @@ public class Game implements IEvents {
 
     public Game() {
         // creamos el juego
-        Dimension win_size = new Dimension(608, 736);
+        Dimension winSize = new Dimension(608, 736);
 
-        lge = new LittleGameEngine(win_size, "Betty", new Color(0xFFFF00));
-        //lge.ShowColliders(new Color(0xFF0000));
-        lge.SetOnMainUpdate(this);
+        lge = new LittleGameEngine(winSize, "Betty", new Color(0xFFFF00));
+        // lge.ShowColliders(new Color(0xFF0000));
+        lge.setOnMainUpdate(this);
 
         // cargamos los recursos que usaremos
-        String resource_dir = lge.GetRealPath(this, "../resources");
+        String resourceDir = lge.getRealPath(this, "../resources");
 
-        lge.LoadImage("fondo", resource_dir + "/images/Betty/Fondo.png", false, false);
-        lge.LoadImage("betty_idle", resource_dir + "/images/Betty/idle-0*.png", false, false);
-        lge.LoadImage("betty_down", resource_dir + "/images/Betty/down-0*.png", false, false);
-        lge.LoadImage("betty_up", resource_dir + "/images/Betty/up-0*.png", false, false);
-        lge.LoadImage("betty_left", resource_dir + "/images/Betty/left-0*.png", false, false);
-        lge.LoadImage("betty_right", resource_dir + "/images/Betty/right-0*.png", false, false);
-        lge.LoadImage("zombie", resource_dir + "/images/Kenny/Zombie/zombie_walk*.png", false, false);
-        lge.LoadTTFFont("monospace.plain.16", resource_dir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
-        lge.LoadTTFFont("cool.plain.30", resource_dir + "/fonts/backlash.ttf", Font.PLAIN, 30);
+        lge.loadImage("fondo", resourceDir + "/images/Betty/Fondo.png", false, false);
+        lge.loadImage("betty_idle", resourceDir + "/images/Betty/idle-0*.png", false, false);
+        lge.loadImage("betty_down", resourceDir + "/images/Betty/down-0*.png", false, false);
+        lge.loadImage("betty_up", resourceDir + "/images/Betty/up-0*.png", false, false);
+        lge.loadImage("betty_left", resourceDir + "/images/Betty/left-0*.png", false, false);
+        lge.loadImage("betty_right", resourceDir + "/images/Betty/right-0*.png", false, false);
+        lge.loadImage("zombie", resourceDir + "/images/Kenny/Zombie/zombie_walk*.png", false, false);
+        lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.loadTTFFont("cool.plain.30", resourceDir + "/fonts/backlash.ttf", Font.PLAIN, 30);
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new Point(0, 0), "fondo");
-        lge.AddGObject(fondo, 0);
+        lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
         Canvas infobar = new Canvas(new Point(0, 714), new Dimension(640, 20), "infobar");
-        lge.AddGObjectGUI(infobar);
+        lge.addGObjectGUI(infobar);
 
         // cargamos el mapa en memoria
         try {
-            String fname = new URI(resource_dir + "/images/Betty/Mapa.txt").getPath();
+            String fname = new URI(resourceDir + "/images/Betty/Mapa.txt").getPath();
             mapa = new int[22][19];
             int x = 0, y = mapa.length - 1;
             Scanner scanner = new Scanner(new File(fname));
@@ -69,15 +69,15 @@ public class Game implements IEvents {
         }
 
         // agregamos a Betty
-        Betty betty = new Betty("Betty", win_size);
-        betty.SetPosition(32 * 9, 32 * 13);
-        lge.AddGObject(betty, 1);
+        Betty betty = new Betty("Betty", winSize);
+        betty.setPosition(32 * 9, 32 * 13);
+        lge.addGObject(betty, 1);
 
         // agregamos 3 zombies
         for (int i = 0; i < 3; i++) {
-            Zombie zombie = new Zombie("Zombie-" + i, win_size);
-            zombie.SetPosition(32 + 32 * 4 + 32 * (i * 4), 32 * 1);
-            lge.AddGObject(zombie, 1);
+            Zombie zombie = new Zombie("Zombie-" + i, winSize);
+            zombie.setPosition(32 + 32 * 4 + 32 * (i * 4), 32 * 1);
+            lge.addGObject(zombie, 1);
         }
 
         // agregamos los muros para las colisiones (segun el mapa)
@@ -85,33 +85,33 @@ public class Game implements IEvents {
             for (int x = 0; x < mapa[y].length; x++)
                 if (mapa[y][x] == 1) {
                     GameObject muro = new GameObject(new Point(x * 32, y * 32), new Dimension(32, 32));
-                    muro.UseColliders(true);
-                    muro.SetTag("muro");
-                    lge.AddGObject(muro, 1);
+                    muro.useColliders(true);
+                    muro.setTag("muro");
+                    lge.addGObject(muro, 1);
                 }
     }
 
     @Override
-    public void OnMainUpdate(double dt) {
+    public void onMainUpdate(double dt) {
         // abortamos con la tecla Escape
-        if (lge.KeyPressed(KeyEvent.VK_ESCAPE))
-            lge.Quit();
+        if (lge.keyPressed(KeyEvent.VK_ESCAPE))
+            lge.quit();
 
         // mostramos la info
-        Point mouse_position = lge.GetMousePosition();
-        boolean[] mouse_buttons = lge.GetMouseButtons();
+        Point mousePosition = lge.getMousePosition();
+        boolean[] mouseButtons = lge.getMouseButtons();
 
-        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.GetFPS(),
-                lge.GetCountGObjects(), mouse_position.x, mouse_position.y, mouse_buttons[0] ? 1 : 0,
-                mouse_buttons[1] ? 1 : 0, mouse_buttons[2] ? 1 : 0);
-        Canvas infobar = (Canvas) lge.GetGObject("infobar");
-        infobar.Fill(new Color(0x80808080, true));
-        infobar.DrawText(info, new Point(50, 5), "monospace.plain.16", Color.WHITE);
+        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.getFPS(),
+                lge.getCountGObjects(), mousePosition.x, mousePosition.y, mouseButtons[0] ? 1 : 0,
+                mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
+        Canvas infobar = (Canvas) lge.getGObject("infobar");
+        infobar.fill(new Color(0x80808080, true));
+        infobar.drawText(info, new Point(50, 5), "monospace.plain.16", Color.WHITE);
     }
 
     // main loop
     public void Run(int fps) {
-        lge.Run(fps);
+        lge.run(fps);
     }
 
     // show time

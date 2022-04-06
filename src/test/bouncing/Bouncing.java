@@ -16,61 +16,61 @@ public class Bouncing implements IEvents {
 
     public Bouncing() {
         // creamos el juego
-        Dimension win_size = new Dimension(800, 600);
+        Dimension winSize = new Dimension(800, 600);
 
-        lge = new LittleGameEngine(win_size, "Bouncing Balls", new Color(0xFFFFFF));
-        lge.ShowColliders(new Color(0xFF0000));
-        lge.SetOnMainUpdate(this);
+        lge = new LittleGameEngine(winSize, "Bouncing Balls", new Color(0xFFFFFF));
+        lge.showColliders(new Color(0xFF0000));
+        lge.setOnMainUpdate(this);
 
         // cargamos los recursos que usaremos
-        String resource_dir = lge.GetRealPath(this, "../resources");
+        String resourceDir = lge.getRealPath(this, "../resources");
 
-        lge.LoadTTFFont("monospace.plain.16", resource_dir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos el suelo
         ground = new Canvas(new Point(0, 0), new Dimension(800, 100), "ground");
-        ground.Fill(Color.GRAY);
-        ground.SetTag("ground");
-        ground.UseColliders(true);
-        lge.AddGObject(ground, 1);
+        ground.fill(Color.GRAY);
+        ground.setTag("ground");
+        ground.useColliders(true);
+        lge.addGObject(ground, 1);
 
         // los objetos a rebotar
         for (int i = 0; i < 50; i++) {
-            int x = (int)(50 + Math.random()*700);
-            int y = (int)(200 + Math.random()*200);
-            double vx = -50 + Math.random()*100;
+            int x = (int) (50 + Math.random() * 700);
+            int y = (int) (200 + Math.random() * 200);
+            double vx = -50 + Math.random() * 100;
             double vy = 0;
-            Ball gobj = new Ball(x,y,vx,vy);
-            lge.AddGObject(gobj, 1);
+            Ball gobj = new Ball(x, y, vx, vy);
+            lge.addGObject(gobj, 1);
         }
 
         // agregamos la barra de info
         Canvas infobar = new Canvas(new Point(0, 580), new Dimension(800, 20), "infobar");
-        lge.AddGObjectGUI(infobar);
+        lge.addGObjectGUI(infobar);
 
     }
 
     @Override
-    public void OnMainUpdate(double dt) {
+    public void onMainUpdate(double dt) {
         // abortamos con la tecla Escape
-        if (lge.KeyPressed(KeyEvent.VK_ESCAPE))
-            lge.Quit();
+        if (lge.keyPressed(KeyEvent.VK_ESCAPE))
+            lge.quit();
 
         // mostramos la info
-        Point mouse_position = lge.GetMousePosition();
-        boolean[] mouse_buttons = lge.GetMouseButtons();
+        Point mousePosition = lge.getMousePosition();
+        boolean[] mouseButtons = lge.getMouseButtons();
 
-        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.GetFPS(),
-                lge.GetCountGObjects(), mouse_position.x, mouse_position.y, mouse_buttons[0] ? 1 : 0,
-                mouse_buttons[1] ? 1 : 0, mouse_buttons[2] ? 1 : 0);
-        Canvas infobar = (Canvas) lge.GetGObject("infobar");
-        infobar.Fill(new Color(0x10202020, true));
-        infobar.DrawText(info, new Point(140, 5), "monospace.plain.16", Color.BLACK);
+        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.getFPS(),
+                lge.getCountGObjects(), mousePosition.x, mousePosition.y, mouseButtons[0] ? 1 : 0,
+                mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
+        Canvas infobar = (Canvas) lge.getGObject("infobar");
+        infobar.fill(new Color(0x10202020, true));
+        infobar.drawText(info, new Point(140, 5), "monospace.plain.16", Color.BLACK);
     }
 
     // main loop
     public void Run(int fps) {
-        lge.Run(fps);
+        lge.run(fps);
     }
 
     // show time

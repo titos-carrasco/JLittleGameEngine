@@ -17,81 +17,81 @@ public class MoveCamera implements IEvents {
 
     public MoveCamera() {
         // creamos el juego
-        Dimension win_size = new Dimension(640, 480);
+        Dimension winSize = new Dimension(640, 480);
 
-        lge = new LittleGameEngine(win_size, "Move Camera", new Color(0xFFFF00));
-        lge.SetOnMainUpdate(this);
+        lge = new LittleGameEngine(winSize, "Move Camera", new Color(0xFFFF00));
+        lge.setOnMainUpdate(this);
 
         // cargamos los recursos que usaremos
-        String resource_dir = lge.GetRealPath(this, "../../resources");
+        String resourceDir = lge.getRealPath(this, "../../resources");
 
-        lge.LoadImage("fondo", resource_dir + "/images/Backgrounds/FreeTileset/Fondo.png", false, false);
-        lge.LoadImage("heroe", resource_dir + "/images/Swordsman/Idle/Idle_000.png", 0.16, false, false);
-        lge.LoadImage("mute", resource_dir + "/images/icons/sound-*.png", false, false);
-        lge.LoadTTFFont("monospace.plain.16", resource_dir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
-        lge.LoadSound("fondo", resource_dir + "/sounds/happy-and-sad.wav");
+        lge.loadImage("fondo", resourceDir + "/images/Backgrounds/FreeTileset/Fondo.png", false, false);
+        lge.loadImage("heroe", resourceDir + "/images/Swordsman/Idle/Idle_000.png", 0.16, false, false);
+        lge.loadImage("mute", resourceDir + "/images/icons/sound-*.png", false, false);
+        lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
 
         // activamos la musica de fondo
-        lge.PlaySound("fondo", true, 50);
+        lge.playSound("fondo", true, 50);
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new Point(0, 0), "fondo");
-        lge.AddGObject(fondo, 0);
+        lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
         Canvas infobar = new Canvas(new Point(0, 460), new Dimension(640, 20), "infobar");
-        lge.AddGObjectGUI(infobar);
+        lge.addGObjectGUI(infobar);
 
         // agregamos el icono del sonido
         Sprite mute = new Sprite("mute", new Point(8, 463), "mute");
-        mute.SetShape("mute", 1);
-        lge.AddGObjectGUI(mute);
+        mute.setShape("mute", 1);
+        lge.addGObjectGUI(mute);
 
         // agregamos al heroe
         Sprite heroe = new Sprite("heroe", new Point(550, 346), "Heroe");
-        lge.AddGObject(heroe, 1);
+        lge.addGObject(heroe, 1);
 
         // # configuramos la camara
-        lge.SetCameraBounds(new Rectangle(0, 0, 1920, 1056));
+        lge.setCameraBounds(new Rectangle(0, 0, 1920, 1056));
 
         // posicionamos la camara
-        Point heroe_position = heroe.GetPosition();
-        Dimension heroe_size = heroe.GetSize();
-        Dimension camera_size = lge.GetCameraSize();
-        int x = heroe_position.x + heroe_size.width / 2 - camera_size.width / 2;
-        int y = heroe_position.y + heroe_size.height / 2 - camera_size.height / 2;
-        lge.SetCameraPosition(new Point(x, y));
+        Point heroePosition = heroe.getPosition();
+        Dimension heroeSize = heroe.getSize();
+        Dimension cameraSize = lge.getCameraSize();
+        int x = heroePosition.x + heroeSize.width / 2 - cameraSize.width / 2;
+        int y = heroePosition.y + heroeSize.height / 2 - cameraSize.height / 2;
+        lge.setCameraPosition(new Point(x, y));
     }
 
     @Override
-    public void OnMainUpdate(double dt) {
+    public void onMainUpdate(double dt) {
         // abortamos con la tecla Escape
-        if (lge.KeyPressed(KeyEvent.VK_ESCAPE))
-            lge.Quit();
+        if (lge.keyPressed(KeyEvent.VK_ESCAPE))
+            lge.quit();
 
         // mostramos la info
-        Point mouse_position = lge.GetMousePosition();
-        boolean[] mouse_buttons = lge.GetMouseButtons();
+        Point mousePosition = lge.getMousePosition();
+        boolean[] mouseButtons = lge.getMouseButtons();
 
-        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.GetFPS(),
-                lge.GetCountGObjects(), mouse_position.x, mouse_position.y, mouse_buttons[0] ? 1 : 0,
-                mouse_buttons[1] ? 1 : 0, mouse_buttons[2] ? 1 : 0);
-        Canvas infobar = (Canvas) lge.GetGObject("infobar");
-        infobar.Fill(new Color(0x10202020, true));
-        infobar.DrawText(info, new Point(50, 5), "monospace.plain.16", Color.BLACK);
+        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.getFPS(),
+                lge.getCountGObjects(), mousePosition.x, mousePosition.y, mouseButtons[0] ? 1 : 0,
+                mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
+        Canvas infobar = (Canvas) lge.getGObject("infobar");
+        infobar.fill(new Color(0x10202020, true));
+        infobar.drawText(info, new Point(50, 5), "monospace.plain.16", Color.BLACK);
 
         // mute on/off
-        mouse_position = lge.GetMouseClicked(0);
-        if (mouse_position != null) {
-            Sprite mute = (Sprite) lge.GetGObject("mute");
-            Rectangle r = mute.GetRectangle();
-            if (r.contains(mouse_position)) {
-                int idx = mute.GetCurrentIdx();
+        mousePosition = lge.getMouseClicked(0);
+        if (mousePosition != null) {
+            Sprite mute = (Sprite) lge.getGObject("mute");
+            Rectangle r = mute.getRectangle();
+            if (r.contains(mousePosition)) {
+                int idx = mute.getCurrentIdx();
                 if (idx == 1)
-                    lge.SetSoundVolume("fondo", 0);
+                    lge.setSoundVolume("fondo", 0);
                 else
-                    lge.SetSoundVolume("fondo", 50);
-                mute.NextShape();
+                    lge.setSoundVolume("fondo", 50);
+                mute.nextShape();
             }
         }
 
@@ -102,27 +102,27 @@ public class MoveCamera implements IEvents {
             pixels = 1;
 
         // la posiciona actual de la camara
-        Point camera_position = lge.GetCameraPosition();
+        Point cameraPosition = lge.getCameraPosition();
 
         // cambiamos sus coordenadas segun la tecla presionada
-        if (lge.KeyPressed(KeyEvent.VK_RIGHT))
-            camera_position.x = (int) (camera_position.x + pixels);
-        else if (lge.KeyPressed(KeyEvent.VK_LEFT))
-            camera_position.x = (int) (camera_position.x - pixels);
+        if (lge.keyPressed(KeyEvent.VK_RIGHT))
+            cameraPosition.x = (int) (cameraPosition.x + pixels);
+        else if (lge.keyPressed(KeyEvent.VK_LEFT))
+            cameraPosition.x = (int) (cameraPosition.x - pixels);
 
-        if (lge.KeyPressed(KeyEvent.VK_UP))
-            camera_position.y = (int) (camera_position.y + pixels);
-        else if (lge.KeyPressed(KeyEvent.VK_DOWN))
-            camera_position.y = (int) (camera_position.y - pixels);
+        if (lge.keyPressed(KeyEvent.VK_UP))
+            cameraPosition.y = (int) (cameraPosition.y + pixels);
+        else if (lge.keyPressed(KeyEvent.VK_DOWN))
+            cameraPosition.y = (int) (cameraPosition.y - pixels);
 
         // posicionamos la camara
-        lge.SetCameraPosition(camera_position);
+        lge.setCameraPosition(cameraPosition);
 
     }
 
     // main loop
     public void Run(int fps) {
-        lge.Run(fps);
+        lge.run(fps);
     }
 
     // show time

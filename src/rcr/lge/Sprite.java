@@ -29,7 +29,7 @@ public class Sprite extends GameObject {
         surfaces = new HashMap<String, BufferedImage[]>();
 
         for (String iname : inames)
-            surfaces.put(iname, LittleGameEngine.GetLGE().GetImages(iname));
+            surfaces.put(iname, LittleGameEngine.getInstance().getImages(iname));
 
         Entry<String, BufferedImage[]> elem = surfaces.entrySet().iterator().next();
         this.iname = elem.getKey();
@@ -38,23 +38,23 @@ public class Sprite extends GameObject {
         this.rect.setSize(this.surface.getWidth(), this.surface.getHeight());
     }
 
-    public String GetCurrentIName() {
+    public String getCurrentIName() {
         return iname;
     }
 
-    public int GetCurrentIdx() {
+    public int getCurrentIdx() {
         return idx;
     }
 
-    public void NextShape() {
-        NextShape(0, 0);
+    public void nextShape() {
+        nextShape(0, 0);
     }
 
-    public void NextShape(double dt) {
-        NextShape(dt, 0);
+    public void nextShape(double dt) {
+        nextShape(dt, 0);
     }
 
-    public void NextShape(double dt, double delay) {
+    public void nextShape(double dt, double delay) {
         elapsed = elapsed + dt;
         if (elapsed < delay)
             return;
@@ -68,11 +68,11 @@ public class Sprite extends GameObject {
         this.rect.setSize(this.surface.getWidth(), this.surface.getHeight());
     }
 
-    public void SetShape(String iname) {
-        SetShape(iname, 0);
+    public void setShape(String iname) {
+        setShape(iname, 0);
     }
 
-    public void SetShape(String iname, int idx) {
+    public void setShape(String iname, int idx) {
         this.iname = iname;
         if (idx >= surfaces.get(iname).length)
             idx = 0;

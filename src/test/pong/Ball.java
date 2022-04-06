@@ -9,51 +9,51 @@ import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
 
 public class Ball extends Canvas {
-    private int init_x;
-    private int init_y;
-    private double speed_x = 180;
-    private double speed_y = -180;
+    private int initX;
+    private int initY;
+    private double speedX = 180;
+    private double speedY = -180;
 
     public Ball(Point position, Dimension size, String name) {
         super(position, size, name);
-        SetOnEvents(LittleGameEngine.E_ON_UPDATE);
-        SetOnEvents(LittleGameEngine.E_ON_COLLISION);
-        UseColliders(true);
-        Fill(Color.WHITE);
+        setOnEvents(LittleGameEngine.E_ON_UPDATE);
+        setOnEvents(LittleGameEngine.E_ON_COLLISION);
+        useColliders(true);
+        fill(Color.WHITE);
 
-        init_x = position.x;
-        init_y = position.y;
+        initX = position.x;
+        initY = position.y;
     }
 
     @Override
-    public void OnUpdate(double dt) {
-        double dx = speed_x * dt;
-        double dy = speed_y * dt;
+    public void onUpdate(double dt) {
+        double dx = speedX * dt;
+        double dy = speedY * dt;
 
-        SetPosition((int) (GetX() + dx), (int) (GetY() + dy));
+        setPosition((int) (getX() + dx), (int) (getY() + dy));
     }
 
     @Override
-    public void OnCollision(double dt, GameObject[] gobjs) {
-        int x = GetX();
-        int y = GetY();
-        double dx = speed_x * dt;
-        double dy = speed_y * dt;
+    public void onCollision(double dt, GameObject[] gobjs) {
+        int x = getX();
+        int y = getY();
+        double dx = speedX * dt;
+        double dy = speedY * dt;
 
         for (GameObject gobj : gobjs) {
-            if (gobj.GetTag().equals("wall-horizontal")) {
-                speed_y = -speed_y;
+            if (gobj.getTag().equals("wall-horizontal")) {
+                speedY = -speedY;
                 dy = -dy;
             }
-            if (gobj.GetTag().equals("paddle")) {
-                speed_x = -speed_x;
+            if (gobj.getTag().equals("paddle")) {
+                speedX = -speedX;
                 dx = -dx;
             }
-            if (gobj.GetTag().equals("wall-vertical")) {
-                x = init_x;
-                y = init_y;
+            if (gobj.getTag().equals("wall-vertical")) {
+                x = initX;
+                y = initY;
             }
         }
-        SetPosition((int) (x + dx), (int) (y + dy));
+        setPosition((int) (x + dx), (int) (y + dy));
     }
 }

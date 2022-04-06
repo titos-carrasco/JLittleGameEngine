@@ -18,19 +18,19 @@ public class MiHeroe extends Sprite {
                 new Point(550, 346), "Heroe");
 
         // acceso al motor de juegos
-        lge = GetLGE();
+        lge = LittleGameEngine.getInstance();
 
         // sus atributos
-        SetOnEvents(LittleGameEngine.E_ON_UPDATE);
-        SetOnEvents(LittleGameEngine.E_ON_COLLISION);
-        SetShape("heroe_idle_left");
-        UseColliders(true);
-        SetBounds(new Rectangle(0, 0, 1920, 1056));
-        last = GetPosition();
+        setOnEvents(LittleGameEngine.E_ON_UPDATE);
+        setOnEvents(LittleGameEngine.E_ON_COLLISION);
+        setShape("heroe_idle_left");
+        useColliders(true);
+        setBounds(new Rectangle(0, 0, 1920, 1056));
+        last = getPosition();
     }
 
     @Override
-    public void OnUpdate(double dt) {
+    public void onUpdate(double dt) {
         // velocity = pixeles por segundo
         int velocity = 240;
         int pixels = (int) (velocity * dt);
@@ -38,51 +38,51 @@ public class MiHeroe extends Sprite {
             pixels = 1;
 
         // la posiciona actual del heroe
-        int x = GetX();
-        int y = GetY();
+        int x = getX();
+        int y = getY();
         last = new Point(x, y);
 
         // cambiamos sus coordenadas, orientacion e imagen segun la tecla presionada
-        if (lge.KeyPressed(KeyEvent.VK_RIGHT)) {
+        if (lge.keyPressed(KeyEvent.VK_RIGHT)) {
             x = x + pixels;
             if (state != 2) {
-                SetShape("heroe_run_right");
+                setShape("heroe_run_right");
                 state = 2;
             }
-        } else if (lge.KeyPressed(KeyEvent.VK_LEFT)) {
+        } else if (lge.keyPressed(KeyEvent.VK_LEFT)) {
             x = x - pixels;
             if (state != -2) {
-                SetShape("heroe_run_left");
+                setShape("heroe_run_left");
                 state = -2;
             }
         } else if (state == 2) {
             if (state != 1) {
-                SetShape("heroe_idle_right");
+                setShape("heroe_idle_right");
                 state = 1;
             }
         } else if (state == -2) {
             if (state != -1) {
-                SetShape("heroe_idle_left");
+                setShape("heroe_idle_left");
                 state = -1;
             }
         }
 
-        if (lge.KeyPressed(KeyEvent.VK_UP))
+        if (lge.keyPressed(KeyEvent.VK_UP))
             y = y + pixels;
-        else if (lge.KeyPressed(KeyEvent.VK_DOWN))
+        else if (lge.keyPressed(KeyEvent.VK_DOWN))
             y = y - pixels;
 
         // siguiente imagen de la secuencia
-        NextShape(dt, 0.050);
+        nextShape(dt, 0.050);
 
         // lo posicionamos
-        SetPosition(x, y);
+        setPosition(x, y);
     }
 
     @Override
-    public void OnCollision(double dt, GameObject[] gobjs) {
-        lge.PlaySound("poing", false, 50);
-        SetPosition(last);
+    public void onCollision(double dt, GameObject[] gobjs) {
+        lge.playSound("poing", false, 50);
+        setPosition(last);
     }
 
 }

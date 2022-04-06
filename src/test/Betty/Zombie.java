@@ -10,33 +10,33 @@ import rcr.lge.Sprite;
 public class Zombie extends Sprite {
     private LittleGameEngine lge;
 
-    private Dimension win_size;
+    private Dimension winSize;
     private char dir;
     private boolean active;
 
-    public Zombie(String name, Dimension win_size) {
+    public Zombie(String name, Dimension winSize) {
         super("zombie", new Point(0, 0), name);
 
         // acceso al motor de juegos
-        lge = GetLGE();
+        lge = LittleGameEngine.getInstance();
 
-        SetOnEvents(LittleGameEngine.E_ON_UPDATE);
-        SetShape("zombie", 0);
-        SetTag("zombie");
-        UseColliders(true);
+        setOnEvents(LittleGameEngine.E_ON_UPDATE);
+        setShape("zombie", 0);
+        setTag("zombie");
+        useColliders(true);
         active = true;
-        this.win_size = win_size;
+        this.winSize = winSize;
 
         // direccion inicial - Right, Down, Left, Up
         dir = "RDLU".charAt((int) (Math.random() * 4));
     }
 
-    public void SetActive(boolean active) {
+    public void setActive(boolean active) {
         this.active = active;
     }
 
     @Override
-    public void OnUpdate(double dt) {
+    public void onUpdate(double dt) {
         if (!active)
             return;
 
@@ -46,13 +46,13 @@ public class Zombie extends Sprite {
         int pixels = 2;
 
         // las coordenadas de Betty
-        Betty betty = (Betty) lge.GetGObject("Betty");
-        int bx = betty.GetX();
-        int by = betty.GetY();
+        Betty betty = (Betty) lge.getGObject("Betty");
+        int bx = betty.getX();
+        int by = betty.getY();
 
         // nuestra posicion actual
-        int x = GetX();
-        int y = GetY();
+        int x = getX();
+        int y = getY();
 
         // posicion respecto a Betty
         boolean abajo = y < by;
@@ -148,11 +148,11 @@ public class Zombie extends Sprite {
                 ny -= pixels;
 
             // verificamos que no colisionemos con un muro u otro zombie
-            SetPosition(nx, ny);
-            GameObject[] gobjs = lge.IntersectGObjects(this);
+            setPosition(nx, ny);
+            GameObject[] gobjs = lge.intersectGObjects(this);
             boolean collision = false;
             for (GameObject gobj : gobjs) {
-                String tag = gobj.GetTag();
+                String tag = gobj.getTag();
                 if (tag.equals("zombie") || tag.equals("muro")) {
                     collision = true;
                     break;
@@ -164,18 +164,18 @@ public class Zombie extends Sprite {
 
                 // tunel?
                 if (nx < -16)
-                    nx = win_size.width - 16;
-                else if (nx > win_size.width - 16)
+                    nx = winSize.width - 16;
+                else if (nx > winSize.width - 16)
                     nx = -16;
-                SetPosition(nx, ny);
+                setPosition(nx, ny);
                 break;
             }
 
             // otro intento
-            SetPosition(x, y);
+            setPosition(x, y);
         }
 
         // siguiente imagen de la secuencia
-        NextShape(dt, 0.1);
+        nextShape(dt, 0.1);
     }
 }

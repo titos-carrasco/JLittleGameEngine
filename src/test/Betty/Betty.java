@@ -12,36 +12,36 @@ public class Betty extends Sprite {
     private LittleGameEngine lge;
 
     private boolean alive;
-    private Dimension win_size;
-    private Point last_point;
+    private Dimension winSize;
+    private Point lastPoint;
 
-    public Betty(String name, Dimension win_size) {
+    public Betty(String name, Dimension winSize) {
         super(new String[] { "betty_idle", "betty_down", "betty_up", "betty_left", "betty_right" }, new Point(0, 0),
                 name);
 
         // acceso al motor de juegos
-        lge = GetLGE();
+        lge = LittleGameEngine.getInstance();
 
-        SetOnEvents(LittleGameEngine.E_ON_UPDATE);
-        SetOnEvents(LittleGameEngine.E_ON_COLLISION);
-        SetShape("betty_idle");
-        SetTag("Betty");
-        UseColliders(true);
+        setOnEvents(LittleGameEngine.E_ON_UPDATE);
+        setOnEvents(LittleGameEngine.E_ON_COLLISION);
+        setShape("betty_idle");
+        setTag("Betty");
+        useColliders(true);
         alive = true;
-        this.win_size = win_size;
+        this.winSize = winSize;
     }
 
     public boolean IsAlive() {
         return alive;
     }
 
-    public void SetAlive(boolean alive) {
+    public void setAlive(boolean alive) {
         this.alive = alive;
-        SetShape("betty_idle");
+        setShape("betty_idle");
     }
 
     @Override
-    public void OnUpdate(double dt) {
+    public void onUpdate(double dt) {
         // solo si estoy viva
         if (!alive)
             return;
@@ -52,26 +52,26 @@ public class Betty extends Sprite {
         int pixels = 2;
 
         // nuestra posicion actual y tamano
-        int x = GetX();
-        int y = GetY();
-        last_point = new Point(x, y);
+        int x = getX();
+        int y = getY();
+        lastPoint = new Point(x, y);
 
         // cambiamos sus coordenadas e imagen segun la tecla presionada
-        int idx = GetCurrentIdx();
-        if (lge.KeyPressed(KeyEvent.VK_RIGHT)) {
-            SetShape("betty_right", idx);
+        int idx = getCurrentIdx();
+        if (lge.keyPressed(KeyEvent.VK_RIGHT)) {
+            setShape("betty_right", idx);
             x = x + pixels;
-        } else if (lge.KeyPressed(KeyEvent.VK_LEFT)) {
-            SetShape("betty_left", idx);
+        } else if (lge.keyPressed(KeyEvent.VK_LEFT)) {
+            setShape("betty_left", idx);
             x = x - pixels;
-        } else if (lge.KeyPressed(KeyEvent.VK_UP)) {
-            SetShape("betty_up", idx);
+        } else if (lge.keyPressed(KeyEvent.VK_UP)) {
+            setShape("betty_up", idx);
             y = y + pixels;
-        } else if (lge.KeyPressed(KeyEvent.VK_DOWN)) {
-            SetShape("betty_down", idx);
+        } else if (lge.keyPressed(KeyEvent.VK_DOWN)) {
+            setShape("betty_down", idx);
             y = y - pixels;
         } else {
-            SetShape("betty_idle", idx);
+            setShape("betty_idle", idx);
             if (x % 32 < 4)
                 x = Math.round(x / 32) * 32;
             else if (x % 32 > 28)
@@ -84,26 +84,26 @@ public class Betty extends Sprite {
 
         // tunel?
         if (x < -16)
-            x = win_size.width - 16;
-        else if (x > win_size.width - 16)
+            x = winSize.width - 16;
+        else if (x > winSize.width - 16)
             x = -16;
 
         // siguiente imagen de la secuencia
-        SetPosition(x, y);
-        NextShape(dt, 0.1);
+        setPosition(x, y);
+        nextShape(dt, 0.1);
     }
 
     @Override
-    public void OnCollision(double dt, GameObject[] gobjs) {
+    public void onCollision(double dt, GameObject[] gobjs) {
         if (!alive)
             return;
 
         for (GameObject gobj : gobjs)
-            if (gobj.GetTag().equals("zombie")) {
+            if (gobj.getTag().equals("zombie")) {
                 alive = false;
                 System.out.println("Un zombie me mato");
                 return;
             }
-        SetPosition(last_point);
+        setPosition(lastPoint);
     }
 }

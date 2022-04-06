@@ -16,23 +16,23 @@ public class Canvas extends GameObject {
 
     public Canvas(Point origin, Dimension size, String name) {
         super(origin, size, name);
-        surface = lge.CreateTranslucentImage(size.width, size.height);
+        surface = LittleGameEngine.getInstance().createTranslucentImage(size.width, size.height);
     }
 
-    public void Fill(Color color) {
+    public void fill(Color color) {
         Graphics2D g2d = surface.createGraphics();
         g2d.setBackground(color);
         g2d.clearRect(0, 0, rect.width, rect.height);
     }
 
-    public void DrawText(String text, Point position, String fname, Color color) {
+    public void drawText(String text, Point position, String fname, Color color) {
         int x = position.x;
         int y = rect.height - position.y;
 
         Graphics2D g2d = surface.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        Font f = LittleGameEngine.GetLGE().GetFont(fname);
+        Font f = LittleGameEngine.getInstance().getFont(fname);
 
         g2d.setColor(color);
         g2d.setFont(f);
@@ -40,7 +40,7 @@ public class Canvas extends GameObject {
         g2d.dispose();
     }
 
-    public void DrawPoint(Point position, Color color) {
+    public void drawPoint(Point position, Color color) {
         int x = position.x;
         int y = rect.height - position.y;
 
@@ -50,7 +50,7 @@ public class Canvas extends GameObject {
         g2d.dispose();
     }
 
-    public void DrawCircle(Point position, int radius, Color color, boolean thickness) {
+    public void drawCircle(Point position, int radius, Color color, boolean thickness) {
         int x = position.x;
         int y = rect.height - position.y;
 
@@ -63,7 +63,7 @@ public class Canvas extends GameObject {
         g2d.dispose();
     }
 
-    public void DrawRectangle(Point position, Dimension size, Color color, boolean thickness) {
+    public void drawRectangle(Point position, Dimension size, Color color, boolean thickness) {
         int x = position.x;
         int y = rect.height - size.height - position.y;
 
@@ -76,7 +76,7 @@ public class Canvas extends GameObject {
         g2d.dispose();
     }
 
-    public void DrawSurface(Point position, BufferedImage surface) {
+    public void drawSurface(Point position, BufferedImage surface) {
         int x = position.x;
         int y = rect.height - surface.getHeight() - position.y;
 

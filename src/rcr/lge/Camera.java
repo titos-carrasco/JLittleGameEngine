@@ -5,15 +5,15 @@ import java.awt.Point;
 
 public class Camera extends GameObject {
     GameObject target;
-    boolean target_center;
+    boolean targetInCenter;
 
     Camera(Point position, Dimension size) {
         super(position, size, "__LGE_CAMERA__");
         target = null;
-        target_center = true;
+        targetInCenter = true;
     }
 
-    void FollowTarget() {
+    void followTarget() {
         // nadie a quien seguir
         if (target == null)
             return;
@@ -23,12 +23,12 @@ public class Camera extends GameObject {
         int y = target.rect.y;
 
         // el centro de la camara en el centro del gobj
-        if (target_center) {
+        if (targetInCenter) {
             x = x + target.rect.width / 2;
             y = y + target.rect.height / 2;
         }
 
-        SetPosition(x - rect.width / 2, y - rect.height / 2);
+        setPosition(x - rect.width / 2, y - rect.height / 2);
     }
 
 }
