@@ -56,7 +56,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     public static final int E_ON_POST_UPDATE = 0b00010000;
     public static final int E_ON_COLLISION = 0b00100000;
     public static final int E_ON_PRE_RENDER = 0b01000000;
-    public static final int E_ON_QUIT = 0b10000010;
+    public static final int E_ON_QUIT = 0b10000000;
 
     private static LittleGameEngine lge = null;
     private GraphicsConfiguration gconfig;
