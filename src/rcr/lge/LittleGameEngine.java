@@ -11,6 +11,7 @@ import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -22,11 +23,13 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,6 +47,11 @@ import javax.sound.sampled.LineListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+/**
+ * La Pequena Maquina de Juegos
+ *
+ * @author Roberto carrasco (titos.carrasco@gmail.com)
+ */
 public class LittleGameEngine extends JPanel implements KeyListener, MouseListener, WindowListener {
     private static final long serialVersionUID = 6162190111045934737L;
 
@@ -81,11 +89,19 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     private HashMap<String, ClipData> sounds;
 
     private JFrame win;
+
     private BufferedImage screen;
     private Color bgColor;
     private Color collidersColor = null;
 
     // ------ game engine ------
+    /**
+     * Crea el juego
+     *
+     * @param winSize dimensiones de la ventana de despliegue
+     * @param title   titulo de la ventana
+     * @param bgColor color de fondo de la ventana
+     */
     public LittleGameEngine(Dimension winSize, String title, Color bgColor) {
         assertion(LittleGameEngine.lge == null, "LittleGameEngine ya se encuentra activa");
         lge = this;
@@ -100,17 +116,27 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         sounds = new HashMap<String, ClipData>();
         images = new HashMap<String, BufferedImage[]>();
 
+        keysPressed = new HashMap<Integer, Boolean>();
+        mouseEvents = new ArrayList<MouseEvent>();
+        mouseButtons = new boolean[] { false, false, false };
+
         gObjects = new HashMap<String, GameObject>();
         gLayers = new TreeMap<Integer, ArrayList<GameObject>>();
         gObjectsToAdd = new ArrayList<GameObject>();
         gObjectsToDel = new ArrayList<GameObject>();
 
-        screen = createOpageImage(winSize.width, winSize.height);
+        screen = createOpaqueImage(winSize.width, winSize.height);
         camera = new Camera(new Point(0, 0), winSize);
 
-        keysPressed = new HashMap<Integer, Boolean>();
-        mouseEvents = new ArrayList<MouseEvent>();
-        mouseButtons = new boolean[] { false, false, false };
+        Font f = new Font("Arial", Font.PLAIN, 40);
+        Graphics2D g2d = screen.createGraphics();
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
+        g2d.setColor(Color.BLACK);
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2d.setFont(f);
+        g2d.drawString("Loading...", (winSize.width - 160) / 2, (winSize.height - 8) / 2);
+        g2d.dispose();
 
         addKeyListener(this);
         addMouseListener(this);
@@ -126,61 +152,70 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         win.setResizable(false);
         win.setVisible(true);
 
-        Font f = new Font("Arial", Font.PLAIN, 40);
-        Graphics2D g2d = screen.createGraphics();
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
-        g2d.setColor(Color.BLACK);
-        g2d.setFont(f);
-        g2d.drawString("Loading...", (winSize.width - 160) / 2, (winSize.height - 8) / 2);
-        g2d.dispose();
-
-        this.repaint();
+        repaint();
     }
 
+    /**
+     * Obtiene una instancia del juego en ejecucion. Util para las diferentes clases
+     * utilizadas en un juego tal de acceder a metodos estaticos
+     *
+     * @return
+     */
     public static LittleGameEngine getInstance() {
-        return lge;
+        return LittleGameEngine.lge;
     }
 
-    private void assertion(boolean condition, String msg) {
-        if (!condition) {
-            System.out.println(msg);
-            System.exit(1);
-        }
-    }
-
-    public String getRealPath(Object objClass, String path) {
-        String p = null;
-        try {
-            p = new URI(objClass.getClass().getResource(path).getPath()).getPath();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        return p;
-    }
-
+    /**
+     * Obtiene los FPS calculados como el promedio de los ultimos 30 valores
+     *
+     * @return los frame por segundo calculados
+     */
     public double getFPS() {
         double dt = 0;
         for (double val : fpsData)
             dt += val;
         dt = dt / fpsData.length;
-        return dt == 0 ? 0 : 1 / dt;
+        return dt == 0 ? 0 : 1.0 / dt;
     }
 
+    /**
+     * Si se especifica un color se habilita el despliegue del rectangulo que bordea
+     * a todos los objetos (util para ver colisiones).
+     *
+     * Si se especifica null se desactiva
+     *
+     * @param color el color para los bordes de los rectangulos
+     */
     public void showColliders(Color color) {
         collidersColor = color;
     }
 
+    /**
+     * Establece la clase que recibira el evento onMainUpdate que es invocado justo
+     * despues de invocar a los metodos onUpdate() de los GameObjects.
+     *
+     * Esta clase debe implementar IEvents
+     *
+     * @param iface
+     */
     public void setOnMainUpdate(IEvents iface) {
         this.onMainUpdate = iface;
     }
 
+    /**
+     * Finaliza el Game Loop de LGE
+     */
     public void quit() {
         running = false;
     }
 
+    /**
+     * Inicia el Game Loop de LGE tratando de mantener los fps especificados
+     *
+     * @param fps los fps a mantener
+     */
     public void run(int fps) {
+        BufferedImage _screen = createOpaqueImage(screen.getWidth(), screen.getHeight());
         running = true;
         long tickExpected = (long) (1000.0 / fps);
         long tickPrev = System.currentTimeMillis();
@@ -201,6 +236,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             long now = System.currentTimeMillis();
             double dt = (now - tickPrev) / 1000.0;
             tickPrev = now;
+
             fpsData[fpsIdx++] = dt;
             fpsIdx %= fpsData.length;
 
@@ -313,52 +349,52 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             camera.followTarget();
 
             // --- Rendering
-            synchronized (screen) {
-                Graphics2D g2d = screen.createGraphics();
-                g2d.setColor(bgColor);
-                g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
+            Graphics2D g2d = _screen.createGraphics();
+            g2d.setColor(bgColor);
+            g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
 
-                // --- layers
-                for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
-                    int layer = elem.getKey();
-                    if (layer != GUI_LAYER) {
-                        for (GameObject gobj : elem.getValue()) {
-                            if (!gobj.rect.intersects(camera.rect))
-                                continue;
-                            Point p = fixXY(gobj);
-                            BufferedImage surface = gobj.surface;
-                            if (surface != null)
-                                g2d.drawImage(surface, p.x, p.y, null);
+            // --- layers
+            for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
+                int layer = elem.getKey();
+                if (layer != GUI_LAYER) {
+                    for (GameObject gobj : elem.getValue()) {
+                        if (!gobj.rect.intersects(camera.rect))
+                            continue;
+                        Point p = fixXY(gobj);
+                        BufferedImage surface = gobj.surface;
+                        if (surface != null)
+                            g2d.drawImage(surface, p.x, p.y, null);
 
-                            if (collidersColor != null && gobj.useColliders) {
-                                g2d.setColor(collidersColor);
-                                g2d.drawRect(p.x, p.y, gobj.rect.width - 1, gobj.rect.height - 1);
-                            }
+                        if (collidersColor != null && gobj.useColliders) {
+                            g2d.setColor(collidersColor);
+                            g2d.drawRect(p.x, p.y, gobj.rect.width - 1, gobj.rect.height - 1);
                         }
                     }
                 }
-
-                // --- GUI
-                for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
-                    int layer = elem.getKey();
-                    if (layer == GUI_LAYER) {
-                        for (GameObject gobj : elem.getValue()) {
-                            BufferedImage surface = gobj.surface;
-                            if (surface != null) {
-                                int x = gobj.rect.x;
-                                int y = gobj.rect.y;
-                                // int w = gobj.width;
-                                int h = gobj.rect.height;
-                                g2d.drawImage(surface, x, camera.rect.height - y - h, null);
-                            }
-                        }
-                    }
-                }
-                g2d.dispose();
             }
-            // ---
-            // this.getGraphics().drawImage(screen, 0, 0, null);
-            this.repaint();
+
+            // --- GUI
+            for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
+                int layer = elem.getKey();
+                if (layer == GUI_LAYER) {
+                    for (GameObject gobj : elem.getValue()) {
+                        BufferedImage surface = gobj.surface;
+                        if (surface != null) {
+                            int x = gobj.rect.x;
+                            int y = gobj.rect.y;
+                            // int w = gobj.width;
+                            int h = gobj.rect.height;
+                            g2d.drawImage(surface, x, camera.rect.height - y - h, null);
+                        }
+                    }
+                }
+            }
+            g2d.dispose();
+
+            synchronized (screen) {
+                screen.setData(_screen.getData());
+            }
+            this.paintComponent(this.getGraphics());
         }
 
         // --- gobj.OnQuit
@@ -381,6 +417,14 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     // sistema cartesiano y zona visible dada por la camara
+    /**
+     * Convierte las coordenadas en sistema cartesiano del GameObject a coordenadas
+     * de pantalla ajustandolas a la zona de vision de la camara
+     *
+     * @param gobj el objeto del cual convertir sus coordenadas
+     *
+     * @return las coordenadas ajustadas
+     */
     private Point fixXY(GameObject gobj) {
         int xo = gobj.rect.x;
         int yo = gobj.rect.y;
@@ -402,6 +446,12 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     // ------ gobjects ------
+    /**
+     * Agrega un GameObject al juego el que quedara habilitado en el siguiente ciclo
+     *
+     * @param gobj  el gameObject a agregar
+     * @param layer la capa a la cual pertenece
+     */
     public void addGObject(GameObject gobj, int layer) {
         assertion(gobj.layer < 0, "'gobj' ya fue agregado");
         assertion(layer >= 0 && layer <= GUI_LAYER, "'layer' invalido");
@@ -410,23 +460,53 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         gObjectsToAdd.add(gobj);
     }
 
+    /**
+     * Agrega un GameObject a la interfaz grafica del juego
+     *
+     * @param gobj el GameObject a agregar
+     */
     public void addGObjectGUI(GameObject gobj) {
         addGObject(gobj, GUI_LAYER);
     }
 
+    /**
+     * Retorna el GameObject identificado con el nombre especificado
+     *
+     * @param name el nombre del GameObject a buscar
+     *
+     * @return el gameObject buscado (nulo si no lo encuentra)
+     */
     public GameObject getGObject(String name) {
         return gObjects.get(name);
     }
 
+    /**
+     * Retorna el total de GameObjects en el juego
+     *
+     * @return el total de gameObjects
+     */
     public int getCountGObjects() {
         return gObjects.size();
     }
 
+    /**
+     * Elimina un GameObject del juego en el siguiente ciclo
+     *
+     * @param gobj el gameObject a eliminar
+     */
     public void delGObject(GameObject gobj) {
         assertion(gobj.layer >= 0, "'gobj' no ha sido agregado");
         gObjectsToDel.add(gobj);
     }
 
+    /**
+     * Obtiene todos los GameObject que colisionan con un GameObject dado en la
+     * misma capa
+     *
+     * @param gobj el GameObject a inspeccionar
+     *
+     * @return lois GameObjects con los que colisiona
+     */
     public GameObject[] intersectGObjects(GameObject gobj) {
         ArrayList<GameObject> gobjs = new ArrayList<GameObject>();
 
@@ -439,14 +519,29 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     // ------ camera ------
+    /**
+     * Retorna la posiciona de la camara
+     *
+     * @return la posicion
+     */
     public Point getCameraPosition() {
         return camera.getPosition();
     }
 
+    /**
+     * retorna la dimension de la camara
+     *
+     * @return la dimension
+     */
     public Dimension getCameraSize() {
         return camera.getSize();
     }
 
+    /**
+     * Establece el GameObject al cual la camara seguira de manera automatica
+     *
+     * @param gobj el GameObject a seguir
+     */
     public void setCameraTarget(GameObject gobj) {
         if (gobj == null)
             camera.target = gobj;
@@ -454,6 +549,14 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             setCameraTarget(gobj, true);
     }
 
+    /**
+     * Establece el GameObject al cual la camara seguira de manera automatica
+     *
+     * @param gobj   el GameObject a seguir
+     * @param center si es verdadero la camara se centrara en el centro del
+     *               GameObject, en caso contrario lo hara en el extremo inferior
+     *               izquierdo
+     */
     public void setCameraTarget(GameObject gobj, boolean center) {
         assertion(gobj.layer >= 0, "'gobj' no ha sido agregado");
         assertion(gobj.layer != GUI_LAYER, "'gobj' invalido");
@@ -462,15 +565,31 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         camera.targetInCenter = center;
     }
 
+    /**
+     * establece los limites en los cuales se movera la camara
+     *
+     * @param bounds los limites
+     */
     public void setCameraBounds(Rectangle bounds) {
         camera.setBounds(bounds);
     }
 
+    /**
+     * Establece la posicion de la camara
+     *
+     * @param position
+     */
     public void setCameraPosition(Point position) {
         camera.setPosition(position);
     }
 
     // ------ keys ------
+    /**
+     * Determina si una tecla se encuentra presionada o no
+     *
+     * @param key la tecla a inspeccionar
+     * @return verdadero si la tecla se encuentra presionada
+     */
     public boolean keyPressed(int key) {
         synchronized (keysPressed) {
             return keysPressed.getOrDefault(key, false);
@@ -496,12 +615,22 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     // ------ mouse ------
+    /**
+     * Retorna el estado de los botones del mouse
+     *
+     * @return el estado de los botones
+     */
     public boolean[] getMouseButtons() {
         synchronized (mouseEvents) {
             return mouseButtons;
         }
     }
 
+    /**
+     * Determina la posicion del mouse en la ventana
+     *
+     * @return la posicion del mouse
+     */
     @Override
     public Point getMousePosition() {
         Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
@@ -515,6 +644,13 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         return new Point(x, y);
     }
 
+    /**
+     * Determina si un boton del mouse se encuentra presionado
+     *
+     * @param button el boton a inspeccionar
+     *
+     * @return verdadero si se encuentra presionado
+     */
     public Point getMouseClicked(int button) {
         synchronized (mouseEvents) {
             for (MouseEvent e : mouseEvents)
@@ -559,6 +695,11 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     // ------ fonts ------
+    /**
+     * Obtiene los tipos de letra del sistema
+     *
+     * @return los tipos de letra
+     */
     public String[] getSysFonts() {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         Font[] fonts = ge.getAllFonts();
@@ -569,6 +710,14 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         return sysFonts;
     }
 
+    /**
+     * Carga un tipo de letra para ser utilizado en el juego
+     *
+     * @param name   nombre interno a asignar
+     * @param fname  nombre del tipo de letra
+     * @param fstyle estilo del tipo de letra
+     * @param fsize  tamano del tipo de letra
+     */
     public void loadSysFont(String name, String fname, int fstyle, int fsize) {
         if (fonts.get(name) == null) {
             Font f = new Font(fname, fstyle, fsize);
@@ -576,10 +725,18 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         }
     }
 
+    /**
+     * Carga un tipo de letra True Type para ser utilizado en el juego
+     *
+     * @param name   nombre interno a asignar
+     * @param fname  nombre del archivo que contiene la fuente TTF
+     * @param fstyle estilo del tipo de letra
+     * @param fsize  tamano del tipo de letra
+     */
     public void loadTTFFont(String name, String fname, int fstyle, int fsize) {
         try {
             if (fname.charAt(2) == ':')
-                fname = fname.substring(3);
+                fname = fname.substring(1);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -601,37 +758,56 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         }
     }
 
+    /**
+     * Recupera un tipo de letra previamente cargado
+     *
+     * @param fname el nombre del tipo de letra a recuperar
+     *
+     * @return el tipo de letra
+     */
     public Font getFont(String fname) {
         return fonts.get(fname);
     }
 
     // ------ sounds ------
+    /**
+     * Carga un archivo de sonido para ser utilizado durante el juego
+     *
+     * @param name  nombre a asignar al sonido
+     * @param fname nombre del archivo que contiene el sonido
+     */
     public void loadSound(String name, String fname) {
-        try {
-            if (fname.charAt(2) == ':')
-                fname = fname.substring(3);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
+        if (fname.charAt(2) == ':')
+            fname = fname.substring(1);
 
         ClipData clipData = sounds.get(name);
         if (clipData == null) {
+            Path path = Paths.get(fname);
+            byte[] data = null;
+
             try {
-                FileInputStream fis = new FileInputStream(fname);
-                clipData = new ClipData();
-                clipData.clip = null;
-                clipData.data = fis.readAllBytes();
-                clipData.level = 50;
-                sounds.put(name, clipData);
-                fis.close();
-            } catch (Exception e) {
+                data = Files.readAllBytes(path);
+            } catch (IOException e) {
                 e.printStackTrace();
                 System.exit(1);
             }
+
+            clipData = new ClipData();
+            clipData.clip = null;
+            clipData.data = data;
+            clipData.level = 50;
+            sounds.put(name, clipData);
+
         }
     }
 
+    /**
+     * Inicia la reproduccion de un sonido
+     *
+     * @param name  el sonido (previamente cargado) a reproducir
+     * @param loop  el numero de veces a repeptirlo
+     * @param level el nivel de volumen
+     */
     public void playSound(String name, boolean loop, double level) {
         ClipData clipData = sounds.get(name);
 
@@ -672,6 +848,11 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         }
     }
 
+    /**
+     * Detiene la reproduccion de un sonido
+     *
+     * @param name el nombre del sonido a detener
+     */
     public void stopSound(String name) {
         ClipData clipData = sounds.get(name);
 
@@ -684,6 +865,12 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         clipData.clip.stop();
     }
 
+    /**
+     * Establece el volumen de un sonido previamente cargado
+     *
+     * @param name  el nombre del sonido
+     * @param level el nivel de volumen
+     */
     public void setSoundVolume(String name, double level) {
         ClipData clipData = sounds.get(name);
 
@@ -698,6 +885,11 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         setSoundVolume(clipData);
     }
 
+    /**
+     * Establece el volumen de un sonido previamente cargado
+     *
+     * @param clipData el sonido
+     */
     private void setSoundVolume(ClipData clipData) {
         try {
             FloatControl volume = (FloatControl) clipData.clip.getControl(FloatControl.Type.VOLUME);
@@ -707,6 +899,13 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         }
     }
 
+    /**
+     * Obtiene el volumen de un sonido previamente cargado
+     *
+     * @param name el nombre del sonido
+     *
+     * @return el nivel de volumen
+     */
     public double getSoundVolume(String name) {
         ClipData clipData = sounds.get(name);
 
@@ -717,30 +916,105 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     // ------ images ------
-    BufferedImage createOpageImage(int width, int height) {
+    /**
+     * Crea una imagen sin transparencia de dimensiones dadas
+     *
+     * @param width  ancho deseado
+     * @param height alto deseado
+     *
+     * @return la imagen creada
+     */
+    BufferedImage createOpaqueImage(int width, int height) {
         return gconfig.createCompatibleImage(width, height, Transparency.OPAQUE);
     }
 
+    /**
+     * Crea una imagen con transparencia de dimensiones dadas
+     *
+     * @param width  ancho deseado
+     * @param height alto deseado
+     *
+     * @return la imagen creada
+     */
     BufferedImage createTranslucentImage(int width, int height) {
         return gconfig.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
     }
 
+    /**
+     * Recupera un grupo de imagenes previamente cargadas
+     *
+     * @param iname el nombre asignado al grupo de imagenes
+     *
+     * @return la imagenes
+     */
     public BufferedImage[] getImages(String iname) {
         return images.get(iname);
     }
 
+    /**
+     * Cara una imagen o grupo de imagenes desde archivos para ser utilizadas en el
+     * juego
+     *
+     * @param iname   nombre a asignar a la imagen o grupo de imagenes cargados
+     * @param pattern nombre del archivo de imagenes a cargar. Si contiene un '*' se
+     *                cargaran todas las imaganes con igual nombre utilizando dicho
+     *                caracter como caracter especial de busqueda (ej.
+     *                imagen_0*.png)
+     * @param flipX   si es verdadero al imagen se reflejara en el eje X
+     * @param flipY   si es verdadero al imagen se reflejara en el eje Y
+     */
     public void loadImage(String iname, String pattern, boolean flipX, boolean flipY) {
         loadImage(iname, pattern, 1, new Dimension(0, 0), flipX, flipY);
     }
 
+    /**
+     * Cara una imagen o grupo de imagenes desde archivos para ser utilizadas en el
+     * juego
+     *
+     * @param iname   nombre a asignar a la imagen o grupo de imagenes cargados
+     * @param pattern nombre del archivo de imagenes a cargar. Si contiene un '*' se
+     *                cargaran todas las imaganes con igual nombre utilizando dicho
+     *                caracter como caracter especial de busqueda (ej.
+     *                imagen_0*.png)
+     * @param size    nuevo tamano de la imagen cargada
+     * @param flipX   si es verdadero al imagen se reflejara en el eje X
+     * @param flipY   si es verdadero al imagen se reflejara en el eje Y
+     */
     public void loadImage(String iname, String pattern, Dimension size, boolean flipX, boolean flipY) {
         loadImage(iname, pattern, 0, size, flipX, flipY);
     }
 
+    /**
+     * Cara una imagen o grupo de imagenes desde archivos para ser utilizadas en el
+     * juego
+     *
+     * @param iname   nombre a asignar a la imagen o grupo de imagenes cargados
+     * @param pattern nombre del archivo de imagenes a cargar. Si contiene un '*' se
+     *                cargaran todas las imaganes con igual nombre utilizando dicho
+     *                caracter como caracter especial de busqueda (ej.
+     *                imagen_0*.png)
+     * @param scale   factor de escala a aplicar a la imagen cargada
+     * @param flipX   si es verdadero al imagen se reflejara en el eje X
+     * @param flipY   si es verdadero al imagen se reflejara en el eje Y
+     */
     public void loadImage(String iname, String pattern, double scale, boolean flipX, boolean flipY) {
         loadImage(iname, pattern, scale, new Dimension(0, 0), flipX, flipY);
     }
 
+    /**
+     * Cara una imagen o grupo de imagenes desde archivos para ser utilizadas en el
+     * juego
+     *
+     * @param iname   nombre a asignar a la imagen o grupo de imagenes cargados
+     * @param pattern nombre del archivo de imagenes a cargar. Si contiene un '*' se
+     *                cargaran todas las imaganes con igual nombre utilizando dicho
+     *                caracter como caracter especial de busqueda (ej.
+     *                imagen_0*.png)
+     * @param scale   factor de escala a aplicar a la imagen cargada
+     * @param size    nuevo tamano de la imagen cargada
+     * @param flipX   si es verdadero al imagen se reflejara en el eje X
+     * @param flipY   si es verdadero al imagen se reflejara en el eje Y
+     */
     private void loadImage(String iname, String pattern, double scale, Dimension size, boolean flipX, boolean flipY) {
         ArrayList<BufferedImage> images = readImages(pattern);
 
@@ -791,10 +1065,18 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         this.images.put(iname, images.toArray(new BufferedImage[images.size()]));
     }
 
+    /**
+     * Carga una imagen o grupo de imagenes acorde al nombre de archivo dado
+     *
+     * @param pattern patron de busqueda de el o los archivos. El caracter '*' es
+     *                usado como comodin
+     *
+     * @return la o las imagenes cargadas
+     */
     private ArrayList<BufferedImage> readImages(String pattern) {
         try {
             if (pattern.charAt(2) == ':')
-                pattern = pattern.substring(3);
+                pattern = pattern.substring(1);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -810,7 +1092,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         }
 
         ArrayList<String> fnames = new ArrayList<String>();
-        Path p = Path.of(dir);
+        Path p = Paths.get(dir);
+
         DirectoryStream<Path> paths = null;
         try {
             paths = Files.newDirectoryStream(p, pattern);
@@ -829,6 +1112,13 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         return images;
     }
 
+    /**
+     * Carga una imagen desde el archivo especificado
+     *
+     * @param fname el archivo que contiene la imagen
+     *
+     * @return la imagen
+     */
     private BufferedImage readImage(String fname) {
         File f = new File(fname);
         BufferedImage img = null;
@@ -841,13 +1131,16 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         return img;
     }
 
-    // ------ window ------
+    // ------ JPanel ------
+
     @Override
     public void paintComponent(Graphics g) {
         synchronized (screen) {
             g.drawImage(screen, 0, 0, null);
         }
     }
+
+    // ------ JFrame ------
 
     @Override
     public void windowClosing(WindowEvent e) {
@@ -876,6 +1169,40 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
     @Override
     public void windowDeactivated(WindowEvent e) {
+    }
+
+    // ------ utils ------
+
+    /**
+     * Finaliza el programa si la condicion recibida no se cumple
+     *
+     * @param condition condicion a vertificar
+     * @param msg       mensaje a desplegar si la condicion no se cumple
+     */
+    private void assertion(boolean condition, String msg) {
+        if (!condition) {
+            System.out.println(msg);
+            System.exit(1);
+        }
+    }
+
+    /**
+     * Obtiene la ruta en el sistema de archivos del path recibido
+     *
+     * @param objClass clase a utilizar como directorio actual (su localizacion)
+     * @param path     ruta a convertir
+     *
+     * @return la ruta completa
+     */
+    public String getRealPath(Object objClass, String path) {
+        String p = null;
+        try {
+            p = new URI(objClass.getClass().getResource(path).getPath()).getPath();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return p;
     }
 
 }
