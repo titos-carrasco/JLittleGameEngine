@@ -218,15 +218,17 @@ public class GameObject {
     /**
      * Establece los eventos que recibira este objeto
      *
-     * @param onEventsEnabled el evento que se sumara a los eventos que recibira -
-     *                        LittleGameEngine.E_ON_DELETE
-     *                        LittleGameEngine.E_ON_START
-     *                        LittleGameEngine.E_ON_PRE_UPDATE
-     *                        LittleGameEngine.E_ON_UPDATE
-     *                        LittleGameEngine.E_ON_POST_UPDATE
-     *                        LittleGameEngine.E_ON_COLLISION
-     *                        LittleGameEngine.E_ON_PRE_RENDER
-     *                        LittleGameEngine.E_ON_QUIT
+     * @param onEventsEnabled el evento que se sumara a los eventos que recibira 
+     * 						<ul>
+     *                        <li>LittleGameEngine.E_ON_DELETE</li>
+     *                        <li>LittleGameEngine.E_ON_START</li>
+     *                        <li>LittleGameEngine.E_ON_PRE_UPDATE</li>
+     *                        <li>LittleGameEngine.E_ON_UPDATE</li>
+     *                        <li>LittleGameEngine.E_ON_POST_UPDATE</li>
+     *                        <li>LittleGameEngine.E_ON_COLLISION</li>
+     *                        <li>LittleGameEngine.E_ON_PRE_RENDER</li>
+     *                        <li>LittleGameEngine.E_ON_QUIT</li>
+     *                      </ul>
      *
      *                        Se deben sobreescribir los siguientes metodos segun se
      *                        habiliten los eventos: onDelete(), onStart(),
@@ -238,21 +240,21 @@ public class GameObject {
     }
 
     /**
-     * Si es habilitada, será invocada en el siguiente ciclo para todos los
-     * GameObjects marcados para eliminación
+     * Si es habilitada, serï¿½ invocada en el siguiente ciclo para todos los
+     * GameObjects marcados para eliminaciï¿½n
      */
     public void onDelete() {
     };
 
     /**
-     * Si es habilitada, será invocada en el siguiente ciclo para todos los
+     * Si es habilitada, serï¿½ invocada en el siguiente ciclo para todos los
      * GameObjects recien creados
      */
     public void onStart() {
     };
 
     /**
-     * Si es habilitada, será invocada en el siguiente ciclo para todos los
+     * Si es habilitada, serï¿½ invocada en el siguiente ciclo para todos los
      * GameObjects previo al evento onUpdate()
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
@@ -261,7 +263,7 @@ public class GameObject {
     };
 
     /**
-     * Si es habilitada, será invocada en el siguiente ciclo para todos los
+     * Si es habilitada, serï¿½ invocada en el siguiente ciclo para todos los
      * GameObjects previo al evento onPostUpdate()
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
@@ -270,7 +272,7 @@ public class GameObject {
     };
 
     /**
-     * Si es habilitada, será invocada en el siguiente ciclo para todos los
+     * Si es habilitada, serï¿½ invocada en el siguiente ciclo para todos los
      * GameObjects previo al evento onCollision()
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
@@ -279,7 +281,7 @@ public class GameObject {
     };
 
     /**
-     * Si es habilitada, será invocada en el siguiente ciclo para todos los
+     * Si es habilitada, serï¿½ invocada en el siguiente ciclo para todos los
      * GameObjects previo al evento onPreRender()
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
@@ -288,7 +290,7 @@ public class GameObject {
     };
 
     /**
-     * Si es habilitada, será invocada en el siguiente ciclo para todos los
+     * Si es habilitada, serï¿½ invocada en el siguiente ciclo para todos los
      * GameObjects previo al rendering del juego en pantalla
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
@@ -297,7 +299,7 @@ public class GameObject {
     };
 
     /**
-     * Si es habilitada, será invocadapara todos los GameObjects jusrto antes de
+     * Si es habilitada, serï¿½ invocadapara todos los GameObjects jusrto antes de
      * finalizar el game loop
      */
     public void onQuit() {

@@ -14,8 +14,7 @@ public class Camera extends GameObject {
     boolean targetInCenter;
 
     /**
-     * Crea la camara en la posicion y dimensiones dadas. Esta clase es privada al
-     * motor de juegos
+     * Crea la camara en la posicion y dimensiones dadas.
      *
      * @param position coordenadas (x, y) de la posicion inicial de la camara
      * @param size     dimension (width, height) de la camara

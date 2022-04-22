@@ -9,7 +9,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 /**
- * GameObject para trazar formas en LittleGameObject
+ * GameObject para trazar formas en Little Game Engine
  *
  * @author Roberto carrasco (titos.carrasco@gmail.com)
  *
