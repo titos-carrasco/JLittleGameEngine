@@ -14,6 +14,6 @@ public class Bird extends Sprite {
 
     @Override
     public void onUpdate(double dt) {
-        nextShape(dt, 0.060);
+        nextImage(dt, 0.060);
     }
 }

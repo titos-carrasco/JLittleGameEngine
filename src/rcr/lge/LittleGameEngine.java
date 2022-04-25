@@ -889,7 +889,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             FloatControl volume = (FloatControl) clipData.clip.getControl(FloatControl.Type.VOLUME);
             volume.setValue((float) (clipData.level / 100.0));
         } catch (Exception e) {
-            System.out.println("SetSoundVolume(): " + e);
+            // System.out.println("SetSoundVolume(): " + e);
         }
     }
 

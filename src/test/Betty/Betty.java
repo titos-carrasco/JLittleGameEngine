@@ -16,15 +16,14 @@ public class Betty extends Sprite {
     private Point lastPoint;
 
     public Betty(String name, Dimension winSize) {
-        super(new String[] { "betty_idle", "betty_down", "betty_up", "betty_left", "betty_right" }, new Point(0, 0),
-                name);
+        super("betty_idle", new Point(0, 0), name);
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
 
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
         setOnEvents(LittleGameEngine.E_ON_COLLISION);
-        setShape("betty_idle");
+        setImage("betty_idle");
         setTag("Betty");
         useColliders(true);
         alive = true;
@@ -37,7 +36,7 @@ public class Betty extends Sprite {
 
     public void setAlive(boolean alive) {
         this.alive = alive;
-        setShape("betty_idle");
+        setImage("betty_idle");
     }
 
     @Override
@@ -57,21 +56,21 @@ public class Betty extends Sprite {
         lastPoint = new Point(x, y);
 
         // cambiamos sus coordenadas e imagen segun la tecla presionada
-        int idx = getCurrentIdx();
+        int idx = getImagesIndex();
         if (lge.keyPressed(KeyEvent.VK_RIGHT)) {
-            setShape("betty_right", idx);
+            setImage("betty_right", idx);
             x = x + pixels;
         } else if (lge.keyPressed(KeyEvent.VK_LEFT)) {
-            setShape("betty_left", idx);
+            setImage("betty_left", idx);
             x = x - pixels;
         } else if (lge.keyPressed(KeyEvent.VK_UP)) {
-            setShape("betty_up", idx);
+            setImage("betty_up", idx);
             y = y - pixels;
         } else if (lge.keyPressed(KeyEvent.VK_DOWN)) {
-            setShape("betty_down", idx);
+            setImage("betty_down", idx);
             y = y + pixels;
         } else {
-            setShape("betty_idle", idx);
+            setImage("betty_idle", idx);
             if (x % 32 < 4)
                 x = Math.round(x / 32) * 32;
             else if (x % 32 > 28)
@@ -90,7 +89,7 @@ public class Betty extends Sprite {
 
         // siguiente imagen de la secuencia
         setPosition(x, y);
-        nextShape(dt, 0.1);
+        nextImage(dt, 0.1);
     }
 
     @Override

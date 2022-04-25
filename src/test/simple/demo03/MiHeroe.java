@@ -11,14 +11,13 @@ public class MiHeroe extends Sprite {
     private LittleGameEngine lge;
 
     public MiHeroe() {
-        super(new String[] { "heroe_right", "heroe_left" }, new Point(550, 626), "Heroe");
+        super("heroe_right", new Point(550, 626), "Heroe");
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
 
         // sus atributos
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
-        setShape("heroe_right");
         setBounds(new Rectangle(0, 0, 1920, 1056));
     }
 
@@ -37,10 +36,10 @@ public class MiHeroe extends Sprite {
         // cambiamos sus coordenadas segun la tecla presionada
         if (lge.keyPressed(KeyEvent.VK_RIGHT)) {
             x = (int) (x + pixels);
-            setShape("heroe_right");
+            setImage("heroe_right");
         } else if (lge.keyPressed(KeyEvent.VK_LEFT)) {
             x = (int) (x - pixels);
-            setShape("heroe_left");
+            setImage("heroe_left");
         }
 
         if (lge.keyPressed(KeyEvent.VK_UP))

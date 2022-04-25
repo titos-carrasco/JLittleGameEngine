@@ -21,7 +21,7 @@ public class Zombie extends Sprite {
         lge = LittleGameEngine.getInstance();
 
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
-        setShape("zombie", 0);
+        setImage("zombie", 0);
         setTag("zombie");
         useColliders(true);
         active = true;
@@ -176,6 +176,6 @@ public class Zombie extends Sprite {
         }
 
         // siguiente imagen de la secuencia
-        nextShape(dt, 0.1);
+        nextImage(dt, 0.1);
     }
 }

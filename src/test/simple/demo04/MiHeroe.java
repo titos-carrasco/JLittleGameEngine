@@ -12,15 +12,13 @@ public class MiHeroe extends Sprite {
     private int state;
 
     public MiHeroe() {
-        super(new String[] { "heroe_idle_right", "heroe_idle_left", "heroe_run_right", "heroe_run_left" },
-                new Point(550, 626), "Heroe");
+        super("heroe_idle_right", new Point(550, 626), "Heroe");
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
 
         // sus atributos
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
-        setShape("heroe_idle_right", 0);
         state = 1;
         setBounds(new Rectangle(0, 0, 1920, 1056));
     }
@@ -41,23 +39,23 @@ public class MiHeroe extends Sprite {
         if (lge.keyPressed(KeyEvent.VK_RIGHT)) {
             x = (int) (x + pixels);
             if (state != 2) {
-                setShape("heroe_run_right");
+                setImage("heroe_run_right");
                 state = 2;
             }
         } else if (lge.keyPressed(KeyEvent.VK_LEFT)) {
             x = (int) (x - pixels);
             if (state != -2) {
-                setShape("heroe_run_left");
+                setImage("heroe_run_left");
                 state = -2;
             }
         } else if (state == 2) {
             if (state != 1) {
-                setShape("heroe_idle_right");
+                setImage("heroe_idle_right");
                 state = 1;
             }
         } else if (state == -2) {
             if (state != -1) {
-                setShape("heroe_idle_left");
+                setImage("heroe_idle_left");
                 state = -1;
             }
         }
@@ -68,7 +66,7 @@ public class MiHeroe extends Sprite {
             y = (int) (y + pixels);
 
         // siguiente imagen de la secuencia
-        nextShape(dt, 0.050);
+        nextImage(dt, 0.050);
 
         // lo posicionamos
         setPosition(x, y);

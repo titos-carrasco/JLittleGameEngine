@@ -44,7 +44,7 @@ public class MoveCamera implements IEvents {
 
         // agregamos el icono del sonido
         Sprite mute = new Sprite("mute", new Point(8, 3), "mute");
-        mute.setShape("mute", 1);
+        mute.setImage("mute", 1);
         lge.addGObjectGUI(mute);
 
         // agregamos al heroe
@@ -86,12 +86,12 @@ public class MoveCamera implements IEvents {
             Sprite mute = (Sprite) lge.getGObject("mute");
             Rectangle r = mute.getRectangle();
             if (r.contains(mousePosition)) {
-                int idx = mute.getCurrentIdx();
+                int idx = mute.getImagesIndex();
                 if (idx == 1)
                     lge.setSoundVolume("fondo", 0);
                 else
                     lge.setSoundVolume("fondo", 50);
-                mute.nextShape();
+                mute.nextImage();
             }
         }
 
