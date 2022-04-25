@@ -18,7 +18,7 @@ public class Particles implements IEvents {
 
     public Particles() {
         // creamos el juego
-        Dimension winSize = new Dimension(800, 600);
+        Dimension winSize = new Dimension(800, 440);
 
         lge = new LittleGameEngine(winSize, "Particles", new Color(0xFFFFFF));
         lge.setOnMainUpdate(this);
@@ -29,7 +29,7 @@ public class Particles implements IEvents {
         lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Point(0, 580), new Dimension(800, 20), "infobar");
+        Canvas infobar = new Canvas(new Point(0, 0), new Dimension(800, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // un canvas para plotear
@@ -41,9 +41,9 @@ public class Particles implements IEvents {
         numParticles = 500;
         particles = new Particle[numParticles];
         for (int i = 0; i < numParticles; i++) {
-            double x = (int) (100 + Math.random() * 600);
-            double y = (int) (300 + Math.random() * 200);
-            double vx = -60 + Math.random() * 120;
+            double x = (int) (300 + Math.random() * 200);
+            double y = (int) (100 + Math.random() * 100);
+            double vx = -120 + Math.random() * 240;
             double vy = -120 + Math.random() * 240;
             double m = 0.1 + Math.random();
             particles[i] = new Particle(x, y, vx, vy, m);
@@ -65,7 +65,7 @@ public class Particles implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Point(140, 5), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new Point(140, 16), "monospace.plain.16", Color.BLACK);
 
         // las particulas
         for (int i = 0; i < numParticles; i++) {
@@ -78,7 +78,7 @@ public class Particles implements IEvents {
             Particle particle = particles[i];
             int x = (int) Math.round(particle.x);
             int y = (int) Math.round(particle.y);
-            int r = (int) Math.round(particle.m * 10);
+            int r = (int) Math.round(particle.m * 5);
             panel.drawRectangle(new Point(x, y), new Dimension(r, r), Color.BLACK, false);
         }
     }

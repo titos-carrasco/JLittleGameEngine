@@ -66,10 +66,10 @@ public class Betty extends Sprite {
             x = x - pixels;
         } else if (lge.keyPressed(KeyEvent.VK_UP)) {
             setShape("betty_up", idx);
-            y = y + pixels;
+            y = y - pixels;
         } else if (lge.keyPressed(KeyEvent.VK_DOWN)) {
             setShape("betty_down", idx);
-            y = y - pixels;
+            y = y + pixels;
         } else {
             setShape("betty_idle", idx);
             if (x % 32 < 4)

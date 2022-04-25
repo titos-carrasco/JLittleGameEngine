@@ -55,8 +55,8 @@ public class Zombie extends Sprite {
         int y = getY();
 
         // posicion respecto a Betty
-        boolean abajo = y < by;
-        boolean arriba = y > by;
+        boolean abajo = y > by;
+        boolean arriba = y < by;
         boolean izquierda = x < bx;
         boolean derecha = x > bx;
 
@@ -143,9 +143,9 @@ public class Zombie extends Sprite {
             else if (c == 'L')
                 nx -= pixels;
             else if (c == 'U')
-                ny += pixels;
-            else if (c == 'D')
                 ny -= pixels;
+            else if (c == 'D')
+                ny += pixels;
 
             // verificamos que no colisionemos con un muro u otro zombie
             setPosition(nx, ny);

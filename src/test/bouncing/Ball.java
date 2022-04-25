@@ -23,7 +23,7 @@ public class Ball extends Canvas {
         this.vx = vx;
         this.vy = vy;
         g = 240;
-        e = 0.8;
+        e = 0.4;
         useColliders(true);
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
         setOnEvents(LittleGameEngine.E_ON_COLLISION);
@@ -42,7 +42,7 @@ public class Ball extends Canvas {
             return;
         }
 
-        vy = vy - g * dt;
+        vy = vy + g * dt;
         setPosition((int) x, (int) y);
     }
 
@@ -51,11 +51,11 @@ public class Ball extends Canvas {
         for (GameObject gobj : gobjs) {
             if (gobj.getTag().equals("ground")) {
                 double x = getX();
-                double y = gobj.getY() + gobj.getHeight();
+                double y = gobj.getY() - getHeight();
                 setPosition((int) x, (int) y);
 
                 vy = -vy * e;
-                if (Math.abs(vy) < 30) {
+                if (Math.abs(vy) < 50) {
                     vy = 0;
                     vx = 0;
                     g = 0;

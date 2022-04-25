@@ -16,11 +16,11 @@ public class Bouncing implements IEvents {
 
     public Bouncing() {
         // creamos el juego
-        Dimension winSize = new Dimension(800, 600);
+        Dimension winSize = new Dimension(800, 440);
 
         lge = new LittleGameEngine(winSize, "Bouncing Balls", new Color(0xFFFFFF));
-        lge.showColliders(new Color(0xFF0000));
         lge.setOnMainUpdate(this);
+        lge.showColliders(new Color(0xFF0000));
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../resources");
@@ -28,7 +28,7 @@ public class Bouncing implements IEvents {
         lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos el suelo
-        ground = new Canvas(new Point(0, 0), new Dimension(800, 100), "ground");
+        ground = new Canvas(new Point(0, 340), new Dimension(800, 100), "ground");
         ground.fill(Color.GRAY);
         ground.setTag("ground");
         ground.useColliders(true);
@@ -37,7 +37,7 @@ public class Bouncing implements IEvents {
         // los objetos a rebotar
         for (int i = 0; i < 50; i++) {
             int x = (int) (50 + Math.random() * 700);
-            int y = (int) (200 + Math.random() * 200);
+            int y = (int) (50 + Math.random() * 150);
             double vx = -50 + Math.random() * 100;
             double vy = 0;
             Ball gobj = new Ball(x, y, vx, vy);
@@ -45,7 +45,7 @@ public class Bouncing implements IEvents {
         }
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Point(0, 580), new Dimension(800, 20), "infobar");
+        Canvas infobar = new Canvas(new Point(0, 0), new Dimension(800, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
     }
@@ -65,7 +65,7 @@ public class Bouncing implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Point(140, 5), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new Point(140, 16), "monospace.plain.16", Color.BLACK);
     }
 
     // main loop

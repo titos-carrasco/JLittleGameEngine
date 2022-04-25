@@ -24,9 +24,9 @@ public class Game implements IEvents {
         // creamos el juego
         Dimension winSize = new Dimension(608, 736);
 
-        lge = new LittleGameEngine(winSize, "Betty", new Color(0xFFFF00));
-        // lge.ShowColliders(new Color(0xFF0000));
+        lge = new LittleGameEngine(winSize, "Betty", new Color(0xFFFFFF));
         lge.setOnMainUpdate(this);
+        lge.showColliders(new Color(0xFF0000));
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../resources");
@@ -46,20 +46,20 @@ public class Game implements IEvents {
         lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Point(0, 714), new Dimension(640, 20), "infobar");
+        Canvas infobar = new Canvas(new Point(0, 0), new Dimension(640, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // cargamos el mapa en memoria
         try {
             String fname = new URI(resourceDir + "/images/Betty/Mapa.txt").getPath();
             mapa = new int[22][19];
-            int x = 0, y = mapa.length - 1;
+            int x = 0, y = 0;
             Scanner scanner = new Scanner(new File(fname));
             while (scanner.hasNextLine()) {
                 String[] line = scanner.nextLine().split(",");
                 for (x = 0; x < line.length; x++)
                     mapa[y][x] = Integer.valueOf(line[x]);
-                y--;
+                y++;
             }
             scanner.close();
 
@@ -70,13 +70,13 @@ public class Game implements IEvents {
 
         // agregamos a Betty
         Betty betty = new Betty("Betty", winSize);
-        betty.setPosition(32 * 9, 32 * 13);
+        betty.setPosition(32 * 9, 32 * 9);
         lge.addGObject(betty, 1);
 
         // agregamos 3 zombies
         for (int i = 0; i < 3; i++) {
             Zombie zombie = new Zombie("Zombie-" + i, winSize);
-            zombie.setPosition(32 + 32 * 4 + 32 * (i * 4), 32 * 1);
+            zombie.setPosition(32 + 32 * 4 + 32 * (i * 4), 32 * 21);
             lge.addGObject(zombie, 1);
         }
 
@@ -84,7 +84,7 @@ public class Game implements IEvents {
         for (int y = 0; y < mapa.length; y++)
             for (int x = 0; x < mapa[y].length; x++)
                 if (mapa[y][x] == 1) {
-                    GameObject muro = new GameObject(new Point(x * 32, y * 32), new Dimension(32, 32));
+                    GameObject muro = new GameObject(new Point(x * 32, 32 + y * 32), new Dimension(32, 32));
                     muro.useColliders(true);
                     muro.setTag("muro");
                     lge.addGObject(muro, 1);
@@ -106,7 +106,7 @@ public class Game implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x80808080, true));
-        infobar.drawText(info, new Point(50, 5), "monospace.plain.16", Color.WHITE);
+        infobar.drawText(info, new Point(50, 16), "monospace.plain.16", Color.WHITE);
     }
 
     // main loop

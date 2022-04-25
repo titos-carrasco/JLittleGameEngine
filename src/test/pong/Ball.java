@@ -12,7 +12,7 @@ public class Ball extends Canvas {
     private int initX;
     private int initY;
     private double speedX = 180;
-    private double speedY = -180;
+    private double speedY = 180;
 
     public Ball(Point position, Dimension size, String name) {
         super(position, size, name);

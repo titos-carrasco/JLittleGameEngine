@@ -15,7 +15,7 @@ public class MiHeroe extends Sprite {
 
     public MiHeroe() {
         super(new String[] { "heroe_idle_right", "heroe_idle_left", "heroe_run_right", "heroe_run_left" },
-                new Point(550, 346), "Heroe");
+                new Point(550, 626), "Heroe");
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
@@ -68,9 +68,9 @@ public class MiHeroe extends Sprite {
         }
 
         if (lge.keyPressed(KeyEvent.VK_UP))
-            y = y + pixels;
-        else if (lge.keyPressed(KeyEvent.VK_DOWN))
             y = y - pixels;
+        else if (lge.keyPressed(KeyEvent.VK_DOWN))
+            y = y + pixels;
 
         // siguiente imagen de la secuencia
         nextShape(dt, 0.050);

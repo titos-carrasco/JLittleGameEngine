@@ -19,7 +19,7 @@ public class MovePlayer implements IEvents {
         // creamos el juego
         Dimension winSize = new Dimension(640, 480);
 
-        lge = new LittleGameEngine(winSize, "Move Player", new Color(0xFFFF00));
+        lge = new LittleGameEngine(winSize, "Move Player", new Color(0xFFFFFF));
         lge.showColliders(new Color(0xFF0000));
         lge.setOnMainUpdate(this);
 
@@ -41,11 +41,11 @@ public class MovePlayer implements IEvents {
         lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Point(0, 460), new Dimension(640, 20), "infobar");
+        Canvas infobar = new Canvas(new Point(0, 0), new Dimension(640, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // agregamos el icono del sonido
-        Sprite mute = new Sprite("mute", new Point(8, 463), "mute");
+        Sprite mute = new Sprite("mute", new Point(8, 3), "mute");
         mute.setShape("mute", 1);
         lge.addGObjectGUI(mute);
 
@@ -75,7 +75,7 @@ public class MovePlayer implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Point(50, 5), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new Point(50, 16), "monospace.plain.16", Color.BLACK);
 
         // mute on/mute off
         mousePosition = lge.getMouseClicked(0);

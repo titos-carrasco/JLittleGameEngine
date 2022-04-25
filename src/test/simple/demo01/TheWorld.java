@@ -19,7 +19,7 @@ public class TheWorld implements IEvents {
         // creamos el juego
         Dimension winSize = new Dimension(800, 440);
 
-        lge = new LittleGameEngine(winSize, "The World", new Color(0xFFFF00));
+        lge = new LittleGameEngine(winSize, "The World", new Color(0xFFFFFF));
         lge.setOnMainUpdate(this);
 
         // cargamos los recursos que usaremos
@@ -40,16 +40,16 @@ public class TheWorld implements IEvents {
         lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Point(0, 420), new Dimension(800, 20), "infobar");
+        Canvas infobar = new Canvas(new Point(0, 0), new Dimension(800, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // agregamos el icono del sonido
-        Sprite mute = new Sprite("mute", new Point(8, 423), "mute");
+        Sprite mute = new Sprite("mute", new Point(8, 3), "mute");
         mute.setShape("mute", 1);
         lge.addGObjectGUI(mute);
 
         // agregamos al heroe
-        Sprite heroe = new Sprite("heroe", new Point(226, 142), "Heroe");
+        Sprite heroe = new Sprite("heroe", new Point(226, 254), "Heroe");
         lge.addGObject(heroe, 1);
 
         // agregamos un texto con transparencia
@@ -73,7 +73,7 @@ public class TheWorld implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Point(140, 5), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new Point(140, 16), "monospace.plain.16", Color.BLACK);
 
         // sonido on/off
         mousePosition = lge.getMouseClicked(0);

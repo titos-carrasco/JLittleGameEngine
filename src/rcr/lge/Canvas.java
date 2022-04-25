@@ -56,14 +56,14 @@ public class Canvas extends GameObject {
      *
      * @param text     el texto a trazar
      * @param position coordenada (x, y) en donde se trazara el texto dentro del
-     *                 canvas
+     *                 canvas (linea base del texto)
      * @param fname    nombre del font (cargado con LoadFont) a utilizar para trazar
      *                 el texto
      * @param color    color a utilizar (r,g,b) para trazar el texto
      */
     public void drawText(String text, Point position, String fname, Color color) {
         int x = position.x;
-        int y = rect.height - position.y;
+        int y = position.y;
 
         Graphics2D g2d = surface.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -85,7 +85,7 @@ public class Canvas extends GameObject {
      */
     public void drawPoint(Point position, Color color) {
         int x = position.x;
-        int y = rect.height - position.y;
+        int y = position.y;
 
         Graphics2D g2d = surface.createGraphics();
         g2d.setColor(color);
@@ -104,7 +104,7 @@ public class Canvas extends GameObject {
      */
     public void drawCircle(Point position, int radius, Color color, boolean thickness) {
         int x = position.x;
-        int y = rect.height - position.y;
+        int y = position.y;
 
         Graphics2D g2d = surface.createGraphics();
         g2d.setColor(color);
@@ -127,7 +127,7 @@ public class Canvas extends GameObject {
      */
     public void drawRectangle(Point position, Dimension size, Color color, boolean thickness) {
         int x = position.x;
-        int y = rect.height - size.height - position.y;
+        int y = position.y;
 
         Graphics2D g2d = surface.createGraphics();
         g2d.setColor(color);
@@ -147,7 +147,7 @@ public class Canvas extends GameObject {
      */
     public void drawSurface(Point position, BufferedImage surface) {
         int x = position.x;
-        int y = rect.height - surface.getHeight() - position.y;
+        int y = position.y;
 
         Graphics2D g2d = this.surface.createGraphics();
         g2d.drawImage(surface, x, y, null);

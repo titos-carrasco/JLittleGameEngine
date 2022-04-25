@@ -20,6 +20,7 @@ public class Pong implements IEvents {
 
         lge = new LittleGameEngine(winSize, "Ping", new Color(0x000000));
         lge.setOnMainUpdate(this);
+        lge.showColliders(new Color(255, 0, 0));
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../resources");
@@ -27,51 +28,51 @@ public class Pong implements IEvents {
         lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Point(0, 620), new Dimension(640, 20), "infobar");
+        Canvas infobar = new Canvas(new Point(0, 0), new Dimension(640, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // el campo de juego
-        Canvas field = new Canvas(new Point(24, 34), new Dimension(592, 526), "field");
+        Canvas field = new Canvas(new Point(24, 80), new Dimension(592, 526), "field");
         field.fill(new Color(0, 0, 100));
         lge.addGObject(field, 0);
 
         // los bordes
-        Canvas wall = new Canvas(new Point(0, 560), new Dimension(640, 4));
+        Canvas wall = new Canvas(new Point(0, 76), new Dimension(640, 4));
         wall.fill(Color.WHITE);
         wall.setTag("wall-horizontal");
         wall.useColliders(true);
         lge.addGObject(wall, 1);
 
-        wall = new Canvas(new Point(0, 30), new Dimension(640, 4));
+        wall = new Canvas(new Point(0, 606), new Dimension(640, 4));
         wall.fill(Color.WHITE);
         wall.setTag("wall-horizontal");
         wall.useColliders(true);
         lge.addGObject(wall, 1);
 
-        wall = new Canvas(new Point(20, 34), new Dimension(4, 526));
+        wall = new Canvas(new Point(20, 80), new Dimension(4, 526));
         wall.fill(Color.WHITE);
         wall.setTag("wall-vertical");
         wall.useColliders(true);
         lge.addGObject(wall, 1);
 
-        wall = new Canvas(new Point(616, 34), new Dimension(4, 526));
+        wall = new Canvas(new Point(616, 80), new Dimension(4, 526));
         wall.fill(Color.WHITE);
         wall.setTag("wall-vertical");
         wall.useColliders(true);
         lge.addGObject(wall, 1);
 
         // los actores
-        Ball ball = new Ball(new Point(320, 400), new Dimension(8, 8), "ball");
+        Ball ball = new Ball(new Point(320, 300), new Dimension(8, 8), "ball");
         lge.addGObject(ball, 1);
 
-        Canvas paddle = new Canvas(new Point(90, 270), new Dimension(8, 60), "user-paddle");
+        Canvas paddle = new Canvas(new Point(90, 340), new Dimension(8, 60), "user-paddle");
         paddle.fill(Color.WHITE);
         paddle.setTag("paddle");
         paddle.useColliders(true);
         paddle.setBounds(field.getRectangle());
         lge.addGObject(paddle, 1);
 
-        paddle = new Canvas(new Point(540, 270), new Dimension(8, 60), "system-paddle");
+        paddle = new Canvas(new Point(540, 340), new Dimension(8, 60), "system-paddle");
         paddle.fill(Color.WHITE);
         paddle.setTag("paddle");
         paddle.useColliders(true);
@@ -94,7 +95,7 @@ public class Pong implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x80808080, true));
-        infobar.drawText(info, new Point(50, 5), "monospace.plain.16", Color.WHITE);
+        infobar.drawText(info, new Point(50, 16), "monospace.plain.16", Color.WHITE);
 
         // user paddle
         Canvas userPaddle = (Canvas) lge.getGObject("user-paddle");
@@ -103,9 +104,9 @@ public class Pong implements IEvents {
         int y = userPaddle.getY();
 
         if (lge.keyPressed(KeyEvent.VK_UP))
-            userPaddle.setPosition(x, (int) (y + speed));
-        else if (lge.keyPressed(KeyEvent.VK_DOWN))
             userPaddle.setPosition(x, (int) (y - speed));
+        else if (lge.keyPressed(KeyEvent.VK_DOWN))
+            userPaddle.setPosition(x, (int) (y + speed));
 
         // la pelota
         Ball ball = (Ball) lge.getGObject("ball");

@@ -11,7 +11,7 @@ public class MiHeroe extends Sprite {
     private LittleGameEngine lge;
 
     public MiHeroe() {
-        super(new String[] { "heroe_right", "heroe_left" }, new Point(550, 346), "Heroe");
+        super(new String[] { "heroe_right", "heroe_left" }, new Point(550, 626), "Heroe");
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
@@ -44,9 +44,9 @@ public class MiHeroe extends Sprite {
         }
 
         if (lge.keyPressed(KeyEvent.VK_UP))
-            y = (int) (y + pixels);
-        else if (lge.keyPressed(KeyEvent.VK_DOWN))
             y = (int) (y - pixels);
+        else if (lge.keyPressed(KeyEvent.VK_DOWN))
+            y = (int) (y + pixels);
 
         // lo posicionamos
         setPosition(x, y);

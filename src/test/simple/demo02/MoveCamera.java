@@ -19,7 +19,7 @@ public class MoveCamera implements IEvents {
         // creamos el juego
         Dimension winSize = new Dimension(640, 480);
 
-        lge = new LittleGameEngine(winSize, "Move Camera", new Color(0xFFFF00));
+        lge = new LittleGameEngine(winSize, "Move Camera", new Color(0xFFFFFF));
         lge.setOnMainUpdate(this);
 
         // cargamos los recursos que usaremos
@@ -39,16 +39,16 @@ public class MoveCamera implements IEvents {
         lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Point(0, 460), new Dimension(640, 20), "infobar");
+        Canvas infobar = new Canvas(new Point(0, 0), new Dimension(640, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // agregamos el icono del sonido
-        Sprite mute = new Sprite("mute", new Point(8, 463), "mute");
+        Sprite mute = new Sprite("mute", new Point(8, 3), "mute");
         mute.setShape("mute", 1);
         lge.addGObjectGUI(mute);
 
         // agregamos al heroe
-        Sprite heroe = new Sprite("heroe", new Point(550, 346), "Heroe");
+        Sprite heroe = new Sprite("heroe", new Point(550, 626), "Heroe");
         lge.addGObject(heroe, 1);
 
         // # configuramos la camara
@@ -78,7 +78,7 @@ public class MoveCamera implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Point(50, 5), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new Point(50, 16), "monospace.plain.16", Color.BLACK);
 
         // mute on/off
         mousePosition = lge.getMouseClicked(0);
@@ -111,9 +111,9 @@ public class MoveCamera implements IEvents {
             cameraPosition.x = (int) (cameraPosition.x - pixels);
 
         if (lge.keyPressed(KeyEvent.VK_UP))
-            cameraPosition.y = (int) (cameraPosition.y + pixels);
-        else if (lge.keyPressed(KeyEvent.VK_DOWN))
             cameraPosition.y = (int) (cameraPosition.y - pixels);
+        else if (lge.keyPressed(KeyEvent.VK_DOWN))
+            cameraPosition.y = (int) (cameraPosition.y + pixels);
 
         // posicionamos la camara
         lge.setCameraPosition(cameraPosition);
