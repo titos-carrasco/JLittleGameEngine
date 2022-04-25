@@ -24,7 +24,7 @@ public class Ball extends Canvas {
         this.vy = vy;
         g = 240;
         e = 0.4;
-        useColliders(true);
+        enableCollider(true);
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
         setOnEvents(LittleGameEngine.E_ON_COLLISION);
 

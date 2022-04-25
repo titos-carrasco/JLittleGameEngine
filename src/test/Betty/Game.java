@@ -26,7 +26,7 @@ public class Game implements IEvents {
 
         lge = new LittleGameEngine(winSize, "Betty", new Color(0xFFFFFF));
         lge.setOnMainUpdate(this);
-        lge.showColliders(new Color(0xFF0000));
+        // lge.showColliders(new Color(0xFF0000));
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../resources");
@@ -85,7 +85,7 @@ public class Game implements IEvents {
             for (int x = 0; x < mapa[y].length; x++)
                 if (mapa[y][x] == 1) {
                     GameObject muro = new GameObject(new Point(x * 32, 32 + y * 32), new Dimension(32, 32));
-                    muro.useColliders(true);
+                    muro.enableCollider(true);
                     muro.setTag("muro");
                     lge.addGObject(muro, 1);
                 }

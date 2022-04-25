@@ -18,7 +18,7 @@ public class Ball extends Canvas {
         super(position, size, name);
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
         setOnEvents(LittleGameEngine.E_ON_COLLISION);
-        useColliders(true);
+        enableCollider(true);
         fill(Color.WHITE);
 
         initX = position.x;

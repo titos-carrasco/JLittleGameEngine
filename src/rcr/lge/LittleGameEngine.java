@@ -218,7 +218,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param fps los fps a mantener
      */
     public void run(int fps) {
-        BufferedImage _screen = createOpaqueImage(screen.getWidth(), screen.getHeight());
         running = true;
         long tickExpected = (long) (1000.0 / fps);
         long tickPrev = System.currentTimeMillis();
@@ -321,7 +320,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                                 continue;
                             if (!gobj2.useColliders)
                                 continue;
-                            if (!gobj1.rect.intersects(gobj2.rect))
+                            if (!gobj1.collidesWith(gobj2))
                                 continue;
                             colliders.add(gobj2);
                         }
@@ -349,7 +348,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             camera.followTarget();
 
             // --- Rendering
-            Graphics2D g2d = _screen.createGraphics();
+            Graphics2D g2d = screen.createGraphics();
             g2d.setColor(bgColor);
             g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
 
@@ -360,14 +359,17 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                     for (GameObject gobj : elem.getValue()) {
                         if (!gobj.rect.intersects(camera.rect))
                             continue;
-                        Point p = fixXY(gobj);
+                        Point p = fixXY(gobj.getPosition());
                         BufferedImage surface = gobj.surface;
                         if (surface != null)
                             g2d.drawImage(surface, p.x, p.y, null);
 
                         if (collidersColor != null && gobj.useColliders) {
                             g2d.setColor(collidersColor);
-                            g2d.drawRect(p.x, p.y, gobj.rect.width - 1, gobj.rect.height - 1);
+                            for (Rectangle r : gobj.getCollider()) {
+                                p = fixXY(new Point(r.x, r.y));
+                                g2d.drawRect(p.x, p.y, r.width - 1, r.height - 1);
+                            }
                         }
                     }
                 }
@@ -389,10 +391,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             }
             g2d.dispose();
 
-            synchronized (screen) {
-                screen.setData(_screen.getData());
-            }
-            this.paintComponent(this.getGraphics());
+            repaint();
         }
 
         // --- gobj.OnQuit
@@ -418,16 +417,16 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     /**
      * Traslada las coordenadas del GameObject a la zona de despliegue de la camara
      *
-     * @param gobj el objeto del cual trasladar sus coordenadas
+     * @param p las coordenadas a trasladar
      *
      * @return las coordenadas trasladadas
      */
-    private Point fixXY(GameObject gobj) {
-        int xo = gobj.rect.x;
+    private Point fixXY(Point p) {
+        int xo = p.x;
         int vx = camera.rect.x;
         int x = xo - vx;
 
-        int yo = gobj.rect.y;
+        int yo = p.y;
         int vy = camera.rect.y;
         int y = yo - vy;
 
@@ -496,12 +495,12 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      *
      * @return los GameObjects con los que colisiona
      */
-    public GameObject[] intersectGObjects(GameObject gobj) {
+    public GameObject[] collidesWithGObjects(GameObject gobj) {
         ArrayList<GameObject> gobjs = new ArrayList<GameObject>();
 
         if (gobj.useColliders)
             for (GameObject o : gLayers.get(gobj.layer))
-                if (gobj != o && o.useColliders && gobj.rect.intersects(o.rect))
+                if (gobj != o && o.useColliders && gobj.collidesWith(o))
                     gobjs.add(o);
 
         return gobjs.toArray(new GameObject[gobjs.size()]);
@@ -646,17 +645,11 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @return verdadero si se encuentra presionado
      */
     public Point getMouseClicked(int button) {
-        Point p = null;
         synchronized (mouseClicked) {
-            p = mouseClicked[button];
+            Point p = mouseClicked[button];
             mouseClicked[button] = null;
+            return p;
         }
-
-        // if (p != null)
-        // SwingUtilities.convertPointFromScreen(p, this);
-
-        return p;
-
     }
 
     @Override
@@ -1129,9 +1122,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
     @Override
     public void paintComponent(Graphics g) {
-        synchronized (screen) {
-            g.drawImage(screen, 0, 0, null);
-        }
+        g.drawImage(screen, 0, 0, null);
     }
 
     // ------ JFrame ------

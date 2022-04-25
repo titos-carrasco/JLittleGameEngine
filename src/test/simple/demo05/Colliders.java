@@ -56,7 +56,8 @@ public class Colliders implements IEvents {
 
         // agregamos un ninja
         Sprite ninja = new Sprite("ninja", new Point(350, 720), "ninja");
-        ninja.useColliders(true);
+        ninja.enableCollider(true);
+        ninja.setCollider(new Rectangle[] { new Rectangle(36, 8, 36, 36), new Rectangle(28, 44, 44, 36) });
         lge.addGObject(ninja, 1);
 
         // agregamos al heroe

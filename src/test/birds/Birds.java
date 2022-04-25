@@ -20,7 +20,7 @@ public class Birds implements IEvents {
 
         lge = new LittleGameEngine(winSize, "Birds", new Color(0xFFFFFF));
         lge.setOnMainUpdate(this);
-        lge.showColliders(new Color(255, 0, 0));
+        // lge.showColliders(new Color(255, 0, 0));
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../resources");
@@ -49,7 +49,7 @@ public class Birds implements IEvents {
             int x = (int) (Math.random() * winSize.width);
             int y = (int) (Math.random() * winSize.height);
             Bird bird = new Bird("bird", new Point(x, y));
-            bird.useColliders(true);
+            // bird.enableCollider(true);
             lge.addGObject(bird, 1);
         }
     }

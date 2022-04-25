@@ -20,7 +20,7 @@ public class Bouncing implements IEvents {
 
         lge = new LittleGameEngine(winSize, "Bouncing Balls", new Color(0xFFFFFF));
         lge.setOnMainUpdate(this);
-        lge.showColliders(new Color(0xFF0000));
+        // lge.showColliders(new Color(0xFF0000));
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../resources");
@@ -31,7 +31,7 @@ public class Bouncing implements IEvents {
         ground = new Canvas(new Point(0, 340), new Dimension(800, 100), "ground");
         ground.fill(Color.GRAY);
         ground.setTag("ground");
-        ground.useColliders(true);
+        ground.enableCollider(true);
         lge.addGObject(ground, 1);
 
         // los objetos a rebotar

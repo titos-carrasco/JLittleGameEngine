@@ -25,7 +25,7 @@ public class Betty extends Sprite {
         setOnEvents(LittleGameEngine.E_ON_COLLISION);
         setImage("betty_idle");
         setTag("Betty");
-        useColliders(true);
+        enableCollider(true);
         alive = true;
         this.winSize = winSize;
     }

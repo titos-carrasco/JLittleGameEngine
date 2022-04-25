@@ -22,7 +22,7 @@ public class MiHeroe extends Sprite {
         // sus atributos
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
         setOnEvents(LittleGameEngine.E_ON_COLLISION);
-        useColliders(true);
+        enableCollider(true);
         setBounds(new Rectangle(0, 0, 1920, 1056));
         last = getPosition();
     }

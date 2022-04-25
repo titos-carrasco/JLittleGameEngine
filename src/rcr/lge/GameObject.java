@@ -13,6 +13,7 @@ import java.util.UUID;
  */
 public class GameObject {
     Rectangle rect;
+    Rectangle[] collider;
     String name;
     BufferedImage surface = null;
     Rectangle bounds = null;
@@ -68,6 +69,7 @@ public class GameObject {
         if (name == null)
             name = "__no_name__" + UUID.randomUUID().toString();
         this.name = name;
+        setCollider(new Rectangle(0, 0, width, height));
     }
 
     /**
@@ -151,6 +153,19 @@ public class GameObject {
         return tag;
     }
 
+    public Rectangle[] getCollider() {
+        int l = collider.length;
+        Rectangle[] rects = new Rectangle[l];
+
+        for (int i = 0; i < l; i++) {
+            Rectangle r = new Rectangle(collider[i]);
+            r.x += rect.x;
+            r.y += rect.y;
+            rects[i] = r;
+        }
+        return rects;
+    }
+
     /**
      * Establece el rectangulo que limita el movimiento de este objeto
      *
@@ -204,13 +219,49 @@ public class GameObject {
     }
 
     /**
+     * Establece el colisionador para este objeto
+     * 
+     * @param rect el rectangulo que define la zona de colision
+     */
+    public void setCollider(Rectangle rect) {
+        collider = new Rectangle[] { new Rectangle(rect) };
+    }
+
+    /**
+     * Establece el colisionador para este objeto
+     * 
+     * @param rects los rectangulos que definen la zona de colision
+     */
+    public void setCollider(Rectangle[] rects) {
+        int l = rects.length;
+        collider = new Rectangle[l];
+        for (int i = 0; i < l; i++)
+            collider[i] = new Rectangle(rects[i]);
+    }
+
+    /**
      * Establece si este objeto participara o no del procesamiento de colisiones
      *
      * @param useColliders si es verdadero participara del procesamiento de
      *                     colisiones
      */
-    public void useColliders(boolean useColliders) {
+    public void enableCollider(boolean useColliders) {
         this.useColliders = useColliders;
+    }
+
+    /**
+     * Determina si un GamneObject colisiona con otro
+     * 
+     * @param gobj el gobject a comparar
+     * @return Verdader si colisiona con el GameObject especificado
+     */
+    public boolean collidesWith(GameObject gobj) {
+        if (layer == gobj.layer)
+            for (Rectangle r1 : getCollider())
+                for (Rectangle r2 : gobj.getCollider())
+                    if (r1.intersects(r2))
+                        return true;
+        return false;
     }
 
     // manejo de eventos
@@ -218,8 +269,8 @@ public class GameObject {
     /**
      * Establece los eventos que recibira este objeto
      *
-     * @param onEventsEnabled el evento que se sumara a los eventos que recibira 
-     * 						<ul>
+     * @param onEventsEnabled el evento que se sumara a los eventos que recibira
+     *                        <ul>
      *                        <li>LittleGameEngine.E_ON_DELETE</li>
      *                        <li>LittleGameEngine.E_ON_START</li>
      *                        <li>LittleGameEngine.E_ON_PRE_UPDATE</li>
@@ -228,7 +279,7 @@ public class GameObject {
      *                        <li>LittleGameEngine.E_ON_COLLISION</li>
      *                        <li>LittleGameEngine.E_ON_PRE_RENDER</li>
      *                        <li>LittleGameEngine.E_ON_QUIT</li>
-     *                      </ul>
+     *                        </ul>
      *
      *                        Se deben sobreescribir los siguientes metodos segun se
      *                        habiliten los eventos: onDelete(), onStart(),

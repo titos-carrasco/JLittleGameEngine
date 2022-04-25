@@ -23,7 +23,7 @@ public class Zombie extends Sprite {
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
         setImage("zombie", 0);
         setTag("zombie");
-        useColliders(true);
+        enableCollider(true);
         active = true;
         this.winSize = winSize;
 
@@ -149,7 +149,7 @@ public class Zombie extends Sprite {
 
             // verificamos que no colisionemos con un muro u otro zombie
             setPosition(nx, ny);
-            GameObject[] gobjs = lge.intersectGObjects(this);
+            GameObject[] gobjs = lge.collidesWithGObjects(this);
             boolean collision = false;
             for (GameObject gobj : gobjs) {
                 String tag = gobj.getTag();

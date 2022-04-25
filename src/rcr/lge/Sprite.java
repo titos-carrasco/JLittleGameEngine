@@ -2,6 +2,7 @@ package rcr.lge;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 /**
@@ -100,7 +101,7 @@ public class Sprite extends GameObject {
 
         surface = surfaces[idx];
         this.rect.setSize(this.surface.getWidth(), this.surface.getHeight());
-
+        setCollider(new Rectangle(0, 0, this.rect.width, this.rect.height));
         return idx;
     }
 
@@ -134,6 +135,7 @@ public class Sprite extends GameObject {
 
             surface = surfaces[idx];
             this.rect.setSize(this.surface.getWidth(), this.surface.getHeight());
+            setCollider(new Rectangle(0, 0, this.rect.width, this.rect.height));
         }
 
         return this.idx;

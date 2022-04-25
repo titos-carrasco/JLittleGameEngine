@@ -20,7 +20,7 @@ public class Pong implements IEvents {
 
         lge = new LittleGameEngine(winSize, "Ping", new Color(0x000000));
         lge.setOnMainUpdate(this);
-        lge.showColliders(new Color(255, 0, 0));
+        // lge.showColliders(new Color(255, 0, 0));
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../resources");
@@ -40,42 +40,42 @@ public class Pong implements IEvents {
         Canvas wall = new Canvas(new Point(0, 76), new Dimension(640, 4));
         wall.fill(Color.WHITE);
         wall.setTag("wall-horizontal");
-        wall.useColliders(true);
+        wall.enableCollider(true);
         lge.addGObject(wall, 1);
 
         wall = new Canvas(new Point(0, 606), new Dimension(640, 4));
         wall.fill(Color.WHITE);
         wall.setTag("wall-horizontal");
-        wall.useColliders(true);
+        wall.enableCollider(true);
         lge.addGObject(wall, 1);
 
         wall = new Canvas(new Point(20, 80), new Dimension(4, 526));
         wall.fill(Color.WHITE);
         wall.setTag("wall-vertical");
-        wall.useColliders(true);
+        wall.enableCollider(true);
         lge.addGObject(wall, 1);
 
         wall = new Canvas(new Point(616, 80), new Dimension(4, 526));
         wall.fill(Color.WHITE);
         wall.setTag("wall-vertical");
-        wall.useColliders(true);
+        wall.enableCollider(true);
         lge.addGObject(wall, 1);
 
         // los actores
-        Ball ball = new Ball(new Point(320, 300), new Dimension(8, 8), "ball");
+        Ball ball = new Ball(new Point(320, 400), new Dimension(8, 8), "ball");
         lge.addGObject(ball, 1);
 
-        Canvas paddle = new Canvas(new Point(90, 340), new Dimension(8, 60), "user-paddle");
+        Canvas paddle = new Canvas(new Point(90, 270), new Dimension(8, 60), "user-paddle");
         paddle.fill(Color.WHITE);
         paddle.setTag("paddle");
-        paddle.useColliders(true);
+        paddle.enableCollider(true);
         paddle.setBounds(field.getRectangle());
         lge.addGObject(paddle, 1);
 
-        paddle = new Canvas(new Point(540, 340), new Dimension(8, 60), "system-paddle");
+        paddle = new Canvas(new Point(540, 270), new Dimension(8, 60), "system-paddle");
         paddle.fill(Color.WHITE);
         paddle.setTag("paddle");
-        paddle.useColliders(true);
+        paddle.enableCollider(true);
         paddle.setBounds(field.getRectangle());
         lge.addGObject(paddle, 1);
     }
