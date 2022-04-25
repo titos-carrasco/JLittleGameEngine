@@ -951,7 +951,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param flipY   si es verdadero al imagen se reflejara en el eje Y
      */
     public void loadImage(String iname, String pattern, boolean flipX, boolean flipY) {
-        loadImage(iname, pattern, 1, new Dimension(0, 0), flipX, flipY);
+        loadImage(iname, pattern, 0, null, flipX, flipY);
     }
 
     /**
@@ -985,7 +985,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param flipY   si es verdadero al imagen se reflejara en el eje Y
      */
     public void loadImage(String iname, String pattern, double scale, boolean flipX, boolean flipY) {
-        loadImage(iname, pattern, scale, new Dimension(0, 0), flipX, flipY);
+        loadImage(iname, pattern, scale, null, flipX, flipY);
     }
 
     /**
@@ -1005,48 +1005,33 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     private void loadImage(String iname, String pattern, double scale, Dimension size, boolean flipX, boolean flipY) {
         ArrayList<BufferedImage> images = readImages(pattern);
 
-        if (size.width > 0 && size.height > 0) {
-            int imgSize = images.size();
-            for (int i = 0; i < imgSize; i++) {
-                BufferedImage img = images.get(i);
-                Image scaledImage = img.getScaledInstance(size.width, size.height, BufferedImage.SCALE_SMOOTH);
-                BufferedImage bi = createTranslucentImage(size.width, size.height);
-                Graphics2D g2d = bi.createGraphics();
-
-                int w = scaledImage.getWidth(null);
-                int h = scaledImage.getHeight(null);
-                if (flipX)
-                    g2d.drawImage(scaledImage, w, 0, -w, h, null);
-                if (flipY)
-                    g2d.drawImage(scaledImage, 0, h, w, -h, null);
-                if (!flipX && !flipY)
-                    g2d.drawImage(scaledImage, 0, 0, null);
-
-                g2d.dispose();
-                images.set(i, bi);
-            }
-        } else if (scale > 0 && scale != 1) {
-            int imgSize = images.size();
-            for (int i = 0; i < imgSize; i++) {
-                BufferedImage img = images.get(i);
+        int nimages = images.size();
+        for (int i = 0; i < nimages; i++) {
+            BufferedImage img = images.get(i);
+            Image image;
+            if (size != null) {
+                image = img.getScaledInstance(size.width, size.height, BufferedImage.SCALE_SMOOTH);
+            } else if (scale > 0) {
                 int width = (int) Math.round(img.getWidth() * scale);
                 int height = (int) Math.round(img.getHeight() * scale);
-                Image scaledImage = img.getScaledInstance(width, height, BufferedImage.SCALE_SMOOTH);
-                BufferedImage bi = createTranslucentImage(width, height);
-                Graphics2D g2d = bi.createGraphics();
+                image = img.getScaledInstance(width, height, BufferedImage.SCALE_SMOOTH);
+            } else
+                image = img;
 
-                int w = scaledImage.getWidth(null);
-                int h = scaledImage.getHeight(null);
-                if (flipX)
-                    g2d.drawImage(scaledImage, w, 0, -w, h, null);
-                if (flipY)
-                    g2d.drawImage(scaledImage, 0, h, w, -h, null);
-                if (!flipX && !flipY)
-                    g2d.drawImage(scaledImage, 0, 0, null);
+            int w = image.getWidth(null);
+            int h = image.getHeight(null);
+            BufferedImage bi = createTranslucentImage(w, h);
+            Graphics2D g2d = bi.createGraphics();
 
-                g2d.dispose();
-                images.set(i, bi);
-            }
+            if (flipX)
+                g2d.drawImage(image, w, 0, -w, h, null);
+            if (flipY)
+                g2d.drawImage(image, 0, h, w, -h, null);
+            if (!flipX && !flipY)
+                g2d.drawImage(image, 0, 0, null);
+
+            g2d.dispose();
+            images.set(i, bi);
         }
 
         this.images.put(iname, images.toArray(new BufferedImage[images.size()]));

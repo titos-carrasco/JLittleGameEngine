@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.5.5.1 2022-04-05
+- Corrige error al cargar imagenes con flipping
+
 ## v0.5.5 2022-04-05
 - GameObject.py
     - Permite múltiples rectángulos como colisionador
