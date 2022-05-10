@@ -469,6 +469,24 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     /**
+     * Obtiene todos los GameObject de una capa cuyo tag comienza con un texto dado
+     *
+     * @param layer la capa den donde buscar
+     * @param tag   el texto inicial del tag
+     *
+     * @return los GameObjects encontrados
+     */
+    public GameObject[] findGObjectsByTag(int layer, String tag) {
+        ArrayList<GameObject> gobjs = new ArrayList<GameObject>();
+
+        for (GameObject o : gLayers.get(layer))
+            if (o.name.startsWith(tag))
+                gobjs.add(o);
+
+        return gobjs.toArray(new GameObject[gobjs.size()]);
+    }
+
+    /**
      * Retorna el total de GameObjects en el juego
      *
      * @return el total de GameObjects

@@ -112,7 +112,7 @@ public class Sprite extends GameObject {
      *              al crear este Sprite)
      */
     public int setImage(String iname) {
-        return setImage(iname, 0);
+        return setImage(iname, -1);
     }
 
     /**
@@ -129,6 +129,8 @@ public class Sprite extends GameObject {
                 this.iname = iname;
             }
 
+            if (idx == -1)
+                idx = this.idx;
             if (idx >= surfaces.length)
                 idx = 0;
             this.idx = idx;

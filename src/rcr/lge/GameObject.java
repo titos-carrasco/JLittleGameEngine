@@ -145,6 +145,15 @@ public class GameObject {
     }
 
     /**
+     * Retorna el layer de este objeto
+     *
+     * @return el layer
+     */
+    public int getLayer() {
+        return layer;
+    }
+
+    /**
      * Retorna el TAG de este objeto
      *
      * @return el tag

@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5.6 2022-05-10
+- GameObject.py
+    - Agrega método getLayer()
+- Sprite.py
+    - Corrige método SetImage
+- LittleGameEngine.py
+    - Agrega método findGObjectsByTag()
+- Agrega demo "Cementerio"
+
 ## v0.5.5.1 2022-04-05
 - Corrige error al cargar imagenes con flipping
 
