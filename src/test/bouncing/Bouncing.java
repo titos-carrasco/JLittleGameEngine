@@ -35,7 +35,7 @@ public class Bouncing implements IEvents {
         lge.addGObject(ground, 1);
 
         // los objetos a rebotar
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 200; i++) {
             int x = (int) (50 + Math.random() * 700);
             int y = (int) (50 + Math.random() * 150);
             double vx = -50 + Math.random() * 100;

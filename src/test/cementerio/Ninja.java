@@ -25,7 +25,6 @@ public class Ninja extends Sprite {
 
         // los eventos que recibiremos
         setOnEvents(LittleGameEngine.E_ON_POST_UPDATE);
-        setOnEvents(LittleGameEngine.E_ON_COLLISION);
         enableCollider(true);
 
         // el colisionador
@@ -98,10 +97,4 @@ public class Ninja extends Sprite {
         if (onfloor && vy > 0)
             vy = 1;
     }
-
-    // solo para detectar premios, energia, muerte, etc...
-    @Override
-    public void onCollision(double dt, GameObject[] gobjs) {
-    }
-
 }

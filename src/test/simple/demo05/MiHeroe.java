@@ -10,6 +10,7 @@ import rcr.lge.Sprite;
 
 public class MiHeroe extends Sprite {
     private LittleGameEngine lge;
+    GameObject ninja;
     private int state = -1;
     private Point last;
 
@@ -18,10 +19,11 @@ public class MiHeroe extends Sprite {
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
+        ninja = lge.getGObject("ninja");
 
         // sus atributos
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
-        setOnEvents(LittleGameEngine.E_ON_COLLISION);
+        setOnEvents(LittleGameEngine.E_ON_POST_UPDATE);
         enableCollider(true);
         setBounds(new Rectangle(0, 0, 1920, 1056));
         last = getPosition();
@@ -78,9 +80,11 @@ public class MiHeroe extends Sprite {
     }
 
     @Override
-    public void onCollision(double dt, GameObject[] gobjs) {
-        lge.playSound("poing", false, 50);
-        setPosition(last);
+    public void onPostUpdate(double dt) {
+        if (collidesWith(ninja)) {
+            lge.playSound("poing", false, 50);
+            setPosition(last);
+        }
     }
 
 }

@@ -9,15 +9,17 @@ import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
 
 public class Ball extends Canvas {
+    LittleGameEngine lge;
     private int initX;
     private int initY;
-    private double speedX = 180;
-    private double speedY = 180;
+    private double speedX = -120;
+    private double speedY = 120;
 
     public Ball(Point position, Dimension size, String name) {
         super(position, size, name);
+        lge = LittleGameEngine.getInstance();
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
-        setOnEvents(LittleGameEngine.E_ON_COLLISION);
+        setOnEvents(LittleGameEngine.E_ON_POST_UPDATE);
         enableCollider(true);
         fill(Color.WHITE);
 
@@ -34,26 +36,29 @@ public class Ball extends Canvas {
     }
 
     @Override
-    public void onCollision(double dt, GameObject[] gobjs) {
-        int x = getX();
-        int y = getY();
-        double dx = speedX * dt;
-        double dy = speedY * dt;
+    public void onPostUpdate(double dt) {
+        GameObject[] gobjs = lge.collidesWithGObjects(this);
+        if (gobjs != null) {
+            int x = getX();
+            int y = getY();
+            double dx = speedX * dt;
+            double dy = speedY * dt;
 
-        for (GameObject gobj : gobjs) {
-            if (gobj.getTag().equals("wall-horizontal")) {
-                speedY = -speedY;
-                dy = -dy;
+            for (GameObject gobj : gobjs) {
+                if (gobj.getTag().equals("wall-horizontal")) {
+                    speedY = -speedY;
+                    dy = -dy;
+                }
+                if (gobj.getTag().equals("paddle")) {
+                    speedX = -speedX;
+                    dx = -dx;
+                }
+                if (gobj.getTag().equals("wall-vertical")) {
+                    x = initX;
+                    y = initY;
+                }
             }
-            if (gobj.getTag().equals("paddle")) {
-                speedX = -speedX;
-                dx = -dx;
-            }
-            if (gobj.getTag().equals("wall-vertical")) {
-                x = initX;
-                y = initY;
-            }
+            setPosition((int) (x + dx), (int) (y + dy));
         }
-        setPosition((int) (x + dx), (int) (y + dy));
     }
 }

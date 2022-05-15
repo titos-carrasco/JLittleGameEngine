@@ -229,7 +229,7 @@ public class GameObject {
 
     /**
      * Establece el colisionador para este objeto
-     * 
+     *
      * @param rect el rectangulo que define la zona de colision
      */
     public void setCollider(Rectangle rect) {
@@ -238,7 +238,7 @@ public class GameObject {
 
     /**
      * Establece el colisionador para este objeto
-     * 
+     *
      * @param rects los rectangulos que definen la zona de colision
      */
     public void setCollider(Rectangle[] rects) {
@@ -259,10 +259,10 @@ public class GameObject {
     }
 
     /**
-     * Determina si un GamneObject colisiona con otro
-     * 
+     * Determina si un GameObject colisiona con otro
+     *
      * @param gobj el gobject a comparar
-     * @return Verdader si colisiona con el GameObject especificado
+     * @return Verdadero si colisiona con el GameObject especificado
      */
     public boolean collidesWith(GameObject gobj) {
         if (layer == gobj.layer)

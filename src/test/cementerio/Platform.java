@@ -8,7 +8,7 @@ import rcr.lge.LittleGameEngine;
 import rcr.lge.Sprite;
 
 public class Platform extends Sprite {
-    private LittleGameEngine lge;
+    //private LittleGameEngine lge;
     char dir;
     private int pixels;
     private int distance;
@@ -18,7 +18,7 @@ public class Platform extends Sprite {
         super("platform", new Point(x, y));
 
         // acceso a LGE
-        lge = LittleGameEngine.getInstance();
+        //lge = LittleGameEngine.getInstance();
 
         // los eventos que recibiremos
         setOnEvents(LittleGameEngine.E_ON_UPDATE);

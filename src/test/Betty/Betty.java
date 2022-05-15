@@ -22,7 +22,7 @@ public class Betty extends Sprite {
         lge = LittleGameEngine.getInstance();
 
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
-        setOnEvents(LittleGameEngine.E_ON_COLLISION);
+        setOnEvents(LittleGameEngine.E_ON_POST_UPDATE);
         setImage("betty_idle");
         setTag("Betty");
         enableCollider(true);
@@ -93,16 +93,18 @@ public class Betty extends Sprite {
     }
 
     @Override
-    public void onCollision(double dt, GameObject[] gobjs) {
+    public void onPostUpdate(double dt) {
         if (!alive)
             return;
 
+        GameObject[] gobjs = lge.collidesWithGObjects(this);
         for (GameObject gobj : gobjs)
             if (gobj.getTag().equals("zombie")) {
                 alive = false;
                 System.out.println("Un zombie me mato");
                 return;
+            } else if (gobj.getTag().equals("muro")) {
+                setPosition(lastPoint);
             }
-        setPosition(lastPoint);
     }
 }
