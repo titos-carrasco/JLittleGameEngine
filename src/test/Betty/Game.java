@@ -118,7 +118,7 @@ public class Game implements IEvents {
     // show time
     public static void main(String[] args) {
         Game game = new Game();
-        game.Run(100);
+        game.Run(60);
         System.out.println("Eso es todo!!!");
     }
 

@@ -217,6 +217,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param fps los fps a mantener
      */
     public void run(int fps) {
+        BufferedImage screenImage = createOpaqueImage(winSize.width, winSize.height);
         running = true;
         long tickExpected = (long) (1000.0 / fps);
         long tickPrev = System.currentTimeMillis();
@@ -347,9 +348,9 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             camera.followTarget();
 
             // --- Rendering
-            Graphics2D g2d = screen.createGraphics();
+            Graphics2D g2d = screenImage.createGraphics();
             g2d.setColor(bgColor);
-            g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
+            g2d.fillRect(0, 0, screenImage.getWidth(), screenImage.getHeight());
 
             // --- layers
             for (Entry<Integer, ArrayList<GameObject>> elem : gLayers.entrySet()) {
@@ -390,6 +391,9 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             }
             g2d.dispose();
 
+            g2d = screen.createGraphics();
+            g2d.drawImage(screenImage, 0, 0, null);
+            g2d.dispose();
             repaint();
         }
 
