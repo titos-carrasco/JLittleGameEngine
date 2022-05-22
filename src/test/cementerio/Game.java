@@ -1,25 +1,25 @@
 package test.cementerio;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 import rcr.lge.Canvas;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
+import rcr.lge.Rectangle;
+import rcr.lge.Size;
 import rcr.lge.Sprite;
 
 public class Game implements IEvents {
     private LittleGameEngine lge;
 
     public Game() {
-        Dimension winSize = new Dimension(640, 342);
+        Size winSize = new Size(640, 342);
 
         lge = new LittleGameEngine(winSize, "El Cementerio", new Color(0, 0, 0));
         lge.setOnMainUpdate(this);
-        lge.showColliders(new Color(255, 0, 0));
+        //lge.showColliders(new Color(255, 0, 0));
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "./resources");
@@ -32,7 +32,7 @@ public class Game implements IEvents {
         lge.loadImage("platform", resourceDir + "/platform.png", 0.3, false, false);
 
         // el fondo
-        Sprite fondo = new Sprite("fondo", new Point(0, 0));
+        Sprite fondo = new Sprite("fondo", new Position(0, 0));
         lge.addGObject(fondo, 0);
 
         // los NonPlayer Characters (NPC)
@@ -41,17 +41,17 @@ public class Game implements IEvents {
 
         // nuestra heroina
         Ninja ninja = new Ninja(90, 163);
-        ninja.setBounds(new Rectangle(new Point(0, 0), new Dimension(winSize.width, winSize.height + 100)));
+        ninja.setBounds(new Rectangle(new Position(0, 0), new Size(winSize.width, winSize.height + 100)));
         lge.addGObject(ninja, 1);
     }
 
     public void makeFloor() {
-        Canvas[] suelos = new Canvas[] { new Canvas(new Point(0, 85), new Dimension(170, 1)),
-                new Canvas(new Point(0, 214), new Dimension(170, 1)),
-                new Canvas(new Point(214, 300), new Dimension(128, 1)),
-                new Canvas(new Point(342, 214), new Dimension(127, 1)),
-                new Canvas(new Point(470, 257), new Dimension(127, 1)),
-                new Canvas(new Point(513, 86), new Dimension(127, 1)) };
+        Canvas[] suelos = new Canvas[] { new Canvas(new Position(0, 85), new Size(170, 1)),
+                new Canvas(new Position(0, 214), new Size(170, 1)),
+                new Canvas(new Position(214, 300), new Size(128, 1)),
+                new Canvas(new Position(342, 214), new Size(127, 1)),
+                new Canvas(new Position(470, 257), new Size(127, 1)),
+                new Canvas(new Position(513, 86), new Size(127, 1)) };
 
         for (Canvas s : suelos) {
             s.enableCollider(true);
@@ -61,8 +61,8 @@ public class Game implements IEvents {
     }
 
     public void makePlatforms() {
-        Platform[] platforms = new Platform[] { new Platform(200, 200, 'U', 100, 1),
-                new Platform(400, 100, 'L', 100, 1) };
+        Platform[] platforms = new Platform[] { new Platform(200, 200, 'U', 100, 60),
+                new Platform(400, 100, 'L', 100, 60) };
         for (Platform p : platforms) {
             lge.addGObject(p, 1);
         }

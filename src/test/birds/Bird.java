@@ -1,13 +1,12 @@
 package test.birds;
 
-import java.awt.Point;
-
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
 import rcr.lge.Sprite;
 
 public class Bird extends Sprite {
 
-    public Bird(String inames, Point position) {
+    public Bird(String inames, Position position) {
         super(inames, position);
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
     }

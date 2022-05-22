@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.6.1 2022-05-21
+- Se modifican todos los archivos fuentes para utilizar coordenadas como double
+- Se agregan Clases Rectangle, Position() y Size() para poder manejar los GameObjects en double
+
 ## 2022-05-15
 - Se modifican los demos para no uilizar onCollision() ya que ralentiza demasiado el mainloop
 

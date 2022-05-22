@@ -1,15 +1,16 @@
 package test.simple.demo05;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 import rcr.lge.Canvas;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
+import rcr.lge.Rectangle;
+import rcr.lge.Size;
 import rcr.lge.Sprite;
 
 public class Colliders implements IEvents {
@@ -17,7 +18,7 @@ public class Colliders implements IEvents {
 
     public Colliders() {
         // creamos el juego
-        Dimension winSize = new Dimension(640, 480);
+        Size winSize = new Size(640, 480);
 
         lge = new LittleGameEngine(winSize, "Colliders", new Color(0xFFFFFF));
         lge.showColliders(new Color(0xFF0000));
@@ -42,20 +43,20 @@ public class Colliders implements IEvents {
         lge.playSound("fondo", true, 100);
 
         // agregamos el fondo
-        Sprite fondo = new Sprite("fondo", new Point(0, 0), "fondo");
+        Sprite fondo = new Sprite("fondo", new Position(0, 0), "fondo");
         lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Point(0, 0), new Dimension(640, 20), "infobar");
+        Canvas infobar = new Canvas(new Position(0, 0), new Size(640, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // agregamos el icono del sonido
-        Sprite mute = new Sprite("mute", new Point(8, 3), "mute");
+        Sprite mute = new Sprite("mute", new Position(8, 3), "mute");
         mute.setImage("mute", 1);
         lge.addGObjectGUI(mute);
 
         // agregamos un ninja
-        Sprite ninja = new Sprite("ninja", new Point(350, 720), "ninja");
+        Sprite ninja = new Sprite("ninja", new Position(350, 720), "ninja");
         ninja.enableCollider(true);
         ninja.setCollider(new Rectangle[] { new Rectangle(36, 8, 36, 36), new Rectangle(28, 44, 44, 36) });
         lge.addGObject(ninja, 1);
@@ -86,7 +87,7 @@ public class Colliders implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Point(50, 16), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new Position(50, 16), "monospace.plain.16", Color.BLACK);
 
         // mute on/mute off
         mousePosition = lge.getMouseClicked(0);
@@ -117,7 +118,7 @@ public class Colliders implements IEvents {
     // show time
     public static void main(String[] args) {
         Colliders game = new Colliders();
-        game.Run(60);
+        game.Run(600);
         System.out.println("Eso es todo!!!");
     }
 

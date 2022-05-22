@@ -1,8 +1,5 @@
 package rcr.lge;
 
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.UUID;
 
@@ -28,7 +25,7 @@ public class GameObject {
      * @param origin posicion inicial (x,y) del GameObject
      * @param size   dimension (ancho,alto) del GameObject
      */
-    public GameObject(Point origin, Dimension size) {
+    public GameObject(Position origin, Size size) {
         this(origin.x, origin.y, size.width, size.height, null);
     }
 
@@ -39,7 +36,7 @@ public class GameObject {
      * @param size   dimension (ancho,alto) del GameObject
      * @param name   nombre unico para este GameObject
      */
-    public GameObject(Point origin, Dimension size, String name) {
+    public GameObject(Position origin, Size size, String name) {
         this(origin.x, origin.y, size.width, size.height, name);
     }
 
@@ -51,7 +48,7 @@ public class GameObject {
      * @param width  ancho del GameObject
      * @param height alto del GameObject
      */
-    public GameObject(int x, int y, int width, int height) {
+    public GameObject(double x, double y, int width, int height) {
         this(x, y, width, height, null);
     }
 
@@ -64,7 +61,7 @@ public class GameObject {
      * @param height alto del GameObject
      * @param name   nombre unico para este GameObject
      */
-    public GameObject(int x, int y, int width, int height, String name) {
+    public GameObject(double x, double y, int width, int height, String name) {
         rect = new Rectangle(x, y, width, height);
         if (name == null)
             name = "__no_name__" + UUID.randomUUID().toString();
@@ -77,8 +74,8 @@ public class GameObject {
      *
      * @return la posicion
      */
-    public Point getPosition() {
-        return new Point(rect.getLocation());
+    public Position getPosition() {
+        return rect.getOrigin();
     }
 
     /**
@@ -86,7 +83,7 @@ public class GameObject {
      *
      * @return la coordenada X
      */
-    public int getX() {
+    public double getX() {
         return rect.x;
     }
 
@@ -95,7 +92,7 @@ public class GameObject {
      *
      * @return la coordenada Y
      */
-    public int getY() {
+    public double getY() {
         return rect.y;
     }
 
@@ -104,8 +101,8 @@ public class GameObject {
      *
      * @return la dimension
      */
-    public Dimension getSize() {
-        return new Dimension(rect.getSize());
+    public Size getSize() {
+        return rect.getSize();
     }
 
     /**
@@ -162,6 +159,11 @@ public class GameObject {
         return tag;
     }
 
+    /**
+     * Retorna el colisionador de este objeto
+     *
+     * @return los rectangulos que definen su colisionador
+     */
     public Rectangle[] getCollider() {
         int l = collider.length;
         Rectangle[] rects = new Rectangle[l];
@@ -189,7 +191,7 @@ public class GameObject {
      *
      * @param position la posicion (x, y)
      */
-    public void setPosition(Point position) {
+    public void setPosition(Position position) {
         setPosition(position.x, position.y);
     }
 
@@ -199,7 +201,7 @@ public class GameObject {
      * @param x la cordenada x
      * @param y la coordenada y
      */
-    public void setPosition(int x, int y) {
+    public void setPosition(double x, double y) {
         rect.x = x;
         rect.y = y;
 
@@ -300,21 +302,21 @@ public class GameObject {
     }
 
     /**
-     * Si es habilitada, ser� invocada en el siguiente ciclo para todos los
-     * GameObjects marcados para eliminaci�n
+     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
+     * GameObjects marcados para eliminacion
      */
     public void onDelete() {
     };
 
     /**
-     * Si es habilitada, ser� invocada en el siguiente ciclo para todos los
+     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
      * GameObjects recien creados
      */
     public void onStart() {
     };
 
     /**
-     * Si es habilitada, ser� invocada en el siguiente ciclo para todos los
+     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
      * GameObjects previo al evento onUpdate()
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
@@ -323,7 +325,7 @@ public class GameObject {
     };
 
     /**
-     * Si es habilitada, ser� invocada en el siguiente ciclo para todos los
+     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
      * GameObjects previo al evento onPostUpdate()
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
@@ -332,7 +334,7 @@ public class GameObject {
     };
 
     /**
-     * Si es habilitada, ser� invocada en el siguiente ciclo para todos los
+     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
      * GameObjects previo al evento onCollision()
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
@@ -341,16 +343,17 @@ public class GameObject {
     };
 
     /**
-     * Si es habilitada, ser� invocada en el siguiente ciclo para todos los
+     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
      * GameObjects previo al evento onPreRender()
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
+     * @param gobjs los GameObjects que colisionan co este GameObject
      */
     public void onCollision(double dt, GameObject[] gobjs) {
     };
 
     /**
-     * Si es habilitada, ser� invocada en el siguiente ciclo para todos los
+     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
      * GameObjects previo al rendering del juego en pantalla
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
@@ -359,7 +362,7 @@ public class GameObject {
     };
 
     /**
-     * Si es habilitada, ser� invocadapara todos los GameObjects jusrto antes de
+     * Si es habilitada, sera invocadapara todos los GameObjects jusrto antes de
      * finalizar el game loop
      */
     public void onQuit() {

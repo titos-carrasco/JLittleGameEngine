@@ -1,29 +1,28 @@
 package test.Betty;
 
-import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.event.KeyEvent;
 
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
+import rcr.lge.Size;
 import rcr.lge.Sprite;
 
 public class Betty extends Sprite {
     private LittleGameEngine lge;
 
     private boolean alive;
-    private Dimension winSize;
-    private Point lastPoint;
+    private Size winSize;
+    private Position lastPoint;
 
-    public Betty(String name, Dimension winSize) {
-        super("betty_idle", new Point(0, 0), name);
+    public Betty(String name, Size winSize) {
+        super("betty_idle", new Position(0, 0), name);
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
 
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
         setOnEvents(LittleGameEngine.E_ON_POST_UPDATE);
-        setImage("betty_idle");
         setTag("Betty");
         enableCollider(true);
         alive = true;
@@ -47,13 +46,13 @@ public class Betty extends Sprite {
 
         // velocity = pixeles por segundo
         // double velocity = 120;
-        // int pixels = (int)velocity*dt;
-        int pixels = 2;
+        // double pixels = velocity*dt;
+        double pixels = 2;
 
         // nuestra posicion actual y tamano
-        int x = getX();
-        int y = getY();
-        lastPoint = new Point(x, y);
+        double x = getX();
+        double y = getY();
+        lastPoint = new Position(x, y);
 
         // cambiamos sus coordenadas e imagen segun la tecla presionada
         int idx = getImagesIndex();

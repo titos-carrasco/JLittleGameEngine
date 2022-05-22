@@ -1,12 +1,12 @@
 package test.bouncing;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
 
 import rcr.lge.Canvas;
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
+import rcr.lge.Size;
 
 public class Ball extends Canvas {
     private LittleGameEngine lge;
@@ -15,8 +15,8 @@ public class Ball extends Canvas {
     private double g, e;
     private GameObject ground;
 
-    public Ball(int x, int y, double vx, double vy) {
-        super(new Point(x, y), new Dimension(20, 20));
+    public Ball(double x, double y, double vx, double vy) {
+        super(new Position(x, y), new Size(20, 20));
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
@@ -45,7 +45,7 @@ public class Ball extends Canvas {
         }
 
         vy = vy + g * dt;
-        setPosition((int) x, (int) y);
+        setPosition(x, y);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class Ball extends Canvas {
         if (collidesWith(ground)) {
             double x = getX();
             double y = ground.getY() - getHeight();
-            setPosition((int) x, (int) y);
+            setPosition(x, y);
 
             vy = -vy * e;
             if (Math.abs(vy) < 50) {

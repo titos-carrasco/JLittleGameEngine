@@ -1,28 +1,27 @@
 package test.cementerio;
 
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
-
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
+import rcr.lge.Rectangle;
+import rcr.lge.Size;
 import rcr.lge.Sprite;
 
 public class Platform extends Sprite {
-    //private LittleGameEngine lge;
+    // private LittleGameEngine lge;
     char dir;
-    private int pixels;
-    private int distance;
-    private int travel = 0;
+    private double pixels;
+    private double distance;
+    private double travel = 0;
 
-    public Platform(int x, int y, char dir, int distance, int speed) {
-        super("platform", new Point(x, y));
+    public Platform(double x, double y, char dir, double distance, double speed) {
+        super("platform", new Position(x, y));
 
         // acceso a LGE
-        //lge = LittleGameEngine.getInstance();
+        // lge = LittleGameEngine.getInstance();
 
         // los eventos que recibiremos
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
-        setCollider(new Rectangle(new Point(0, 0), new Dimension(getWidth(), 1)));
+        setCollider(new Rectangle(new Position(0, 0), new Size(getWidth(), 1)));
         enableCollider(true);
         setTag("plataforma");
 
@@ -36,28 +35,29 @@ public class Platform extends Sprite {
         return dir;
     }
 
-    public int getSpeed() {
+    public double getSpeed() {
         return pixels;
     }
 
     @Override
     public void onUpdate(double dt) {
-        Point position = getPosition();
-        int x = position.x;
-        int y = position.y;
+        Position position = getPosition();
+        double x = position.x;
+        double y = position.y;
 
+        double d = pixels * dt;
         if (dir == 'R')
-            x = x + pixels;
+            x = x + d;
         else if (dir == 'L')
-            x = x - pixels;
+            x = x - d;
         else if (dir == 'D')
-            y = y + pixels;
+            y = y + d;
         else if (dir == 'U')
-            y = y - pixels;
+            y = y - d;
 
         setPosition(x, y);
 
-        travel = travel + pixels;
+        travel = travel + d;
         if (travel > distance) {
             travel = 0;
             if (dir == 'R')

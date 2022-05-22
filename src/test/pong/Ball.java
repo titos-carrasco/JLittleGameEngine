@@ -1,21 +1,21 @@
 package test.pong;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
 
 import rcr.lge.Canvas;
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
+import rcr.lge.Size;
 
 public class Ball extends Canvas {
     LittleGameEngine lge;
-    private int initX;
-    private int initY;
+    private double initX;
+    private double initY;
     private double speedX = -120;
     private double speedY = 120;
 
-    public Ball(Point position, Dimension size, String name) {
+    public Ball(Position position, Size size, String name) {
         super(position, size, name);
         lge = LittleGameEngine.getInstance();
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
@@ -32,15 +32,15 @@ public class Ball extends Canvas {
         double dx = speedX * dt;
         double dy = speedY * dt;
 
-        setPosition((int) (getX() + dx), (int) (getY() + dy));
+        setPosition(getX() + dx, getY() + dy);
     }
 
     @Override
     public void onPostUpdate(double dt) {
         GameObject[] gobjs = lge.collidesWithGObjects(this);
         if (gobjs != null) {
-            int x = getX();
-            int y = getY();
+            double x = getX();
+            double y = getY();
             double dx = speedX * dt;
             double dy = speedY * dt;
 
@@ -58,7 +58,7 @@ public class Ball extends Canvas {
                     y = initY;
                 }
             }
-            setPosition((int) (x + dx), (int) (y + dy));
+            setPosition(x + dx, y + dy);
         }
     }
 }

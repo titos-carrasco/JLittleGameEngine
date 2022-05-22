@@ -10,7 +10,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.event.KeyEvent;
@@ -76,7 +75,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     private ArrayList<GameObject> gObjectsToDel;
     private Camera camera;
 
-    private Dimension winSize;
+    private Size winSize;
     private double[] fpsData;
     private int fpsIdx;
     private boolean running = false;
@@ -104,7 +103,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param title   titulo de la ventana
      * @param bgColor color de fondo de la ventana
      */
-    public LittleGameEngine(Dimension winSize, String title, Color bgColor) {
+    public LittleGameEngine(Size winSize, String title, Color bgColor) {
         assertion(LittleGameEngine.lge == null, "LittleGameEngine ya se encuentra activa");
         lge = this;
         this.winSize = winSize;
@@ -129,7 +128,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         gObjectsToDel = new ArrayList<GameObject>();
 
         screen = createOpaqueImage(winSize.width, winSize.height);
-        camera = new Camera(new Point(0, 0), winSize);
+        camera = new Camera(new Position(0, 0), winSize);
 
         Font f = new Font("Arial", Font.PLAIN, 40);
         Graphics2D g2d = screen.createGraphics();
@@ -144,8 +143,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         addKeyListener(this);
         addMouseListener(this);
         setFocusable(true);
-        setSize(winSize);
-        setPreferredSize(winSize);
+        setSize(new Dimension(winSize.width, winSize.height));
+        setPreferredSize(new Dimension(winSize.width, winSize.height));
 
         win = new JFrame();
         win.addWindowListener(this);
@@ -162,7 +161,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * Obtiene una instancia del juego en ejecucion. Util para las diferentes clases
      * utilizadas en un juego tal de acceder a metodos estaticos
      *
-     * @return
+     * @return la instancia de LGE en ejecucion
      */
     public static LittleGameEngine getInstance() {
         return LittleGameEngine.lge;
@@ -359,16 +358,16 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                     for (GameObject gobj : elem.getValue()) {
                         if (!gobj.rect.intersects(camera.rect))
                             continue;
-                        Point p = fixXY(gobj.getPosition());
+                        Position p = fixXY(gobj.getPosition());
                         BufferedImage surface = gobj.surface;
                         if (surface != null)
-                            g2d.drawImage(surface, p.x, p.y, null);
+                            g2d.drawImage(surface, (int) p.x, (int) p.y, null);
 
                         if (collidersColor != null && gobj.useColliders) {
                             g2d.setColor(collidersColor);
                             for (Rectangle r : gobj.getCollider()) {
-                                p = fixXY(new Point(r.x, r.y));
-                                g2d.drawRect(p.x, p.y, r.width - 1, r.height - 1);
+                                p = fixXY(new Position(r.x, r.y));
+                                g2d.drawRect((int) p.x, (int) p.y, r.width - 1, r.height - 1);
                             }
                         }
                     }
@@ -382,9 +381,9 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                     for (GameObject gobj : elem.getValue()) {
                         BufferedImage surface = gobj.surface;
                         if (surface != null) {
-                            int x = gobj.rect.x;
-                            int y = gobj.rect.y;
-                            g2d.drawImage(surface, x, y, null);
+                            double x = gobj.rect.x;
+                            double y = gobj.rect.y;
+                            g2d.drawImage(surface, (int) x, (int) y, null);
                         }
                     }
                 }
@@ -421,16 +420,16 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      *
      * @return las coordenadas trasladadas
      */
-    private Point fixXY(Point p) {
-        int xo = p.x;
-        int vx = camera.rect.x;
-        int x = xo - vx;
+    private Position fixXY(Position p) {
+        double xo = p.x;
+        double vx = camera.rect.x;
+        double x = xo - vx;
 
-        int yo = p.y;
-        int vy = camera.rect.y;
-        int y = yo - vy;
+        double yo = p.y;
+        double vy = camera.rect.y;
+        double y = yo - vy;
 
-        return new Point(x, y);
+        return new Position(x, y);
     }
 
     // ------ gobjects ------
@@ -530,7 +529,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      *
      * @return la posicion
      */
-    public Point getCameraPosition() {
+    public Position getCameraPosition() {
         return camera.getPosition();
     }
 
@@ -539,7 +538,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      *
      * @return la dimension
      */
-    public Dimension getCameraSize() {
+    public Size getCameraSize() {
         return camera.getSize();
     }
 
@@ -585,7 +584,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      *
      * @param position la posicion
      */
-    public void setCameraPosition(Point position) {
+    public void setCameraPosition(Position position) {
         camera.setPosition(position);
     }
 
@@ -985,7 +984,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param flipX   si es verdadero al imagen se reflejara en el eje X
      * @param flipY   si es verdadero al imagen se reflejara en el eje Y
      */
-    public void loadImage(String iname, String pattern, Dimension size, boolean flipX, boolean flipY) {
+    public void loadImage(String iname, String pattern, Size size, boolean flipX, boolean flipY) {
         loadImage(iname, pattern, 0, size, flipX, flipY);
     }
 
@@ -1020,7 +1019,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param flipX   si es verdadero al imagen se reflejara en el eje X
      * @param flipY   si es verdadero al imagen se reflejara en el eje Y
      */
-    private void loadImage(String iname, String pattern, double scale, Dimension size, boolean flipX, boolean flipY) {
+    private void loadImage(String iname, String pattern, double scale, Size size, boolean flipX, boolean flipY) {
         ArrayList<BufferedImage> images = readImages(pattern);
 
         int nimages = images.size();

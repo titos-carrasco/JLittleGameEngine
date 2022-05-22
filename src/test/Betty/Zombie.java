@@ -1,27 +1,25 @@
 package test.Betty;
 
-import java.awt.Dimension;
-import java.awt.Point;
-
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
+import rcr.lge.Size;
 import rcr.lge.Sprite;
 
 public class Zombie extends Sprite {
     private LittleGameEngine lge;
 
-    private Dimension winSize;
+    private Size winSize;
     private char dir;
     private boolean active;
 
-    public Zombie(String name, Dimension winSize) {
-        super("zombie", new Point(0, 0), name);
+    public Zombie(String name, Size winSize) {
+        super("zombie", new Position(0, 0), name);
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
 
         setOnEvents(LittleGameEngine.E_ON_UPDATE);
-        setImage("zombie", 0);
         setTag("zombie");
         enableCollider(true);
         active = true;
@@ -42,17 +40,17 @@ public class Zombie extends Sprite {
 
         // velocity = pixeles por segundo
         // double velocity = 120;
-        // int pixels = (int)(velocity*dt);
-        int pixels = 2;
+        // double pixels = velocity*dt;
+        double pixels = 2;
 
         // las coordenadas de Betty
         Betty betty = (Betty) lge.getGObject("Betty");
-        int bx = betty.getX();
-        int by = betty.getY();
+        double bx = betty.getX();
+        double by = betty.getY();
 
         // nuestra posicion actual
-        int x = getX();
-        int y = getY();
+        double x = getX();
+        double y = getY();
 
         // posicion respecto a Betty
         boolean abajo = y > by;
@@ -136,7 +134,7 @@ public class Zombie extends Sprite {
         // probamos cada movimiento de la estrategia
         for (int i = 0; i < estrategia.length(); i++) {
             char c = estrategia.charAt(i);
-            int nx = x, ny = y;
+            double nx = x, ny = y;
 
             if (c == 'R')
                 nx += pixels;

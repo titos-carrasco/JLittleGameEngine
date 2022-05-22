@@ -1,15 +1,16 @@
 package test.simple.demo01;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 import rcr.lge.Canvas;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
+import rcr.lge.Rectangle;
+import rcr.lge.Size;
 import rcr.lge.Sprite;
 
 public class TheWorld implements IEvents {
@@ -17,7 +18,7 @@ public class TheWorld implements IEvents {
 
     public TheWorld() {
         // creamos el juego
-        Dimension winSize = new Dimension(800, 440);
+        Size winSize = new Size(800, 440);
 
         lge = new LittleGameEngine(winSize, "The World", new Color(0xFFFFFF));
         lge.setOnMainUpdate(this);
@@ -36,25 +37,25 @@ public class TheWorld implements IEvents {
         lge.playSound("fondo", true, 50);
 
         // agregamos el fondo
-        Sprite fondo = new Sprite("fondo", new Point(0, 0));
+        Sprite fondo = new Sprite("fondo", new Position(0, 0));
         lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Point(0, 0), new Dimension(800, 20), "infobar");
+        Canvas infobar = new Canvas(new Position(0, 0), new Size(800, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // agregamos el icono del sonido
-        Sprite mute = new Sprite("mute", new Point(8, 3), "mute");
+        Sprite mute = new Sprite("mute", new Position(8, 3), "mute");
         mute.setImage("mute", 1);
         lge.addGObjectGUI(mute);
 
         // agregamos al heroe
-        Sprite heroe = new Sprite("heroe", new Point(226, 254), "Heroe");
+        Sprite heroe = new Sprite("heroe", new Position(226, 254), "Heroe");
         lge.addGObject(heroe, 1);
 
         // agregamos un texto con transparencia
-        Canvas canvas = new Canvas(new Point(200, 110), new Dimension(400, 200));
-        canvas.drawText("Little Game Engine", new Point(30, 90), "backlash.plain.40", new Color(20, 20, 20));
+        Canvas canvas = new Canvas(new Position(200, 110), new Size(400, 200));
+        canvas.drawText("Little Game Engine", new Position(30, 90), "backlash.plain.40", new Color(20, 20, 20));
         lge.addGObjectGUI(canvas);
     }
 
@@ -73,7 +74,7 @@ public class TheWorld implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Point(140, 16), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new Position(140, 16), "monospace.plain.16", Color.BLACK);
 
         // sonido on/off
         mousePosition = lge.getMouseClicked(0);

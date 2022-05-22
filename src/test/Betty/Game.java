@@ -1,7 +1,6 @@
 package test.Betty;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
@@ -13,6 +12,8 @@ import rcr.lge.Canvas;
 import rcr.lge.GameObject;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
+import rcr.lge.Size;
 import rcr.lge.Sprite;
 
 public class Game implements IEvents {
@@ -22,7 +23,7 @@ public class Game implements IEvents {
 
     public Game() {
         // creamos el juego
-        Dimension winSize = new Dimension(608, 736);
+        Size winSize = new Size(608, 736);
 
         lge = new LittleGameEngine(winSize, "Betty", new Color(0xFFFFFF));
         lge.setOnMainUpdate(this);
@@ -42,11 +43,11 @@ public class Game implements IEvents {
         lge.loadTTFFont("cool.plain.30", resourceDir + "/fonts/backlash.ttf", Font.PLAIN, 30);
 
         // agregamos el fondo
-        Sprite fondo = new Sprite("fondo", new Point(0, 0), "fondo");
+        Sprite fondo = new Sprite("fondo", new Position(0, 0), "fondo");
         lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Point(0, 0), new Dimension(640, 20), "infobar");
+        Canvas infobar = new Canvas(new Position(0, 0), new Size(640, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // cargamos el mapa en memoria
@@ -84,7 +85,7 @@ public class Game implements IEvents {
         for (int y = 0; y < mapa.length; y++)
             for (int x = 0; x < mapa[y].length; x++)
                 if (mapa[y][x] == 1) {
-                    GameObject muro = new GameObject(new Point(x * 32, 32 + y * 32), new Dimension(32, 32));
+                    GameObject muro = new GameObject(new Position(x * 32, 32 + y * 32), new Size(32, 32));
                     muro.enableCollider(true);
                     muro.setTag("muro");
                     lge.addGObject(muro, 1);
@@ -106,7 +107,7 @@ public class Game implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x80808080, true));
-        infobar.drawText(info, new Point(50, 16), "monospace.plain.16", Color.WHITE);
+        infobar.drawText(info, new Position(50, 16), "monospace.plain.16", Color.WHITE);
     }
 
     // main loop
@@ -117,7 +118,7 @@ public class Game implements IEvents {
     // show time
     public static void main(String[] args) {
         Game game = new Game();
-        game.Run(60);
+        game.Run(100);
         System.out.println("Eso es todo!!!");
     }
 

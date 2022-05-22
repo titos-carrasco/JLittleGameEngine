@@ -1,7 +1,6 @@
 package test.pong;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
@@ -9,6 +8,8 @@ import java.awt.event.KeyEvent;
 import rcr.lge.Canvas;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
+import rcr.lge.Size;
 
 public class Pong implements IEvents {
     private LittleGameEngine lge;
@@ -16,7 +17,7 @@ public class Pong implements IEvents {
 
     public Pong() {
         // creamos el juego
-        Dimension winSize = new Dimension(640, 640);
+        Size winSize = new Size(640, 640);
 
         lge = new LittleGameEngine(winSize, "Ping", new Color(0x000000));
         lge.setOnMainUpdate(this);
@@ -28,51 +29,51 @@ public class Pong implements IEvents {
         lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Point(0, 0), new Dimension(640, 20), "infobar");
+        Canvas infobar = new Canvas(new Position(0, 0), new Size(640, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // el campo de juego
-        Canvas field = new Canvas(new Point(24, 80), new Dimension(592, 526), "field");
+        Canvas field = new Canvas(new Position(24, 80), new Size(592, 526), "field");
         field.fill(new Color(0, 0, 100));
         lge.addGObject(field, 0);
 
         // los bordes
-        Canvas wall = new Canvas(new Point(0, 76), new Dimension(640, 4));
+        Canvas wall = new Canvas(new Position(0, 76), new Size(640, 4));
         wall.fill(Color.WHITE);
         wall.setTag("wall-horizontal");
         wall.enableCollider(true);
         lge.addGObject(wall, 1);
 
-        wall = new Canvas(new Point(0, 606), new Dimension(640, 4));
+        wall = new Canvas(new Position(0, 606), new Size(640, 4));
         wall.fill(Color.WHITE);
         wall.setTag("wall-horizontal");
         wall.enableCollider(true);
         lge.addGObject(wall, 1);
 
-        wall = new Canvas(new Point(20, 80), new Dimension(4, 526));
+        wall = new Canvas(new Position(20, 80), new Size(4, 526));
         wall.fill(Color.WHITE);
         wall.setTag("wall-vertical");
         wall.enableCollider(true);
         lge.addGObject(wall, 1);
 
-        wall = new Canvas(new Point(616, 80), new Dimension(4, 526));
+        wall = new Canvas(new Position(616, 80), new Size(4, 526));
         wall.fill(Color.WHITE);
         wall.setTag("wall-vertical");
         wall.enableCollider(true);
         lge.addGObject(wall, 1);
 
         // los actores
-        Ball ball = new Ball(new Point(320, 400), new Dimension(8, 8), "ball");
+        Ball ball = new Ball(new Position(320, 400), new Size(8, 8), "ball");
         lge.addGObject(ball, 1);
 
-        Canvas paddle = new Canvas(new Point(90, 270), new Dimension(8, 60), "user-paddle");
+        Canvas paddle = new Canvas(new Position(90, 270), new Size(8, 60), "user-paddle");
         paddle.fill(Color.WHITE);
         paddle.setTag("paddle");
         paddle.enableCollider(true);
         paddle.setBounds(field.getRectangle());
         lge.addGObject(paddle, 1);
 
-        paddle = new Canvas(new Point(540, 270), new Dimension(8, 60), "system-paddle");
+        paddle = new Canvas(new Position(540, 270), new Size(8, 60), "system-paddle");
         paddle.fill(Color.WHITE);
         paddle.setTag("paddle");
         paddle.enableCollider(true);
@@ -95,35 +96,35 @@ public class Pong implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x80808080, true));
-        infobar.drawText(info, new Point(50, 16), "monospace.plain.16", Color.WHITE);
+        infobar.drawText(info, new Position(50, 16), "monospace.plain.16", Color.WHITE);
 
         // user paddle
         Canvas userPaddle = (Canvas) lge.getGObject("user-paddle");
         double speed = paddleSpeed * dt;
-        int x = userPaddle.getX();
-        int y = userPaddle.getY();
+        double x = userPaddle.getX();
+        double y = userPaddle.getY();
 
         if (lge.keyPressed(KeyEvent.VK_UP))
-            userPaddle.setPosition(x, (int) (y - speed));
+            userPaddle.setPosition(x, y - speed);
         else if (lge.keyPressed(KeyEvent.VK_DOWN))
-            userPaddle.setPosition(x, (int) (y + speed));
+            userPaddle.setPosition(x, y + speed);
 
         // la pelota
         Ball ball = (Ball) lge.getGObject("ball");
-        // int bx = ball.getX();
-        int by = ball.getY();
+        // double bx = ball.getX();
+        double by = ball.getY();
 
         // system paddle
         Canvas systemPaddle = (Canvas) lge.getGObject("system-paddle");
-        int px = systemPaddle.getX();
-        int py = systemPaddle.getY();
+        double px = systemPaddle.getX();
+        double py = systemPaddle.getY();
         // int pw = systemPaddle.getWidth();
         int ph = systemPaddle.getHeight();
 
-        if (py + ph / 2 < by)
-            py = (int) (py + speed);
-        else if (py + ph / 2 > by)
-            py = (int) (py - speed);
+        if (py + ph / 2.0 < by)
+            py = py + speed;
+        else if (py + ph / 2.0 > by)
+            py = py - speed;
         systemPaddle.setPosition(px, py);
     }
 

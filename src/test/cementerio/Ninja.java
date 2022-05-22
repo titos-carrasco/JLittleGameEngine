@@ -1,24 +1,25 @@
 package test.cementerio;
 
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
+import rcr.lge.Rectangle;
+import rcr.lge.Size;
 import rcr.lge.Sprite;
 
 public class Ninja extends Sprite {
     private LittleGameEngine lge;
     private Rectangle colisionador;
-    private double vx = 2;
+    private double vx = 120;
     private double vy = 0;
-    private double g = 0.8;
-    private double vsalto = 8;
+    private double vym = 500;
+    private double g = 480;
+    private double vsalto = 140;
 
-    public Ninja(int x, int y) {
-        super("ninja-idle-right", new Point(x, y));
+    public Ninja(double x, double y) {
+        super("ninja-idle-right", new Position(x, y));
 
         // acceso a LGE
         lge = LittleGameEngine.getInstance();
@@ -28,11 +29,11 @@ public class Ninja extends Sprite {
         enableCollider(true);
 
         // el colisionador
-        colisionador = new Rectangle(new Point(20, 5), new Dimension(15, getHeight() - 5));
+        colisionador = new Rectangle(new Position(20, 5), new Size(15, getHeight() - 5));
         setCollider(colisionador);
     }
 
-    public boolean fixPosition(double dx, double dy) {
+    public boolean fixPosition(double dx, double dy, double dt) {
         GameObject[] gobjs = lge.collidesWithGObjects(this);
         for (GameObject gobj : gobjs) {
             String tag = gobj.getTag();
@@ -42,11 +43,13 @@ public class Ninja extends Sprite {
             } else if (tag.equals("plataforma")) {
                 Platform p = (Platform) gobj;
                 if (p.getDir() == 'L')
-                    setPosition(getX() - p.getSpeed(), p.getY() - getHeight());
-                if (p.getDir() == 'R')
-                    setPosition(getX() + p.getSpeed(), p.getY() - getHeight());
-                else
-                    setPosition(getX(), p.getY() - getHeight());
+                    setPosition(getX() - p.getSpeed() * dt, p.getY() - getHeight() + 1);
+                else if (p.getDir() == 'R')
+                    setPosition(getX() + p.getSpeed() * dt, p.getY() - getHeight() + 1);
+                else if (p.getDir() == 'U')
+                    setPosition(getX(), getY() - p.getSpeed() * dt);
+                else if (p.getDir() == 'D')
+                    setPosition(getX(), getY() + p.getSpeed() * dt);
                 return true;
             }
         }
@@ -57,7 +60,7 @@ public class Ninja extends Sprite {
     @Override
     public void onPostUpdate(double dt) {
         // nuestra posicion actual
-        Point position = getPosition();
+        Position position = getPosition();
         double x = position.x;
         double y = position.y;
         double x0 = x;
@@ -74,27 +77,32 @@ public class Ninja extends Sprite {
         } else {
             setImage("ninja-idle-right");
         }
-        x = x + move_x * vx;
+        x = x + move_x * vx * dt;
 
-        // ahora el movimiento en Y
-        y = y + vy;
-
-        // nueva posicion
-        setPosition((int) x, (int) y);
+        // siguiente imagen y su colisionador
         nextImage(dt, 0.04);
         setCollider(colisionador);
 
-        // la velocidad en Y es afectada por la gravedad
-        vy = vy + g;
+        // ahora el movimiento en Y
+        y = y + vy * dt;
+        vy = vy + g*dt;
+
+        // nueva posicion
+        setPosition(x, y);
 
         // estamos en un suelo?
-        boolean onfloor = fixPosition(x - x0, y - y0);
+        boolean onfloor = fixPosition(x - x0, y - y0, dt);
 
         // nos piden saltar
-        if (onfloor && lge.keyPressed(KeyEvent.VK_SPACE))
-            vy = -vsalto;
+        if (onfloor) {
+            if (lge.keyPressed(KeyEvent.VK_SPACE))
+                vy = -vsalto;
+            else
+                vy = 0;
+        }
 
-        if (onfloor && vy > 0)
-            vy = 1;
+        // limitamos a velocidad en Y
+        if (vy > vym)
+            vy = vym;
     }
 }

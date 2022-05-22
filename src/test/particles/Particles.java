@@ -1,7 +1,6 @@
 package test.particles;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
@@ -9,6 +8,8 @@ import java.awt.event.KeyEvent;
 import rcr.lge.Canvas;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
+import rcr.lge.Size;
 
 public class Particles implements IEvents {
     private LittleGameEngine lge;
@@ -18,7 +19,7 @@ public class Particles implements IEvents {
 
     public Particles() {
         // creamos el juego
-        Dimension winSize = new Dimension(800, 440);
+        Size winSize = new Size(800, 440);
 
         lge = new LittleGameEngine(winSize, "Particles", new Color(0xFFFFFF));
         lge.setOnMainUpdate(this);
@@ -29,11 +30,11 @@ public class Particles implements IEvents {
         lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Point(0, 0), new Dimension(800, 20), "infobar");
+        Canvas infobar = new Canvas(new Position(0, 0), new Size(800, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // un canvas para plotear
-        panel = new Canvas(new Point(0, 0), new Dimension(800, 600), "Panel");
+        panel = new Canvas(new Position(0, 0), new Size(800, 600), "Panel");
         panel.fill(Color.WHITE);
         lge.addGObject(panel, 1);
 
@@ -41,8 +42,8 @@ public class Particles implements IEvents {
         numParticles = 500;
         particles = new Particle[numParticles];
         for (int i = 0; i < numParticles; i++) {
-            double x = (int) (300 + Math.random() * 200);
-            double y = (int) (100 + Math.random() * 100);
+            double x = 300 + Math.random() * 200;
+            double y = 100 + Math.random() * 100;
             double vx = -120 + Math.random() * 240;
             double vy = -120 + Math.random() * 240;
             double m = 0.1 + Math.random();
@@ -65,7 +66,7 @@ public class Particles implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Point(140, 16), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new Position(140, 16), "monospace.plain.16", Color.BLACK);
 
         // las particulas
         for (int i = 0; i < numParticles; i++) {
@@ -76,10 +77,10 @@ public class Particles implements IEvents {
         panel.fill(Color.WHITE);
         for (int i = 0; i < numParticles; i++) {
             Particle particle = particles[i];
-            int x = (int) Math.round(particle.x);
-            int y = (int) Math.round(particle.y);
-            int r = (int) Math.round(particle.m * 5);
-            panel.drawRectangle(new Point(x, y), new Dimension(r, r), Color.BLACK, false);
+            double x = particle.x;
+            double y = particle.y;
+            int r = (int)(particle.m * 5);
+            panel.drawRectangle(new Position(x, y), new Size(r, r), Color.BLACK, false);
         }
     }
 

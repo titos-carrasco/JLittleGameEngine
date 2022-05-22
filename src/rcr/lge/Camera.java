@@ -1,8 +1,5 @@
 package rcr.lge;
 
-import java.awt.Dimension;
-import java.awt.Point;
-
 /**
  * La camara de Little Game Engine
  *
@@ -19,7 +16,7 @@ public class Camera extends GameObject {
      * @param position coordenadas (x, y) de la posicion inicial de la camara
      * @param size     dimension (width, height) de la camara
      */
-    Camera(Point position, Dimension size) {
+    Camera(Position position, Size size) {
         super(position, size, "__LGE_CAMERA__");
         target = null;
         targetInCenter = true;
@@ -34,16 +31,16 @@ public class Camera extends GameObject {
             return;
 
         // la posicion del que seguimos
-        int x = target.rect.x;
-        int y = target.rect.y;
+        double x = target.rect.x;
+        double y = target.rect.y;
 
         // el centro de la camara en el centro del gobj
         if (targetInCenter) {
-            x = x + target.rect.width / 2;
-            y = y + target.rect.height / 2;
+            x = x + target.rect.width / 2.0;
+            y = y + target.rect.height / 2.0;
         }
 
-        setPosition(x - rect.width / 2, y - rect.height / 2);
+        setPosition((int) (x - rect.width / 2.0), (int) (y - rect.height / 2.0));
     }
 
 }

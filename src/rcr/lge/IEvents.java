@@ -8,10 +8,10 @@ package rcr.lge;
  *
  */
 public interface IEvents {
-	/**
-	 * Manjeador del evento onMainUpdate
-	 * 
-	 * @param dt tiempo en segundos desde el ultimo ciclo del main loop
-	 */
-	public void onMainUpdate(double dt);
+    /**
+     * Manjeador del evento onMainUpdate
+     *
+     * @param dt tiempo en segundos desde el ultimo ciclo del main loop
+     */
+    public void onMainUpdate(double dt);
 }

@@ -1,8 +1,5 @@
 package rcr.lge;
 
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 /**
@@ -22,7 +19,7 @@ public class Sprite extends GameObject {
      *
      * @param position posicion inicial (x, y) del GameObject
      */
-    public Sprite(Point position) {
+    public Sprite(Position position) {
         this(null, position, null);
     }
 
@@ -32,7 +29,7 @@ public class Sprite extends GameObject {
      * @param iname    nombre de la secuencia de imagenes a utilizar
      * @param position posicion inicial (x, y) del GameObject
      */
-    public Sprite(String iname, Point position) {
+    public Sprite(String iname, Position position) {
         this(iname, position, null);
     }
 
@@ -43,8 +40,8 @@ public class Sprite extends GameObject {
      * @param position posicion inicial (x, y) del GameObject
      * @param name     nombre a asignar a este GameObject
      */
-    public Sprite(String iname, Point position, String name) {
-        super(position, new Dimension(0, 0), name);
+    public Sprite(String iname, Position position, String name) {
+        super(position, new Size(0, 0), name);
         setImage(iname);
     }
 
@@ -68,6 +65,8 @@ public class Sprite extends GameObject {
 
     /**
      * Avanza automaticamente a la siguiente imagen de la secuencia de este Sprite
+     *
+     * @return el indice de la imagen actual
      */
     public int nextImage() {
         return nextImage(0, 0);
@@ -77,6 +76,7 @@ public class Sprite extends GameObject {
      * Avanza automaticamente a la siguiente imagen de la secuencia de este Sprite
      *
      * @param dt tiempo transcurrido desde la ultima invocacion a este metodo
+     * @return el indice de la imagen actual
      */
     public int nextImage(double dt) {
         return nextImage(dt, 0);
@@ -88,6 +88,7 @@ public class Sprite extends GameObject {
      * @param dt    tiempo transcurrido desde la ultima invocacion a este metodo
      * @param delay tiempo que debe transcurrir antes de pasar a la siguiente imagen
      *              de la secuencia
+     * @return el indice de la imagen actual
      */
     public int nextImage(double dt, double delay) {
         elapsed = elapsed + dt;
@@ -110,6 +111,7 @@ public class Sprite extends GameObject {
      *
      * @param iname el nombre de la secuencia (cargada con LoadImage y especificada
      *              al crear este Sprite)
+     * @return el indice de la imagen actual
      */
     public int setImage(String iname) {
         return setImage(iname, -1);
@@ -121,6 +123,7 @@ public class Sprite extends GameObject {
      * @param iname el nombre de la secuencia (cargada con LoadImage y especificada
      *              al crear este Sprite)
      * @param idx   el numero de la secuencia a utilizar
+     * @return el indice de la imagen actual
      */
     public int setImage(String iname, int idx) {
         if (iname != null) {

@@ -1,10 +1,8 @@
 package rcr.lge;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
@@ -22,7 +20,7 @@ public class Canvas extends GameObject {
      * @param origin posicion (x, y) del canvas
      * @param size   dimension (width, height) del canvas
      */
-    public Canvas(Point origin, Dimension size) {
+    public Canvas(Position origin, Size size) {
         this(origin, size, null);
     }
 
@@ -33,7 +31,7 @@ public class Canvas extends GameObject {
      * @param size   dimension (width, height) del canvas
      * @param name   nombre para esta GameObject
      */
-    public Canvas(Point origin, Dimension size, String name) {
+    public Canvas(Position origin, Size size, String name) {
         super(origin, size, name);
         surface = LittleGameEngine.getInstance().createTranslucentImage(size.width, size.height);
     }
@@ -61,9 +59,9 @@ public class Canvas extends GameObject {
      *                 el texto
      * @param color    color a utilizar (r,g,b) para trazar el texto
      */
-    public void drawText(String text, Point position, String fname, Color color) {
-        int x = position.x;
-        int y = position.y;
+    public void drawText(String text, Position position, String fname, Color color) {
+        double x = position.x;
+        double y = position.y;
 
         Graphics2D g2d = surface.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -72,7 +70,7 @@ public class Canvas extends GameObject {
 
         g2d.setColor(color);
         g2d.setFont(f);
-        g2d.drawString(text, x, y);
+        g2d.drawString(text, (int) x, (int) y);
         g2d.dispose();
     }
 
@@ -83,13 +81,13 @@ public class Canvas extends GameObject {
      *                 canvas
      * @param color    color a utilizar (r,g,b) para trazar el punto
      */
-    public void drawPoint(Point position, Color color) {
-        int x = position.x;
-        int y = position.y;
+    public void drawPosition(Position position, Color color) {
+        double x = position.x;
+        double y = position.y;
 
         Graphics2D g2d = surface.createGraphics();
         g2d.setColor(color);
-        g2d.drawLine(x, y, x, y);
+        g2d.drawLine((int) x, (int) y, (int) x, (int) y);
         g2d.dispose();
     }
 
@@ -102,16 +100,16 @@ public class Canvas extends GameObject {
      * @param color     color a utilizar (r,g,b) para trazar el circulo
      * @param thickness si es verdadero se mostrara el borde del circulo
      */
-    public void drawCircle(Point position, int radius, Color color, boolean thickness) {
-        int x = position.x;
-        int y = position.y;
+    public void drawCircle(Position position, double radius, Color color, boolean thickness) {
+        double x = position.x;
+        double y = position.y;
 
         Graphics2D g2d = surface.createGraphics();
         g2d.setColor(color);
         if (thickness)
-            g2d.drawOval(x, y, radius, radius);
+            g2d.drawOval((int) x, (int) y, (int) radius, (int) radius);
         else
-            g2d.fillOval(x, y, radius, radius);
+            g2d.fillOval((int) x, (int) y, (int) radius, (int) radius);
         g2d.dispose();
     }
 
@@ -125,16 +123,16 @@ public class Canvas extends GameObject {
      * @param color     color a utilizar (r,g,b) para trazar el rectangulo
      * @param thickness si es True se mostrara el borde del rectangulo
      */
-    public void drawRectangle(Point position, Dimension size, Color color, boolean thickness) {
-        int x = position.x;
-        int y = position.y;
+    public void drawRectangle(Position position, Size size, Color color, boolean thickness) {
+        double x = position.x;
+        double y = position.y;
 
         Graphics2D g2d = surface.createGraphics();
         g2d.setColor(color);
         if (thickness)
-            g2d.drawRect(x, y, size.width - 1, size.height - 1);
+            g2d.drawRect((int) x, (int) y, (int) (size.width - 1.0), (int) (size.height - 1.0));
         else
-            g2d.fillRect(x, y, size.width, size.height);
+            g2d.fillRect((int) x, (int) y, size.width, size.height);
         g2d.dispose();
     }
 
@@ -145,12 +143,12 @@ public class Canvas extends GameObject {
      *                 canvas
      * @param surface  superficie (imagen) a trazar
      */
-    public void drawSurface(Point position, BufferedImage surface) {
-        int x = position.x;
-        int y = position.y;
+    public void drawSurface(Position position, BufferedImage surface) {
+        double x = position.x;
+        double y = position.y;
 
         Graphics2D g2d = this.surface.createGraphics();
-        g2d.drawImage(surface, x, y, null);
+        g2d.drawImage(surface, (int) x, (int) y, null);
         g2d.dispose();
     }
 

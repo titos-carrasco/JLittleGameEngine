@@ -1,21 +1,21 @@
 package test.simple.demo05;
 
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
+import rcr.lge.Position;
+import rcr.lge.Rectangle;
 import rcr.lge.Sprite;
 
 public class MiHeroe extends Sprite {
     private LittleGameEngine lge;
     GameObject ninja;
     private int state = -1;
-    private Point last;
+    private Position last;
 
     public MiHeroe() {
-        super("heroe_idle_right", new Point(550, 626), "Heroe");
+        super("heroe_idle_right", new Position(550, 626), "Heroe");
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
@@ -32,15 +32,13 @@ public class MiHeroe extends Sprite {
     @Override
     public void onUpdate(double dt) {
         // velocity = pixeles por segundo
-        int velocity = 240;
-        int pixels = (int) (velocity * dt);
-        if (pixels < 1)
-            pixels = 1;
+        double velocity = 240;
+        double pixels = velocity * dt;
 
         // la posiciona actual del heroe
-        int x = getX();
-        int y = getY();
-        last = new Point(x, y);
+        double x = getX();
+        double y = getY();
+        last = new Position(x, y);
 
         // cambiamos sus coordenadas, orientacion e imagen segun la tecla presionada
         if (lge.keyPressed(KeyEvent.VK_RIGHT)) {
