@@ -258,6 +258,20 @@ public class GameObject {
      */
     public void enableCollider(boolean useColliders) {
         this.useColliders = useColliders;
+        this.callOnCollision = false;
+    }
+
+    /**
+     * Establece si este objeto participara o no del procesamiento de colisiones
+     *
+     * @param useColliders si es verdadero participara del procesamiento de
+     *                     colisiones
+     * @param oncollision  si es verdadero se generara el evento OnCollision para
+     *                     este objeto
+     */
+    public void enableCollider(boolean useColliders, boolean oncollision) {
+        this.useColliders = useColliders;
+        this.callOnCollision = oncollision;
     }
 
     /**

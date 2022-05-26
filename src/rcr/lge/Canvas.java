@@ -82,7 +82,7 @@ public class Canvas extends GameObject {
      *                 canvas
      * @param color    color a utilizar (r,g,b) para trazar el punto
      */
-    public void drawPosition(Position position, Color color) {
+    public void drawPoint(Position position, Color color) {
         double x = position.x;
         double y = position.y;
 
