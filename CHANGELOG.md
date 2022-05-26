@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.5.7 2022-05-26
+- Simplifica lanzamiento de eventos
+
 ## v0.5.6.1 2022-05-21
 - Se modifican todos los archivos fuentes para utilizar coordenadas como double
 - Se agregan Clases Rectangle, Position() y Size() para poder manejar los GameObjects en double

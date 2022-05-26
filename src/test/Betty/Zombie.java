@@ -19,7 +19,6 @@ public class Zombie extends Sprite {
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
 
-        setOnEvents(LittleGameEngine.E_ON_UPDATE);
         setTag("zombie");
         enableCollider(true);
         active = true;

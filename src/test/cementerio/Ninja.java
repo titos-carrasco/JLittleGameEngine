@@ -25,7 +25,6 @@ public class Ninja extends Sprite {
         lge = LittleGameEngine.getInstance();
 
         // los eventos que recibiremos
-        setOnEvents(LittleGameEngine.E_ON_POST_UPDATE);
         enableCollider(true);
 
         // el colisionador
@@ -85,7 +84,7 @@ public class Ninja extends Sprite {
 
         // ahora el movimiento en Y
         y = y + vy * dt;
-        vy = vy + g*dt;
+        vy = vy + g * dt;
 
         // nueva posicion
         setPosition(x, y);

@@ -1,6 +1,5 @@
 package test.cementerio;
 
-import rcr.lge.LittleGameEngine;
 import rcr.lge.Position;
 import rcr.lge.Rectangle;
 import rcr.lge.Size;
@@ -20,7 +19,6 @@ public class Platform extends Sprite {
         // lge = LittleGameEngine.getInstance();
 
         // los eventos que recibiremos
-        setOnEvents(LittleGameEngine.E_ON_UPDATE);
         setCollider(new Rectangle(new Position(0, 0), new Size(getWidth(), 1)));
         enableCollider(true);
         setTag("plataforma");

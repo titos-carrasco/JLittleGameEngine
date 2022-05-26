@@ -22,8 +22,6 @@ public class MiHeroe extends Sprite {
         ninja = lge.getGObject("ninja");
 
         // sus atributos
-        setOnEvents(LittleGameEngine.E_ON_UPDATE);
-        setOnEvents(LittleGameEngine.E_ON_POST_UPDATE);
         enableCollider(true);
         setBounds(new Rectangle(0, 0, 1920, 1056));
         last = getPosition();

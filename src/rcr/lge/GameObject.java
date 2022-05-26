@@ -16,8 +16,8 @@ public class GameObject {
     Rectangle bounds = null;
     String tag = "";
     boolean useColliders = false;
+    boolean callOnCollision = false;
     int layer = -1;
-    int onEventsEnabled = 0x00;
 
     /**
      * Crea un objeto del juego
@@ -278,94 +278,68 @@ public class GameObject {
     // manejo de eventos
 
     /**
-     * Establece los eventos que recibira este objeto
-     *
-     * @param onEventsEnabled el evento que se sumara a los eventos que recibira
-     *                        <ul>
-     *                        <li>LittleGameEngine.E_ON_DELETE</li>
-     *                        <li>LittleGameEngine.E_ON_START</li>
-     *                        <li>LittleGameEngine.E_ON_PRE_UPDATE</li>
-     *                        <li>LittleGameEngine.E_ON_UPDATE</li>
-     *                        <li>LittleGameEngine.E_ON_POST_UPDATE</li>
-     *                        <li>LittleGameEngine.E_ON_COLLISION</li>
-     *                        <li>LittleGameEngine.E_ON_PRE_RENDER</li>
-     *                        <li>LittleGameEngine.E_ON_QUIT</li>
-     *                        </ul>
-     *
-     *                        Se deben sobreescribir los siguientes metodos segun se
-     *                        habiliten los eventos: onDelete(), onStart(),
-     *                        onPreUpdate(dt), onUpdate(dt), onPostUpdate( dt) ,
-     *                        onCollision(dt, gobjs), onPreRender(dt), onQuit()
+     * Es invocada en el siguiente ciclo para todos los GameObjects marcados para
+     * eliminacion
      */
-    public void setOnEvents(int onEventsEnabled) {
-        this.onEventsEnabled |= onEventsEnabled;
+    public void onDelete() {
     }
 
     /**
-     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
-     * GameObjects marcados para eliminacion
-     */
-    public void onDelete() {
-    };
-
-    /**
-     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
-     * GameObjects recien creados
+     * Es invocada en el siguiente ciclo para todos los GameObjects recien creados
      */
     public void onStart() {
-    };
+    }
 
     /**
-     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
-     * GameObjects previo al evento onUpdate()
+     * Es invocada en el siguiente ciclo para todos los GameObjects previo al evento
+     * onUpdate()
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
      */
     public void onPreUpdate(double dt) {
-    };
+    }
 
     /**
-     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
-     * GameObjects previo al evento onPostUpdate()
+     * Es invocada en el siguiente ciclo para todos los GameObjects previo al evento
+     * onPostUpdate()
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
      */
     public void onUpdate(double dt) {
-    };
+    }
 
     /**
-     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
-     * GameObjects previo al evento onCollision()
+     * Es invocada en el siguiente ciclo para todos los GameObjects previo al evento
+     * onCollision()
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
      */
     public void onPostUpdate(double dt) {
-    };
+    }
 
     /**
-     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
-     * GameObjects previo al evento onPreRender()
+     * Es invocada en el siguiente ciclo para todos los GameObjects previo al evento
+     * onPreRender()
      *
-     * @param dt tiempo en segundos desde el ultimo ciclo
+     * @param dt    tiempo en segundos desde el ultimo ciclo
      * @param gobjs los GameObjects que colisionan co este GameObject
      */
     public void onCollision(double dt, GameObject[] gobjs) {
-    };
+    }
 
     /**
-     * Si es habilitada, sera invocada en el siguiente ciclo para todos los
-     * GameObjects previo al rendering del juego en pantalla
+     * Es invocada en el siguiente ciclo para todos los GameObjects previo al
+     * rendering del juego en pantalla
      *
      * @param dt tiempo en segundos desde el ultimo ciclo
      */
     public void onPreRender(double dt) {
-    };
+    }
 
     /**
-     * Si es habilitada, sera invocadapara todos los GameObjects jusrto antes de
-     * finalizar el game loop
+     * Es invocada para todos los GameObjects justo antes de finalizar el game loop
      */
     public void onQuit() {
-    };
+    }
 
 }

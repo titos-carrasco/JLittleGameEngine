@@ -21,8 +21,6 @@ public class Betty extends Sprite {
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
 
-        setOnEvents(LittleGameEngine.E_ON_UPDATE);
-        setOnEvents(LittleGameEngine.E_ON_POST_UPDATE);
         setTag("Betty");
         enableCollider(true);
         alive = true;

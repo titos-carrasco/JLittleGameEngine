@@ -26,8 +26,6 @@ public class Ball extends Canvas {
         g = 240;
         e = 0.4;
         enableCollider(true);
-        setOnEvents(LittleGameEngine.E_ON_UPDATE);
-        setOnEvents(LittleGameEngine.E_ON_POST_UPDATE);
         ground = lge.getGObject("ground");
 
         Color fillColor = new Color(0, 255, 0, 64);

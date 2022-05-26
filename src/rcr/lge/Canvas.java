@@ -45,6 +45,7 @@ public class Canvas extends GameObject {
         Graphics2D g2d = surface.createGraphics();
         g2d.setBackground(color);
         g2d.clearRect(0, 0, rect.width, rect.height);
+        g2d.dispose();
     }
 
     /**

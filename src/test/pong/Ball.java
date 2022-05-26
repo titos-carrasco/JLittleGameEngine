@@ -18,8 +18,6 @@ public class Ball extends Canvas {
     public Ball(Position position, Size size, String name) {
         super(position, size, name);
         lge = LittleGameEngine.getInstance();
-        setOnEvents(LittleGameEngine.E_ON_UPDATE);
-        setOnEvents(LittleGameEngine.E_ON_POST_UPDATE);
         enableCollider(true);
         fill(Color.WHITE);
 
