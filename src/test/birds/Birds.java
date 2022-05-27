@@ -30,7 +30,7 @@ public class Birds implements IEvents {
         lge.loadImage("heroe", resourceDir + "/images/Swordsman/Idle/Idle_0*.png", 0.08, false, false);
         lge.loadImage("mute", resourceDir + "/images/icons/sound-*.png", false, false);
         lge.loadImage("bird", resourceDir + "/images/BlueBird/frame-*.png", 0.04, false, false);
-        lge.loadTTFFont("backlash.plain.40", resourceDir + "/fonts/backlash.ttf", Font.PLAIN, 40);
+        lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
         lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
 
         // agregamos el fondo
@@ -70,7 +70,7 @@ public class Birds implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Position(140, 16), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new Position(140, 0), "monospace.plain.16", Color.BLACK);
     }
 
     // main loop

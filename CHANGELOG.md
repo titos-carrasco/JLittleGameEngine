@@ -1,5 +1,9 @@
 # Changelog
 
+# v0.5.7.1 2022-05-27
+- Canvas.java: corrige coordenadas en método drawText
+- Se corrigeb los demos acorde a lo anterior
+
 ## 2022-05-26
 - Canvas.Java: corrige error de nombre de método drawPoint()
 - GameObject.java: agrega parametro en enableCollider() para habilitar detección de colisión

@@ -40,7 +40,6 @@ public class Game implements IEvents {
         lge.loadImage("betty_right", resourceDir + "/images/Betty/right-0*.png", false, false);
         lge.loadImage("zombie", resourceDir + "/images/Kenny/Zombie/zombie_walk*.png", false, false);
         lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
-        lge.loadTTFFont("cool.plain.30", resourceDir + "/fonts/backlash.ttf", Font.PLAIN, 30);
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new Position(0, 0), "fondo");
@@ -107,7 +106,7 @@ public class Game implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x80808080, true));
-        infobar.drawText(info, new Position(50, 16), "monospace.plain.16", Color.WHITE);
+        infobar.drawText(info, new Position(50, 0), "monospace.plain.16", Color.WHITE);
     }
 
     // main loop

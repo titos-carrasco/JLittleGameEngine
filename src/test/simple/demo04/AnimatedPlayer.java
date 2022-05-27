@@ -77,7 +77,7 @@ public class AnimatedPlayer implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Position(50, 16), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new Position(50, 0), "monospace.plain.16", Color.BLACK);
 
         // mute on/mute off
         mousePosition = lge.getMouseClicked(0);

@@ -66,7 +66,7 @@ public class Particles implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Position(140, 16), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new Position(140, 0), "monospace.plain.16", Color.BLACK);
 
         // las particulas
         for (int i = 0; i < numParticles; i++) {
@@ -79,7 +79,7 @@ public class Particles implements IEvents {
             Particle particle = particles[i];
             double x = particle.x;
             double y = particle.y;
-            int r = (int)(particle.m * 5);
+            int r = (int) (particle.m * 5);
             panel.drawRectangle(new Position(x, y), new Size(r, r), Color.BLACK, false);
         }
     }

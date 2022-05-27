@@ -2,6 +2,7 @@ package rcr.lge;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -68,10 +69,11 @@ public class Canvas extends GameObject {
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
         Font f = LittleGameEngine.getInstance().getFont(fname);
+        FontMetrics metrics = g2d.getFontMetrics(f);
 
         g2d.setColor(color);
         g2d.setFont(f);
-        g2d.drawString(text, (int) x, (int) y);
+        g2d.drawString(text, (int) x, (int) y + metrics.getHeight());
         g2d.dispose();
     }
 

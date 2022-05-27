@@ -96,7 +96,7 @@ public class Pong implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x80808080, true));
-        infobar.drawText(info, new Position(50, 16), "monospace.plain.16", Color.WHITE);
+        infobar.drawText(info, new Position(50, 0), "monospace.plain.16", Color.WHITE);
 
         // user paddle
         Canvas userPaddle = (Canvas) lge.getGObject("user-paddle");
