@@ -31,7 +31,7 @@ public class MovePlayer implements IEvents {
         lge.loadImage("heroe_right", resourceDir + "/images/Swordsman/Idle/Idle_000.png", 0.16, false, false);
         lge.loadImage("heroe_left", resourceDir + "/images/Swordsman/Idle/Idle_000.png", 0.16, true, false);
         lge.loadImage("mute", resourceDir + "/images/icons/sound-*.png", false, false);
-        lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
         lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
 
         // activamos la musica de fondo

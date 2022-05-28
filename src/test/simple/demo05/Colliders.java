@@ -34,7 +34,7 @@ public class Colliders implements IEvents {
         lge.loadImage("heroe_run_left", resourceDir + "/images/Swordsman/Run/Run_0*.png", 0.16, true, false);
         lge.loadImage("ninja", resourceDir + "/images/Swordsman/Idle/Idle_000.png", 0.16, false, false);
         lge.loadImage("mute", resourceDir + "/images/icons/sound-*.png", false, false);
-        lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
         lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
         lge.loadSound("aves", resourceDir + "/sounds/bird-thrush-nightingale.wav");
         lge.loadSound("poing", resourceDir + "/sounds/cartoon-poing.wav");

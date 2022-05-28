@@ -39,7 +39,7 @@ public class Game implements IEvents {
         lge.loadImage("betty_left", resourceDir + "/images/Betty/left-0*.png", false, false);
         lge.loadImage("betty_right", resourceDir + "/images/Betty/right-0*.png", false, false);
         lge.loadImage("zombie", resourceDir + "/images/Kenny/Zombie/zombie_walk*.png", false, false);
-        lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new Position(0, 0), "fondo");

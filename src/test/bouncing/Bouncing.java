@@ -26,7 +26,7 @@ public class Bouncing implements IEvents {
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../resources");
 
-        lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos el suelo
         ground = new Canvas(new Position(0, 340), new Size(800, 100), "ground");

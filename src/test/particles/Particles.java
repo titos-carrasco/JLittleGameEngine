@@ -27,7 +27,7 @@ public class Particles implements IEvents {
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../resources");
 
-        lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos la barra de info
         Canvas infobar = new Canvas(new Position(0, 0), new Size(800, 20), "infobar");

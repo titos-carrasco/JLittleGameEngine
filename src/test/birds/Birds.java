@@ -30,7 +30,7 @@ public class Birds implements IEvents {
         lge.loadImage("heroe", resourceDir + "/images/Swordsman/Idle/Idle_0*.png", 0.08, false, false);
         lge.loadImage("mute", resourceDir + "/images/icons/sound-*.png", false, false);
         lge.loadImage("bird", resourceDir + "/images/BlueBird/frame-*.png", 0.04, false, false);
-        lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
         lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
 
         // agregamos el fondo

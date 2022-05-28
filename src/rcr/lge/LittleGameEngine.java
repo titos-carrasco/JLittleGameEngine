@@ -718,7 +718,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param fstyle estilo del tipo de letra
      * @param fsize  tamano del tipo de letra
      */
-    public void loadTTFFont(String name, String fname, int fstyle, int fsize) {
+    public void loadTTFont(String name, String fname, int fstyle, int fsize) {
         try {
             if (fname.charAt(2) == ':')
                 fname = fname.substring(1);

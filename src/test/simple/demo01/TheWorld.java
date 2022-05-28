@@ -29,8 +29,8 @@ public class TheWorld implements IEvents {
         lge.loadImage("fondo", resourceDir + "/images/Backgrounds/FreeTileset/Fondo.png", winSize, false, false);
         lge.loadImage("heroe", resourceDir + "/images/Swordsman/Idle/Idle_0*.png", 0.08, false, false);
         lge.loadImage("mute", resourceDir + "/images/icons/sound-*.png", false, false);
-        lge.loadTTFFont("backlash.plain.40", resourceDir + "/fonts/backlash.ttf", Font.PLAIN, 40);
-        lge.loadTTFFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.loadTTFont("backlash.plain.40", resourceDir + "/fonts/backlash.ttf", Font.PLAIN, 40);
+        lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
         lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
 
         // activamos la musica de fondo
