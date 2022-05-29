@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
+import rcr.lge.PointD;
 import rcr.lge.Size;
 import rcr.lge.Sprite;
 
@@ -13,10 +13,10 @@ public class Betty extends Sprite {
 
     private boolean alive;
     private Size winSize;
-    private Position lastPoint;
+    private PointD lastPoint;
 
     public Betty(String name, Size winSize) {
-        super("betty_idle", new Position(0, 0), name);
+        super("betty_idle", new PointD(0, 0), name);
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
@@ -50,7 +50,7 @@ public class Betty extends Sprite {
         // nuestra posicion actual y tamano
         double x = getX();
         double y = getY();
-        lastPoint = new Position(x, y);
+        lastPoint = new PointD(x, y);
 
         // cambiamos sus coordenadas e imagen segun la tecla presionada
         int idx = getImagesIndex();

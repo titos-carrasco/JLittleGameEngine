@@ -8,7 +8,7 @@ import java.awt.event.KeyEvent;
 import rcr.lge.Canvas;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
+import rcr.lge.PointD;
 import rcr.lge.Size;
 
 public class Particles implements IEvents {
@@ -30,11 +30,11 @@ public class Particles implements IEvents {
         lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Position(0, 0), new Size(800, 20), "infobar");
+        Canvas infobar = new Canvas(new PointD(0, 0), new Size(800, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // un canvas para plotear
-        panel = new Canvas(new Position(0, 0), new Size(800, 600), "Panel");
+        panel = new Canvas(new PointD(0, 0), new Size(800, 600), "Panel");
         panel.fill(Color.WHITE);
         lge.addGObject(panel, 1);
 
@@ -66,7 +66,7 @@ public class Particles implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Position(140, 0), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new PointD(140, 0), "monospace.plain.16", Color.BLACK);
 
         // las particulas
         for (int i = 0; i < numParticles; i++) {
@@ -80,7 +80,7 @@ public class Particles implements IEvents {
             double x = particle.x;
             double y = particle.y;
             int r = (int) (particle.m * 5);
-            panel.drawRectangle(new Position(x, y), new Size(r, r), Color.BLACK, false);
+            panel.drawRectangle(new PointD(x, y), new Size(r, r), Color.BLACK, false);
         }
     }
 

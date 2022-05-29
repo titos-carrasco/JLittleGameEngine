@@ -118,7 +118,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         gObjectsToDel = new ArrayList<GameObject>();
 
         screen = createOpaqueImage(winSize.width, winSize.height);
-        camera = new Camera(new Position(0, 0), winSize);
+        camera = new Camera(new PointD(0, 0), winSize);
 
         Font f = new Font("Arial", Font.PLAIN, 40);
         Graphics2D g2d = screen.createGraphics();
@@ -337,15 +337,15 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
                     for (GameObject gobj : elem.getValue()) {
                         if (!gobj.rect.intersects(camera.rect))
                             continue;
-                        Position p = fixXY(gobj.getPosition());
+                        PointD p = fixXY(gobj.getPosition());
                         BufferedImage surface = gobj.surface;
                         if (surface != null)
                             g2d.drawImage(surface, (int) p.x, (int) p.y, null);
 
                         if (collidersColor != null && gobj.useColliders) {
                             g2d.setColor(collidersColor);
-                            for (Rectangle r : gobj.getCollider()) {
-                                p = fixXY(new Position(r.x, r.y));
+                            for (RectangleD r : gobj.getCollider()) {
+                                p = fixXY(new PointD(r.x, r.y));
                                 g2d.drawRect((int) p.x, (int) p.y, r.width - 1, r.height - 1);
                             }
                         }
@@ -401,7 +401,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      *
      * @return las coordenadas trasladadas
      */
-    private Position fixXY(Position p) {
+    private PointD fixXY(PointD p) {
         double xo = p.x;
         double vx = camera.rect.x;
         double x = xo - vx;
@@ -410,7 +410,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         double vy = camera.rect.y;
         double y = yo - vy;
 
-        return new Position(x, y);
+        return new PointD(x, y);
     }
 
     // ------ gobjects ------
@@ -510,7 +510,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      *
      * @return la posicion
      */
-    public Position getCameraPosition() {
+    public PointD getCameraPosition() {
         return camera.getPosition();
     }
 
@@ -556,7 +556,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      *
      * @param bounds los limites
      */
-    public void setCameraBounds(Rectangle bounds) {
+    public void setCameraBounds(RectangleD bounds) {
         camera.setBounds(bounds);
     }
 
@@ -565,7 +565,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      *
      * @param position la posicion
      */
-    public void setCameraPosition(Position position) {
+    public void setCameraPosition(PointD position) {
         camera.setPosition(position);
     }
 

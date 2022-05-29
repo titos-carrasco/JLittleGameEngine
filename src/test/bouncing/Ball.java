@@ -5,7 +5,7 @@ import java.awt.Color;
 import rcr.lge.Canvas;
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
+import rcr.lge.PointD;
 import rcr.lge.Size;
 
 public class Ball extends Canvas {
@@ -16,7 +16,7 @@ public class Ball extends Canvas {
     private GameObject ground;
 
     public Ball(double x, double y, double vx, double vy) {
-        super(new Position(x, y), new Size(20, 20));
+        super(new PointD(x, y), new Size(20, 20));
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();

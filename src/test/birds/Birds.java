@@ -8,7 +8,7 @@ import java.awt.event.KeyEvent;
 import rcr.lge.Canvas;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
+import rcr.lge.PointD;
 import rcr.lge.Size;
 import rcr.lge.Sprite;
 
@@ -34,22 +34,22 @@ public class Birds implements IEvents {
         lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
 
         // agregamos el fondo
-        Sprite fondo = new Sprite("fondo", new Position(0, 0), "fondo");
+        Sprite fondo = new Sprite("fondo", new PointD(0, 0), "fondo");
         lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Position(0, 0), new Size(800, 20), "infobar");
+        Canvas infobar = new Canvas(new PointD(0, 0), new Size(800, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // agregamos al heroe
-        Sprite heroe = new Sprite("heroe", new Position(226, 254), "Heroe");
+        Sprite heroe = new Sprite("heroe", new PointD(226, 254), "Heroe");
         lge.addGObject(heroe, 1);
 
         // agregamos pajaros
         for (int i = 0; i < 500; i++) {
             double x = Math.random() * winSize.width;
             double y = Math.random() * winSize.height;
-            Bird bird = new Bird("bird", new Position(x, y));
+            Bird bird = new Bird("bird", new PointD(x, y));
             // bird.enableCollider(true);
             lge.addGObject(bird, 1);
         }
@@ -70,7 +70,7 @@ public class Birds implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Position(140, 0), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new PointD(140, 0), "monospace.plain.16", Color.BLACK);
     }
 
     // main loop

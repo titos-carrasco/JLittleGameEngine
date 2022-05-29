@@ -21,7 +21,7 @@ public class Canvas extends GameObject {
      * @param origin posicion (x, y) del canvas
      * @param size   dimension (width, height) del canvas
      */
-    public Canvas(Position origin, Size size) {
+    public Canvas(PointD origin, Size size) {
         this(origin, size, null);
     }
 
@@ -32,7 +32,7 @@ public class Canvas extends GameObject {
      * @param size   dimension (width, height) del canvas
      * @param name   nombre para esta GameObject
      */
-    public Canvas(Position origin, Size size, String name) {
+    public Canvas(PointD origin, Size size, String name) {
         super(origin, size, name);
         surface = LittleGameEngine.getInstance().createTranslucentImage(size.width, size.height);
     }
@@ -61,7 +61,7 @@ public class Canvas extends GameObject {
      *                 el texto
      * @param color    color a utilizar (r,g,b) para trazar el texto
      */
-    public void drawText(String text, Position position, String fname, Color color) {
+    public void drawText(String text, PointD position, String fname, Color color) {
         double x = position.x;
         double y = position.y;
 
@@ -84,7 +84,7 @@ public class Canvas extends GameObject {
      *                 canvas
      * @param color    color a utilizar (r,g,b) para trazar el punto
      */
-    public void drawPoint(Position position, Color color) {
+    public void drawPoint(PointD position, Color color) {
         double x = position.x;
         double y = position.y;
 
@@ -103,7 +103,7 @@ public class Canvas extends GameObject {
      * @param color     color a utilizar (r,g,b) para trazar el circulo
      * @param thickness si es verdadero se mostrara el borde del circulo
      */
-    public void drawCircle(Position position, double radius, Color color, boolean thickness) {
+    public void drawCircle(PointD position, double radius, Color color, boolean thickness) {
         double x = position.x;
         double y = position.y;
 
@@ -126,7 +126,7 @@ public class Canvas extends GameObject {
      * @param color     color a utilizar (r,g,b) para trazar el rectangulo
      * @param thickness si es True se mostrara el borde del rectangulo
      */
-    public void drawRectangle(Position position, Size size, Color color, boolean thickness) {
+    public void drawRectangle(PointD position, Size size, Color color, boolean thickness) {
         double x = position.x;
         double y = position.y;
 
@@ -146,7 +146,7 @@ public class Canvas extends GameObject {
      *                 canvas
      * @param surface  superficie (imagen) a trazar
      */
-    public void drawSurface(Position position, BufferedImage surface) {
+    public void drawSurface(PointD position, BufferedImage surface) {
         double x = position.x;
         double y = position.y;
 

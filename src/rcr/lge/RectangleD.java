@@ -1,14 +1,12 @@
 package rcr.lge;
 
-import java.awt.Point;
-
 /**
  * Clase para representar un rectangulo
  *
  * @author Roberto carrasco (titos.carrasco@gmail.com)
  *
  */
-public class Rectangle {
+public class RectangleD {
     public double x, y;
     public int width, height;
 
@@ -18,7 +16,7 @@ public class Rectangle {
      * @param origin coordenadas (x, y) del origen del rectangulo
      * @param size   dimension (width, height) del rectangulo
      */
-    public Rectangle(Position origin, Size size) {
+    public RectangleD(PointD origin, Size size) {
         x = origin.x;
         y = origin.y;
         width = size.width;
@@ -33,7 +31,7 @@ public class Rectangle {
      * @param width  su ancho
      * @param height su alto
      */
-    public Rectangle(double x, double y, int width, int height) {
+    public RectangleD(double x, double y, int width, int height) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -45,7 +43,7 @@ public class Rectangle {
      *
      * @param rect el rectangulo a tomar como base
      */
-    public Rectangle(Rectangle rect) {
+    public RectangleD(RectangleD rect) {
         x = rect.x;
         y = rect.y;
         width = rect.width;
@@ -57,8 +55,8 @@ public class Rectangle {
      *
      * @return la copia
      */
-    public Rectangle copy() {
-        return new Rectangle(new Position(x, y), new Size(width, height));
+    public RectangleD copy() {
+        return new RectangleD(x, y, width, height);
     }
 
     /**
@@ -66,8 +64,8 @@ public class Rectangle {
      *
      * @return las coordenadas de su origen
      */
-    public Position getOrigin() {
-        return new Position(x, y);
+    public PointD getOrigin() {
+        return new PointD(x, y);
     }
 
     /**
@@ -107,7 +105,7 @@ public class Rectangle {
      * @param rect el rectangulo sobre el cual determinar la interseccion
      * @return Verdadero si intersectan
      */
-    public boolean intersects(Rectangle rect) {
+    public boolean intersects(RectangleD rect) {
         double sx1 = x;
         double sx2 = x + width - 1;
         double sy1 = y;
@@ -122,22 +120,12 @@ public class Rectangle {
     }
 
     /**
-     * Determina si el punto dado se encuentran dentro de este rectangulo
-     *
-     * @param p el punto a verificar
-     * @return verdadero si el punto esta dentro del rectangulo
-     */
-    public boolean contains(Point p) {
-        return contains(p.x, p.y);
-    }
-
-    /**
      * Determina si la posicion dada se encuentran dentro de este rectangulo
      *
      * @param p el punto a verificar
      * @return verdadero si el punto esta dentro del rectangulo
      */
-    public boolean contains(Position p) {
+    public boolean contains(PointD p) {
         return contains(p.x, p.y);
     }
 

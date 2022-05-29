@@ -3,8 +3,8 @@ package test.simple.demo04;
 import java.awt.event.KeyEvent;
 
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
-import rcr.lge.Rectangle;
+import rcr.lge.PointD;
+import rcr.lge.RectangleD;
 import rcr.lge.Sprite;
 
 public class MiHeroe extends Sprite {
@@ -12,14 +12,14 @@ public class MiHeroe extends Sprite {
     private int state;
 
     public MiHeroe() {
-        super("heroe_idle_right", new Position(550, 626), "Heroe");
+        super("heroe_idle_right", new PointD(550, 626), "Heroe");
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
 
         // sus atributos
         state = 1;
-        setBounds(new Rectangle(0, 0, 1920, 1056));
+        setBounds(new RectangleD(0, 0, 1920, 1056));
     }
 
     @Override

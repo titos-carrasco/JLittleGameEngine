@@ -6,8 +6,8 @@ import java.awt.event.KeyEvent;
 import rcr.lge.Canvas;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
-import rcr.lge.Rectangle;
+import rcr.lge.PointD;
+import rcr.lge.RectangleD;
 import rcr.lge.Size;
 import rcr.lge.Sprite;
 
@@ -32,7 +32,7 @@ public class Game implements IEvents {
         lge.loadImage("platform", resourceDir + "/platform.png", 0.3, false, false);
 
         // el fondo
-        Sprite fondo = new Sprite("fondo", new Position(0, 0));
+        Sprite fondo = new Sprite("fondo", new PointD(0, 0));
         lge.addGObject(fondo, 0);
 
         // los NonPlayer Characters (NPC)
@@ -41,17 +41,17 @@ public class Game implements IEvents {
 
         // nuestra heroina
         Ninja ninja = new Ninja(90, 163);
-        ninja.setBounds(new Rectangle(new Position(0, 0), new Size(winSize.width, winSize.height + 100)));
+        ninja.setBounds(new RectangleD(new PointD(0, 0), new Size(winSize.width, winSize.height + 100)));
         lge.addGObject(ninja, 1);
     }
 
     public void makeFloor() {
-        Canvas[] suelos = new Canvas[] { new Canvas(new Position(0, 85), new Size(170, 1)),
-                new Canvas(new Position(0, 214), new Size(170, 1)),
-                new Canvas(new Position(214, 300), new Size(128, 1)),
-                new Canvas(new Position(342, 214), new Size(127, 1)),
-                new Canvas(new Position(470, 257), new Size(127, 1)),
-                new Canvas(new Position(513, 86), new Size(127, 1)) };
+        Canvas[] suelos = new Canvas[] { new Canvas(new PointD(0, 85), new Size(170, 1)),
+                new Canvas(new PointD(0, 214), new Size(170, 1)),
+                new Canvas(new PointD(214, 300), new Size(128, 1)),
+                new Canvas(new PointD(342, 214), new Size(127, 1)),
+                new Canvas(new PointD(470, 257), new Size(127, 1)),
+                new Canvas(new PointD(513, 86), new Size(127, 1)) };
 
         for (Canvas s : suelos) {
             s.enableCollider(true);

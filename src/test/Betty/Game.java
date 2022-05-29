@@ -12,7 +12,7 @@ import rcr.lge.Canvas;
 import rcr.lge.GameObject;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
+import rcr.lge.PointD;
 import rcr.lge.Size;
 import rcr.lge.Sprite;
 
@@ -27,7 +27,7 @@ public class Game implements IEvents {
 
         lge = new LittleGameEngine(winSize, "Betty", new Color(0xFFFFFF));
         lge.setOnMainUpdate(this);
-        // lge.showColliders(new Color(0xFF0000));
+        lge.showColliders(new Color(0xFF0000));
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../resources");
@@ -42,11 +42,11 @@ public class Game implements IEvents {
         lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos el fondo
-        Sprite fondo = new Sprite("fondo", new Position(0, 0), "fondo");
+        Sprite fondo = new Sprite("fondo", new PointD(0, 0), "fondo");
         lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Position(0, 0), new Size(640, 20), "infobar");
+        Canvas infobar = new Canvas(new PointD(0, 0), new Size(640, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // cargamos el mapa en memoria
@@ -84,7 +84,7 @@ public class Game implements IEvents {
         for (int y = 0; y < mapa.length; y++)
             for (int x = 0; x < mapa[y].length; x++)
                 if (mapa[y][x] == 1) {
-                    GameObject muro = new GameObject(new Position(x * 32, 32 + y * 32), new Size(32, 32));
+                    GameObject muro = new GameObject(new PointD(x * 32, 32 + y * 32), new Size(32, 32));
                     muro.enableCollider(true);
                     muro.setTag("muro");
                     lge.addGObject(muro, 1);
@@ -106,7 +106,7 @@ public class Game implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x80808080, true));
-        infobar.drawText(info, new Position(50, 0), "monospace.plain.16", Color.WHITE);
+        infobar.drawText(info, new PointD(50, 0), "monospace.plain.16", Color.WHITE);
     }
 
     // main loop

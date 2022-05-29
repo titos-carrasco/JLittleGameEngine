@@ -3,21 +3,21 @@ package test.simple.demo03;
 import java.awt.event.KeyEvent;
 
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
-import rcr.lge.Rectangle;
+import rcr.lge.PointD;
+import rcr.lge.RectangleD;
 import rcr.lge.Sprite;
 
 public class MiHeroe extends Sprite {
     private LittleGameEngine lge;
 
     public MiHeroe() {
-        super("heroe_right", new Position(550, 626), "Heroe");
+        super("heroe_right", new PointD(550, 626), "Heroe");
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
 
         // sus atributos
-        setBounds(new Rectangle(0, 0, 1920, 1056));
+        setBounds(new RectangleD(0, 0, 1920, 1056));
     }
 
     @Override

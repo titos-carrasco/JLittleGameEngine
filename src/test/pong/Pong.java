@@ -8,7 +8,7 @@ import java.awt.event.KeyEvent;
 import rcr.lge.Canvas;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
+import rcr.lge.PointD;
 import rcr.lge.Size;
 
 public class Pong implements IEvents {
@@ -29,51 +29,51 @@ public class Pong implements IEvents {
         lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Position(0, 0), new Size(640, 20), "infobar");
+        Canvas infobar = new Canvas(new PointD(0, 0), new Size(640, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // el campo de juego
-        Canvas field = new Canvas(new Position(24, 80), new Size(592, 526), "field");
+        Canvas field = new Canvas(new PointD(24, 80), new Size(592, 526), "field");
         field.fill(new Color(0, 0, 100));
         lge.addGObject(field, 0);
 
         // los bordes
-        Canvas wall = new Canvas(new Position(0, 76), new Size(640, 4));
+        Canvas wall = new Canvas(new PointD(0, 76), new Size(640, 4));
         wall.fill(Color.WHITE);
         wall.setTag("wall-horizontal");
         wall.enableCollider(true);
         lge.addGObject(wall, 1);
 
-        wall = new Canvas(new Position(0, 606), new Size(640, 4));
+        wall = new Canvas(new PointD(0, 606), new Size(640, 4));
         wall.fill(Color.WHITE);
         wall.setTag("wall-horizontal");
         wall.enableCollider(true);
         lge.addGObject(wall, 1);
 
-        wall = new Canvas(new Position(20, 80), new Size(4, 526));
+        wall = new Canvas(new PointD(20, 80), new Size(4, 526));
         wall.fill(Color.WHITE);
         wall.setTag("wall-vertical");
         wall.enableCollider(true);
         lge.addGObject(wall, 1);
 
-        wall = new Canvas(new Position(616, 80), new Size(4, 526));
+        wall = new Canvas(new PointD(616, 80), new Size(4, 526));
         wall.fill(Color.WHITE);
         wall.setTag("wall-vertical");
         wall.enableCollider(true);
         lge.addGObject(wall, 1);
 
         // los actores
-        Ball ball = new Ball(new Position(320, 400), new Size(8, 8), "ball");
+        Ball ball = new Ball(new PointD(320, 400), new Size(8, 8), "ball");
         lge.addGObject(ball, 1);
 
-        Canvas paddle = new Canvas(new Position(90, 270), new Size(8, 60), "user-paddle");
+        Canvas paddle = new Canvas(new PointD(90, 270), new Size(8, 60), "user-paddle");
         paddle.fill(Color.WHITE);
         paddle.setTag("paddle");
         paddle.enableCollider(true);
         paddle.setBounds(field.getRectangle());
         lge.addGObject(paddle, 1);
 
-        paddle = new Canvas(new Position(540, 270), new Size(8, 60), "system-paddle");
+        paddle = new Canvas(new PointD(540, 270), new Size(8, 60), "system-paddle");
         paddle.fill(Color.WHITE);
         paddle.setTag("paddle");
         paddle.enableCollider(true);
@@ -96,7 +96,7 @@ public class Pong implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x80808080, true));
-        infobar.drawText(info, new Position(50, 0), "monospace.plain.16", Color.WHITE);
+        infobar.drawText(info, new PointD(50, 0), "monospace.plain.16", Color.WHITE);
 
         // user paddle
         Canvas userPaddle = (Canvas) lge.getGObject("user-paddle");

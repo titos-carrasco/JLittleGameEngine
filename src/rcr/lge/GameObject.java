@@ -9,11 +9,11 @@ import java.util.UUID;
  * @author Roberto carrasco (titos.carrasco@gmail.com)
  */
 public class GameObject {
-    Rectangle rect;
-    Rectangle[] collider;
+    RectangleD rect;
+    RectangleD[] collider;
     String name;
     BufferedImage surface = null;
-    Rectangle bounds = null;
+    RectangleD bounds = null;
     String tag = "";
     boolean useColliders = false;
     boolean callOnCollision = false;
@@ -25,7 +25,7 @@ public class GameObject {
      * @param origin posicion inicial (x,y) del GameObject
      * @param size   dimension (ancho,alto) del GameObject
      */
-    public GameObject(Position origin, Size size) {
+    public GameObject(PointD origin, Size size) {
         this(origin.x, origin.y, size.width, size.height, null);
     }
 
@@ -36,7 +36,7 @@ public class GameObject {
      * @param size   dimension (ancho,alto) del GameObject
      * @param name   nombre unico para este GameObject
      */
-    public GameObject(Position origin, Size size, String name) {
+    public GameObject(PointD origin, Size size, String name) {
         this(origin.x, origin.y, size.width, size.height, name);
     }
 
@@ -62,11 +62,11 @@ public class GameObject {
      * @param name   nombre unico para este GameObject
      */
     public GameObject(double x, double y, int width, int height, String name) {
-        rect = new Rectangle(x, y, width, height);
+        rect = new RectangleD(x, y, width, height);
         if (name == null)
             name = "__no_name__" + UUID.randomUUID().toString();
         this.name = name;
-        setCollider(new Rectangle(0, 0, width, height));
+        setCollider(new RectangleD(0, 0, width, height));
     }
 
     /**
@@ -74,7 +74,7 @@ public class GameObject {
      *
      * @return la posicion
      */
-    public Position getPosition() {
+    public PointD getPosition() {
         return rect.getOrigin();
     }
 
@@ -128,8 +128,8 @@ public class GameObject {
      *
      * @return el rectangulo
      */
-    public Rectangle getRectangle() {
-        return new Rectangle(rect);
+    public RectangleD getRectangle() {
+        return new RectangleD(rect);
     }
 
     /**
@@ -164,12 +164,12 @@ public class GameObject {
      *
      * @return los rectangulos que definen su colisionador
      */
-    public Rectangle[] getCollider() {
+    public RectangleD[] getCollider() {
         int l = collider.length;
-        Rectangle[] rects = new Rectangle[l];
+        RectangleD[] rects = new RectangleD[l];
 
         for (int i = 0; i < l; i++) {
-            Rectangle r = new Rectangle(collider[i]);
+            RectangleD r = new RectangleD(collider[i]);
             r.x += rect.x;
             r.y += rect.y;
             rects[i] = r;
@@ -182,8 +182,8 @@ public class GameObject {
      *
      * @param bounds el rectangulo en donde se permitira mover al objeto
      */
-    public void setBounds(Rectangle bounds) {
-        this.bounds = new Rectangle(bounds);
+    public void setBounds(RectangleD bounds) {
+        this.bounds = new RectangleD(bounds);
     }
 
     /**
@@ -191,7 +191,7 @@ public class GameObject {
      *
      * @param position la posicion (x, y)
      */
-    public void setPosition(Position position) {
+    public void setPosition(PointD position) {
         setPosition(position.x, position.y);
     }
 
@@ -234,8 +234,8 @@ public class GameObject {
      *
      * @param rect el rectangulo que define la zona de colision
      */
-    public void setCollider(Rectangle rect) {
-        collider = new Rectangle[] { new Rectangle(rect) };
+    public void setCollider(RectangleD rect) {
+        collider = new RectangleD[] { new RectangleD(rect) };
     }
 
     /**
@@ -243,11 +243,11 @@ public class GameObject {
      *
      * @param rects los rectangulos que definen la zona de colision
      */
-    public void setCollider(Rectangle[] rects) {
+    public void setCollider(RectangleD[] rects) {
         int l = rects.length;
-        collider = new Rectangle[l];
+        collider = new RectangleD[l];
         for (int i = 0; i < l; i++)
-            collider[i] = new Rectangle(rects[i]);
+            collider[i] = new RectangleD(rects[i]);
     }
 
     /**
@@ -282,8 +282,8 @@ public class GameObject {
      */
     public boolean collidesWith(GameObject gobj) {
         if (layer == gobj.layer)
-            for (Rectangle r1 : getCollider())
-                for (Rectangle r2 : gobj.getCollider())
+            for (RectangleD r1 : getCollider())
+                for (RectangleD r2 : gobj.getCollider())
                     if (r1.intersects(r2))
                         return true;
         return false;

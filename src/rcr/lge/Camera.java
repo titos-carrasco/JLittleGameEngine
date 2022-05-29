@@ -16,7 +16,7 @@ public class Camera extends GameObject {
      * @param position coordenadas (x, y) de la posicion inicial de la camara
      * @param size     dimension (width, height) de la camara
      */
-    Camera(Position position, Size size) {
+    Camera(PointD position, Size size) {
         super(position, size, "__LGE_CAMERA__");
         target = null;
         targetInCenter = true;

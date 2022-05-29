@@ -5,7 +5,7 @@ import java.awt.Color;
 import rcr.lge.Canvas;
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
+import rcr.lge.PointD;
 import rcr.lge.Size;
 
 public class Ball extends Canvas {
@@ -15,7 +15,7 @@ public class Ball extends Canvas {
     private double speedX = -120;
     private double speedY = 120;
 
-    public Ball(Position position, Size size, String name) {
+    public Ball(PointD position, Size size, String name) {
         super(position, size, name);
         lge = LittleGameEngine.getInstance();
         enableCollider(true);

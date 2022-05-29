@@ -4,18 +4,18 @@ import java.awt.event.KeyEvent;
 
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
-import rcr.lge.Rectangle;
+import rcr.lge.PointD;
+import rcr.lge.RectangleD;
 import rcr.lge.Sprite;
 
 public class MiHeroe extends Sprite {
     private LittleGameEngine lge;
     GameObject ninja;
     private int state = -1;
-    private Position last;
+    private PointD last;
 
     public MiHeroe() {
-        super("heroe_idle_right", new Position(550, 626), "Heroe");
+        super("heroe_idle_right", new PointD(550, 626), "Heroe");
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();
@@ -23,7 +23,7 @@ public class MiHeroe extends Sprite {
 
         // sus atributos
         enableCollider(true);
-        setBounds(new Rectangle(0, 0, 1920, 1056));
+        setBounds(new RectangleD(0, 0, 1920, 1056));
         last = getPosition();
     }
 
@@ -36,7 +36,7 @@ public class MiHeroe extends Sprite {
         // la posiciona actual del heroe
         double x = getX();
         double y = getY();
-        last = new Position(x, y);
+        last = new PointD(x, y);
 
         // cambiamos sus coordenadas, orientacion e imagen segun la tecla presionada
         if (lge.keyPressed(KeyEvent.VK_RIGHT)) {

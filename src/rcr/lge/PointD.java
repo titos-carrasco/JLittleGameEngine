@@ -7,7 +7,7 @@ package rcr.lge;
  *
  */
 
-public class Position {
+public class PointD {
     public double x, y;
 
     /**
@@ -16,7 +16,7 @@ public class Position {
      * @param x coordenada x del punto
      * @param y coordenada y del punto
      */
-    public Position(double x, double y) {
+    public PointD(double x, double y) {
         this.x = x;
         this.y = y;
     }

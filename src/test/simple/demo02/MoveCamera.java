@@ -8,8 +8,8 @@ import java.awt.event.KeyEvent;
 import rcr.lge.Canvas;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
-import rcr.lge.Rectangle;
+import rcr.lge.PointD;
+import rcr.lge.RectangleD;
 import rcr.lge.Size;
 import rcr.lge.Sprite;
 
@@ -36,32 +36,32 @@ public class MoveCamera implements IEvents {
         lge.playSound("fondo", true, 50);
 
         // agregamos el fondo
-        Sprite fondo = new Sprite("fondo", new Position(0, 0), "fondo");
+        Sprite fondo = new Sprite("fondo", new PointD(0, 0), "fondo");
         lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Position(0, 0), new Size(640, 20), "infobar");
+        Canvas infobar = new Canvas(new PointD(0, 0), new Size(640, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // agregamos el icono del sonido
-        Sprite mute = new Sprite("mute", new Position(8, 3), "mute");
+        Sprite mute = new Sprite("mute", new PointD(8, 3), "mute");
         mute.setImage("mute", 1);
         lge.addGObjectGUI(mute);
 
         // agregamos al heroe
-        Sprite heroe = new Sprite("heroe", new Position(550, 626), "Heroe");
+        Sprite heroe = new Sprite("heroe", new PointD(550, 626), "Heroe");
         lge.addGObject(heroe, 1);
 
         // # configuramos la camara
-        lge.setCameraBounds(new Rectangle(0, 0, 1920, 1056));
+        lge.setCameraBounds(new RectangleD(0, 0, 1920, 1056));
 
         // posicionamos la camara
-        Position heroePosition = heroe.getPosition();
+        PointD heroePosition = heroe.getPosition();
         Size heroeSize = heroe.getSize();
         Size cameraSize = lge.getCameraSize();
         double x = heroePosition.x + heroeSize.width / 2 - cameraSize.width / 2;
         double y = heroePosition.y + heroeSize.height / 2 - cameraSize.height / 2;
-        lge.setCameraPosition(new Position(x, y));
+        lge.setCameraPosition(new PointD(x, y));
     }
 
     @Override
@@ -79,14 +79,14 @@ public class MoveCamera implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Position(50, 0), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new PointD(50, 0), "monospace.plain.16", Color.BLACK);
 
         // mute on/off
         mousePosition = lge.getMouseClicked(0);
         if (mousePosition != null) {
             Sprite mute = (Sprite) lge.getGObject("mute");
-            Rectangle r = mute.getRectangle();
-            if (r.contains(mousePosition)) {
+            RectangleD r = mute.getRectangle();
+            if (r.contains(mousePosition.x, mousePosition.y)) {
                 int idx = mute.getImagesIndex();
                 if (idx == 1)
                     lge.setSoundVolume("fondo", 0);
@@ -101,7 +101,7 @@ public class MoveCamera implements IEvents {
         double pixels = velocity * dt;
 
         // la posiciona actual de la camara
-        Position cameraPosition = lge.getCameraPosition();
+        PointD cameraPosition = lge.getCameraPosition();
 
         // cambiamos sus coordenadas segun la tecla presionada
         if (lge.keyPressed(KeyEvent.VK_RIGHT))

@@ -2,7 +2,7 @@ package test.Betty;
 
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
+import rcr.lge.PointD;
 import rcr.lge.Size;
 import rcr.lge.Sprite;
 
@@ -14,7 +14,7 @@ public class Zombie extends Sprite {
     private boolean active;
 
     public Zombie(String name, Size winSize) {
-        super("zombie", new Position(0, 0), name);
+        super("zombie", new PointD(0, 0), name);
 
         // acceso al motor de juegos
         lge = LittleGameEngine.getInstance();

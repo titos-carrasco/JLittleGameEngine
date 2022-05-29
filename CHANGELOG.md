@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.6.1 2022-05-28
+- Renombre dos clases para coincidir con la versión en C#
+
 # v0.6.0 2022-05-28
 - Versión estable
 

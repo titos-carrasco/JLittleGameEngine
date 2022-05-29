@@ -1,7 +1,7 @@
 package test.cementerio;
 
-import rcr.lge.Position;
-import rcr.lge.Rectangle;
+import rcr.lge.PointD;
+import rcr.lge.RectangleD;
 import rcr.lge.Size;
 import rcr.lge.Sprite;
 
@@ -13,13 +13,13 @@ public class Platform extends Sprite {
     private double travel = 0;
 
     public Platform(double x, double y, char dir, double distance, double speed) {
-        super("platform", new Position(x, y));
+        super("platform", new PointD(x, y));
 
         // acceso a LGE
         // lge = LittleGameEngine.getInstance();
 
         // los eventos que recibiremos
-        setCollider(new Rectangle(new Position(0, 0), new Size(getWidth(), 1)));
+        setCollider(new RectangleD(new PointD(0, 0), new Size(getWidth(), 1)));
         enableCollider(true);
         setTag("plataforma");
 
@@ -39,7 +39,7 @@ public class Platform extends Sprite {
 
     @Override
     public void onUpdate(double dt) {
-        Position position = getPosition();
+        PointD position = getPosition();
         double x = position.x;
         double y = position.y;
 

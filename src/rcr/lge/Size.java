@@ -10,7 +10,7 @@ public class Size {
     public int width, height;
 
     /**
-     * Crea una instancia de una dimension
+     * Crea una instancia de un tamano
      *
      * @param width  el ancho
      * @param height el alto

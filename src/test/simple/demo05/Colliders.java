@@ -8,8 +8,8 @@ import java.awt.event.KeyEvent;
 import rcr.lge.Canvas;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
-import rcr.lge.Rectangle;
+import rcr.lge.PointD;
+import rcr.lge.RectangleD;
 import rcr.lge.Size;
 import rcr.lge.Sprite;
 
@@ -43,22 +43,22 @@ public class Colliders implements IEvents {
         lge.playSound("fondo", true, 100);
 
         // agregamos el fondo
-        Sprite fondo = new Sprite("fondo", new Position(0, 0), "fondo");
+        Sprite fondo = new Sprite("fondo", new PointD(0, 0), "fondo");
         lge.addGObject(fondo, 0);
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Position(0, 0), new Size(640, 20), "infobar");
+        Canvas infobar = new Canvas(new PointD(0, 0), new Size(640, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
         // agregamos el icono del sonido
-        Sprite mute = new Sprite("mute", new Position(8, 3), "mute");
+        Sprite mute = new Sprite("mute", new PointD(8, 3), "mute");
         mute.setImage("mute", 1);
         lge.addGObjectGUI(mute);
 
         // agregamos un ninja
-        Sprite ninja = new Sprite("ninja", new Position(350, 720), "ninja");
+        Sprite ninja = new Sprite("ninja", new PointD(350, 720), "ninja");
         ninja.enableCollider(true);
-        ninja.setCollider(new Rectangle[] { new Rectangle(36, 8, 36, 36), new Rectangle(28, 44, 44, 36) });
+        ninja.setCollider(new RectangleD[] { new RectangleD(36, 8, 36, 36), new RectangleD(28, 44, 44, 36) });
         lge.addGObject(ninja, 1);
 
         // agregamos al heroe
@@ -66,7 +66,7 @@ public class Colliders implements IEvents {
         lge.addGObject(heroe, 1);
 
         // # configuramos la camara
-        lge.setCameraBounds(new Rectangle(0, 0, 1920, 1056));
+        lge.setCameraBounds(new RectangleD(0, 0, 1920, 1056));
 
         // establecemos que la camara siga al heroe
         lge.setCameraTarget(heroe, false);
@@ -87,14 +87,14 @@ public class Colliders implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Position(50, 0), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new PointD(50, 0), "monospace.plain.16", Color.BLACK);
 
         // mute on/mute off
         mousePosition = lge.getMouseClicked(0);
         if (mousePosition != null) {
             Sprite mute = (Sprite) lge.getGObject("mute");
-            Rectangle r = mute.getRectangle();
-            if (r.contains(mousePosition)) {
+            RectangleD r = mute.getRectangle();
+            if (r.contains(mousePosition.x, mousePosition.y)) {
                 int idx = mute.getImagesIndex();
                 if (idx == 1)
                     lge.setSoundVolume("fondo", 0);

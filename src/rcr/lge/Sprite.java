@@ -19,7 +19,7 @@ public class Sprite extends GameObject {
      *
      * @param position posicion inicial (x, y) del GameObject
      */
-    public Sprite(Position position) {
+    public Sprite(PointD position) {
         this(null, position, null);
     }
 
@@ -29,7 +29,7 @@ public class Sprite extends GameObject {
      * @param iname    nombre de la secuencia de imagenes a utilizar
      * @param position posicion inicial (x, y) del GameObject
      */
-    public Sprite(String iname, Position position) {
+    public Sprite(String iname, PointD position) {
         this(iname, position, null);
     }
 
@@ -40,7 +40,7 @@ public class Sprite extends GameObject {
      * @param position posicion inicial (x, y) del GameObject
      * @param name     nombre a asignar a este GameObject
      */
-    public Sprite(String iname, Position position, String name) {
+    public Sprite(String iname, PointD position, String name) {
         super(position, new Size(0, 0), name);
         setImage(iname);
     }
@@ -102,7 +102,7 @@ public class Sprite extends GameObject {
 
         surface = surfaces[idx];
         this.rect.setSize(this.surface.getWidth(), this.surface.getHeight());
-        setCollider(new Rectangle(0, 0, this.rect.width, this.rect.height));
+        setCollider(new RectangleD(0, 0, this.rect.width, this.rect.height));
         return idx;
     }
 
@@ -140,7 +140,7 @@ public class Sprite extends GameObject {
 
             surface = surfaces[idx];
             this.rect.setSize(this.surface.getWidth(), this.surface.getHeight());
-            setCollider(new Rectangle(0, 0, this.rect.width, this.rect.height));
+            setCollider(new RectangleD(0, 0, this.rect.width, this.rect.height));
         }
 
         return this.idx;

@@ -4,14 +4,14 @@ import java.awt.event.KeyEvent;
 
 import rcr.lge.GameObject;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
-import rcr.lge.Rectangle;
+import rcr.lge.PointD;
+import rcr.lge.RectangleD;
 import rcr.lge.Size;
 import rcr.lge.Sprite;
 
 public class Ninja extends Sprite {
     private LittleGameEngine lge;
-    private Rectangle colisionador;
+    private RectangleD colisionador;
     private double vx = 120;
     private double vy = 0;
     private double vym = 500;
@@ -19,7 +19,7 @@ public class Ninja extends Sprite {
     private double vsalto = 140;
 
     public Ninja(double x, double y) {
-        super("ninja-idle-right", new Position(x, y));
+        super("ninja-idle-right", new PointD(x, y));
 
         // acceso a LGE
         lge = LittleGameEngine.getInstance();
@@ -28,7 +28,7 @@ public class Ninja extends Sprite {
         enableCollider(true);
 
         // el colisionador
-        colisionador = new Rectangle(new Position(20, 5), new Size(15, getHeight() - 5));
+        colisionador = new RectangleD(new PointD(20, 5), new Size(15, getHeight() - 5));
         setCollider(colisionador);
     }
 
@@ -59,7 +59,7 @@ public class Ninja extends Sprite {
     @Override
     public void onPostUpdate(double dt) {
         // nuestra posicion actual
-        Position position = getPosition();
+        PointD position = getPosition();
         double x = position.x;
         double y = position.y;
         double x0 = x;

@@ -8,7 +8,7 @@ import java.awt.event.KeyEvent;
 import rcr.lge.Canvas;
 import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
-import rcr.lge.Position;
+import rcr.lge.PointD;
 import rcr.lge.Size;
 
 public class Bouncing implements IEvents {
@@ -29,7 +29,7 @@ public class Bouncing implements IEvents {
         lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos el suelo
-        ground = new Canvas(new Position(0, 340), new Size(800, 100), "ground");
+        ground = new Canvas(new PointD(0, 340), new Size(800, 100), "ground");
         ground.fill(Color.GRAY);
         ground.setTag("ground");
         ground.enableCollider(true);
@@ -46,7 +46,7 @@ public class Bouncing implements IEvents {
         }
 
         // agregamos la barra de info
-        Canvas infobar = new Canvas(new Position(0, 0), new Size(800, 20), "infobar");
+        Canvas infobar = new Canvas(new PointD(0, 0), new Size(800, 20), "infobar");
         lge.addGObjectGUI(infobar);
 
     }
@@ -66,7 +66,7 @@ public class Bouncing implements IEvents {
                 mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new Position(140, 0), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new PointD(140, 0), "monospace.plain.16", Color.BLACK);
     }
 
     // main loop
