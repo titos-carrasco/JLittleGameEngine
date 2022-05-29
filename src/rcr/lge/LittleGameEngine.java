@@ -493,7 +493,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      *
      * @return los GameObjects con los que colisiona
      */
-    public GameObject[] collidesWithGObjects(GameObject gobj) {
+    public GameObject[] collidesWith(GameObject gobj) {
         ArrayList<GameObject> gobjs = new ArrayList<GameObject>();
 
         if (gobj.useColliders)

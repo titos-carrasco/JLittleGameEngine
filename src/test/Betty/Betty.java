@@ -94,7 +94,7 @@ public class Betty extends Sprite {
         if (!alive)
             return;
 
-        GameObject[] gobjs = lge.collidesWithGObjects(this);
+        GameObject[] gobjs = lge.collidesWith(this);
         for (GameObject gobj : gobjs)
             if (gobj.getTag().equals("zombie")) {
                 alive = false;

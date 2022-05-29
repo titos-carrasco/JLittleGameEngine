@@ -35,7 +35,7 @@ public class Ball extends Canvas {
 
     @Override
     public void onPostUpdate(double dt) {
-        GameObject[] gobjs = lge.collidesWithGObjects(this);
+        GameObject[] gobjs = lge.collidesWith(this);
         if (gobjs != null) {
             double x = getX();
             double y = getY();

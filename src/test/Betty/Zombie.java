@@ -146,7 +146,7 @@ public class Zombie extends Sprite {
 
             // verificamos que no colisionemos con un muro u otro zombie
             setPosition(nx, ny);
-            GameObject[] gobjs = lge.collidesWithGObjects(this);
+            GameObject[] gobjs = lge.collidesWith(this);
             boolean collision = false;
             for (GameObject gobj : gobjs) {
                 String tag = gobj.getTag();

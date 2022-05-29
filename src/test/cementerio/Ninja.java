@@ -33,7 +33,7 @@ public class Ninja extends Sprite {
     }
 
     public boolean fixPosition(double dx, double dy, double dt) {
-        GameObject[] gobjs = lge.collidesWithGObjects(this);
+        GameObject[] gobjs = lge.collidesWith(this);
         for (GameObject gobj : gobjs) {
             String tag = gobj.getTag();
             if (tag.equals("suelo")) {
