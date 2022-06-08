@@ -19,10 +19,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
@@ -35,14 +33,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.function.DoubleConsumer;
 
 import javax.imageio.ImageIO;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -69,21 +62,25 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     private Size winSize;
     private double[] fpsData;
     private int fpsIdx;
+    private double[] lpsData;
+    private int lpsIdx;
     private boolean running = false;
 
-    private IEvents onMainUpdate = null;
+    public DoubleConsumer onMainUpdate = null;
     private HashMap<Integer, Boolean> keysPressed;
     private boolean[] mouseButtons;
     private Point[] mouseClicked;
 
     private HashMap<String, BufferedImage[]> images;
     private HashMap<String, Font> fonts;
-    private HashMap<String, ClipData> sounds;
+    // private HashMap<String, ClipData> sounds;
+
+    private Color bgColor;
+    private Color collidersColor = null;
 
     private JFrame win;
     private BufferedImage screen;
-    private Color bgColor;
-    private Color collidersColor = null;
+    private long screenTime = 0;
 
     // ------ game engine ------
     /**
@@ -99,14 +96,16 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         this.winSize = winSize;
 
         gconfig = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-        fpsData = new double[30];
+        fpsData = new double[10];
         fpsIdx = 0;
+        lpsData = new double[10];
+        lpsIdx = 0;
 
         this.bgColor = bgColor;
 
-        fonts = new HashMap<String, Font>();
-        sounds = new HashMap<String, ClipData>();
         images = new HashMap<String, BufferedImage[]>();
+        fonts = new HashMap<String, Font>();
+        // sounds = new HashMap<String, ClipData>();
 
         keysPressed = new HashMap<Integer, Boolean>();
         mouseButtons = new boolean[] { false, false, false };
@@ -117,8 +116,9 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         gObjectsToAdd = new ArrayList<GameObject>();
         gObjectsToDel = new ArrayList<GameObject>();
 
-        screen = createOpaqueImage(winSize.width, winSize.height);
         camera = new Camera(new PointD(0, 0), winSize);
+
+        screen = createOpaqueImage(winSize.width, winSize.height);
 
         Font f = new Font("Arial", Font.PLAIN, 40);
         Graphics2D g2d = screen.createGraphics();
@@ -158,16 +158,34 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     /**
-     * Obtiene los FPS calculados como el promedio de los ultimos 30 valores
+     * Obtiene los FPS calculados como el promedio de los ultimos valores
      *
      * @return los frame por segundo calculados
      */
     public double getFPS() {
         double dt = 0;
-        for (double val : fpsData)
-            dt += val;
-        dt = dt / fpsData.length;
+        synchronized (fpsData) {
+            for (double val : fpsData)
+                dt += val;
+            dt = dt / fpsData.length;
+        }
         return dt == 0 ? 0 : 1.0 / dt;
+    }
+
+    /**
+     * Obtiene los LPS (Loops per Seconds) calculados como el promedio de los
+     * ultimos valores
+     *
+     * @return los ciclos por segundo del GameLoop
+     */
+    public double getLPS() {
+        double dt = 0;
+        synchronized (lpsData) {
+            for (double val : lpsData)
+                dt += val;
+            dt = dt / lpsData.length;
+            return dt == 0 ? 0 : 1.0 / dt;
+        }
     }
 
     /**
@@ -183,18 +201,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     }
 
     /**
-     * Establece la clase que recibira el evento onMainUpdate que es invocado justo
-     * despues de invocar a los metodos onUpdate() de los GameObjects.
-     *
-     * Esta clase debe implementar IEvents
-     *
-     * @param iface la clase que recibira el evento
-     */
-    public void setOnMainUpdate(IEvents iface) {
-        this.onMainUpdate = iface;
-    }
-
-    /**
      * Finaliza el Game Loop de LGE
      */
     public void quit() {
@@ -207,27 +213,33 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param fps los fps a mantener
      */
     public void run(int fps) {
+        screenTime = System.nanoTime();
         BufferedImage screenImage = createOpaqueImage(winSize.width, winSize.height);
+
+        long tExpected = 1000000000 / fps;
+        long tPrev = System.nanoTime();
+
         running = true;
-        long tickExpected = (long) (1000.0 / fps);
-        long tickPrev = System.currentTimeMillis();
         while (running) {
             // los eventos son atrapados por los listener
 
             // --- tiempo en ms desde el ciclo anterior
-            long tickElapsed = System.currentTimeMillis() - tickPrev;
-            if (tickElapsed < tickExpected)
+            long tElapsed = System.nanoTime() - tPrev;
+            long t = tExpected - tElapsed;
+            if (t > 0)
                 try {
-                    Thread.sleep(tickExpected - tickElapsed);
+                    Thread.sleep(t / 1000000);
                 } catch (InterruptedException e) {
                 }
 
-            long now = System.currentTimeMillis();
-            double dt = (now - tickPrev) / 1000.0;
-            tickPrev = now;
+            long now = System.nanoTime();
+            double dt = (now - tPrev) / 1000000000.0;
+            tPrev = now;
 
-            fpsData[fpsIdx++] = dt;
-            fpsIdx %= fpsData.length;
+            synchronized (lpsData) {
+                lpsData[lpsIdx++] = dt;
+                lpsIdx %= lpsData.length;
+            }
 
             // --- Del gobj and gobj.OnDelete
             for (GameObject gobj : gObjectsToDel) {
@@ -279,7 +291,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
             // --- game.OnMainUpdate
             if (onMainUpdate != null)
-                onMainUpdate.onMainUpdate(dt);
+                onMainUpdate.accept(dt);
 
             // --- gobj.OnCollision
             LinkedHashMap<GameObject, ArrayList<GameObject>> oncollisions = new LinkedHashMap<GameObject, ArrayList<GameObject>>();
@@ -383,11 +395,10 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         }
 
         // apagamos los sonidos
-        for (Entry<String, ClipData> elem : sounds.entrySet()) {
-            ClipData clipData = elem.getValue();
-            if (clipData.clip != null)
-                clipData.clip.stop();
-        }
+        /*
+         * for (Entry<String, ClipData> elem : sounds.entrySet()) { ClipData clipData =
+         * elem.getValue(); if (clipData.clip != null) clipData.clip.stop(); }
+         */
 
         // eso es todo
         win.dispose();
@@ -622,15 +633,10 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         Point p = MouseInfo.getPointerInfo().getLocation();
         SwingUtilities.convertPointFromScreen(p, this);
 
-        if (p.x < 0)
-            p.x = 0;
-        else if (p.x >= this.winSize.width)
-            p.x = this.winSize.width - 1;
-
-        if (p.y < 0)
-            p.y = 0;
-        else if (p.y >= this.winSize.height)
-            p.y = this.winSize.height - 1;
+        if (p.x < 0 || p.x >= this.winSize.width || p.y < 0 || p.y >= this.winSize.height) {
+            p.x = -1;
+            p.y = -1;
+        }
 
         return p;
     }
@@ -761,30 +767,21 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param name  nombre a asignar al sonido
      * @param fname nombre del archivo que contiene el sonido
      */
-    public void loadSound(String name, String fname) {
-        if (fname.charAt(2) == ':')
-            fname = fname.substring(1);
-
-        ClipData clipData = sounds.get(name);
-        if (clipData == null) {
-            Path path = Paths.get(fname);
-            byte[] data = null;
-
-            try {
-                data = Files.readAllBytes(path);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-
-            clipData = new ClipData();
-            clipData.clip = null;
-            clipData.data = data;
-            clipData.level = 50;
-            sounds.put(name, clipData);
-
-        }
-    }
+    /*
+     * public void loadSound(String name, String fname) { if (fname.charAt(2) ==
+     * ':') fname = fname.substring(1);
+     * 
+     * ClipData clipData = sounds.get(name); if (clipData == null) { Path path =
+     * Paths.get(fname); byte[] data = null;
+     * 
+     * try { data = Files.readAllBytes(path); } catch (IOException e) {
+     * e.printStackTrace(); System.exit(1); }
+     * 
+     * clipData = new ClipData(); clipData.clip = null; clipData.data = data;
+     * clipData.level = 50; sounds.put(name, clipData);
+     * 
+     * } }
+     */
 
     /**
      * Inicia la reproduccion de un sonido
@@ -793,62 +790,45 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param loop  el numero de veces a repeptirlo
      * @param level el nivel de volumen
      */
-    public void playSound(String name, boolean loop, double level) {
-        ClipData clipData = sounds.get(name);
-
-        if (clipData == null)
-            return;
-
-        if (clipData.clip != null)
-            return;
-
-        try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(clipData.data);
-            AudioInputStream ais = AudioSystem.getAudioInputStream(bis);
-
-            clipData.clip = AudioSystem.getClip();
-
-            clipData.level = level;
-            setSoundVolume(clipData);
-
-            clipData.clip.addLineListener(new LineListener() {
-                private ClipData TheClipData = clipData;
-
-                @Override
-                public void update(LineEvent event) {
-                    if (event.getType() == LineEvent.Type.STOP) {
-                        TheClipData.clip.close();
-                        TheClipData.clip = null;
-                    }
-                }
-            });
-            clipData.clip.open(ais);
-            if (loop)
-                clipData.clip.loop(Clip.LOOP_CONTINUOUSLY);
-            else
-                clipData.clip.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
+    /*
+     * public void playSound(String name, boolean loop, double level) { ClipData
+     * clipData = sounds.get(name);
+     * 
+     * if (clipData == null) return;
+     * 
+     * if (clipData.clip != null) return;
+     * 
+     * try { ByteArrayInputStream bis = new ByteArrayInputStream(clipData.data);
+     * AudioInputStream ais = AudioSystem.getAudioInputStream(bis);
+     * 
+     * clipData.clip = AudioSystem.getClip();
+     * 
+     * clipData.level = level; setSoundVolume(clipData);
+     * 
+     * clipData.clip.addLineListener(new LineListener() { private ClipData
+     * TheClipData = clipData;
+     * 
+     * @Override public void update(LineEvent event) { if (event.getType() ==
+     * LineEvent.Type.STOP) { TheClipData.clip.close(); TheClipData.clip = null; } }
+     * }); clipData.clip.open(ais); if (loop)
+     * clipData.clip.loop(Clip.LOOP_CONTINUOUSLY); else clipData.clip.start(); }
+     * catch (Exception e) { e.printStackTrace(); System.exit(1); } }
+     */
 
     /**
      * Detiene la reproduccion de un sonido
      *
      * @param name el nombre del sonido a detener
      */
-    public void stopSound(String name) {
-        ClipData clipData = sounds.get(name);
-
-        if (clipData == null)
-            return;
-
-        if (clipData.clip == null)
-            return;
-
-        clipData.clip.stop();
-    }
+    /*
+     * public void stopSound(String name) { ClipData clipData = sounds.get(name);
+     * 
+     * if (clipData == null) return;
+     * 
+     * if (clipData.clip == null) return;
+     * 
+     * clipData.clip.stop(); }
+     */
 
     /**
      * Establece el volumen de un sonido previamente cargado
@@ -856,33 +836,30 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param name  el nombre del sonido
      * @param level el nivel de volumen
      */
-    public void setSoundVolume(String name, double level) {
-        ClipData clipData = sounds.get(name);
-
-        if (clipData == null)
-            return;
-
-        clipData.level = level;
-
-        if (clipData.clip == null)
-            return;
-
-        setSoundVolume(clipData);
-    }
+    /*
+     * public void setSoundVolume(String name, double level) { ClipData clipData =
+     * sounds.get(name);
+     * 
+     * if (clipData == null) return;
+     * 
+     * clipData.level = level;
+     * 
+     * if (clipData.clip == null) return;
+     * 
+     * setSoundVolume(clipData); }
+     */
 
     /**
      * Establece el volumen de un sonido previamente cargado
      *
      * @param clipData el sonido
      */
-    private void setSoundVolume(ClipData clipData) {
-        try {
-            FloatControl volume = (FloatControl) clipData.clip.getControl(FloatControl.Type.VOLUME);
-            volume.setValue((float) (clipData.level / 100.0));
-        } catch (Exception e) {
-            // System.out.println("SetSoundVolume(): " + e);
-        }
-    }
+    /*
+     * private void setSoundVolume(ClipData clipData) { try { FloatControl volume =
+     * (FloatControl) clipData.clip.getControl(FloatControl.Type.VOLUME);
+     * volume.setValue((float) (clipData.level / 100.0)); } catch (Exception e) { //
+     * System.out.println("SetSoundVolume(): " + e); } }
+     */
 
     /**
      * Obtiene el volumen de un sonido previamente cargado
@@ -891,14 +868,14 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      *
      * @return el nivel de volumen
      */
-    public double getSoundVolume(String name) {
-        ClipData clipData = sounds.get(name);
-
-        if (clipData == null)
-            return 0;
-
-        return clipData.level * 100;
-    }
+    /*
+     * public double getSoundVolume(String name) { ClipData clipData =
+     * sounds.get(name);
+     * 
+     * if (clipData == null) return 0;
+     * 
+     * return clipData.level * 100; }
+     */
 
     // ------ images ------
     /**
@@ -1009,10 +986,12 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             Image image;
             if (size != null) {
                 image = img.getScaledInstance(size.width, size.height, BufferedImage.SCALE_SMOOTH);
+                img.flush();
             } else if (scale > 0) {
                 int width = (int) Math.round(img.getWidth() * scale);
                 int height = (int) Math.round(img.getHeight() * scale);
                 image = img.getScaledInstance(width, height, BufferedImage.SCALE_SMOOTH);
+                img.flush();
             } else
                 image = img;
 
@@ -1030,6 +1009,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
             g2d.dispose();
             images.set(i, bi);
+
+            image.flush();
         }
 
         this.images.put(iname, images.toArray(new BufferedImage[images.size()]));
@@ -1105,6 +1086,15 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
     @Override
     public void paintComponent(Graphics g) {
+        // los FPS
+        double dt = (System.nanoTime() - screenTime) / 1000000.0;
+        screenTime = System.nanoTime();
+
+        synchronized (fpsData) {
+            fpsData[fpsIdx++] = dt / 1000.0;
+            fpsIdx %= fpsData.length;
+        }
+
         g.drawImage(screen, 0, 0, null);
     }
 

@@ -68,14 +68,8 @@ public class Betty extends Sprite {
             y = y + pixels;
         } else {
             setImage("betty_idle", idx);
-            if (x % 32 < 4)
-                x = Math.round(x / 32) * 32;
-            else if (x % 32 > 28)
-                x = Math.round((x + 32) / 32) * 32;
-            if (y % 32 < 4)
-                y = Math.round(y / 32) * 32;
-            else if (y % 32 > 28)
-                y = Math.round((y + 32) / 32) * 32;
+            x = (int) (x / 4) * 4;
+            y = (int) (y / 4) * 4;
         }
 
         // tunel?
@@ -101,7 +95,22 @@ public class Betty extends Sprite {
                 System.out.println("Un zombie me mato");
                 return;
             } else if (gobj.getTag().equals("muro")) {
-                setPosition(lastPoint);
+                double x = getX();
+                double y = getY();
+                double xo = gobj.getX();
+                double yo = gobj.getY();
+
+                if (lastPoint.x < x)
+                    x = xo - getWidth();
+                else if (lastPoint.x > x)
+                    x = xo + gobj.getWidth();
+
+                if (lastPoint.y < y)
+                    y = yo - getHeight();
+                else if (lastPoint.y > y)
+                    y = yo + gobj.getHeight();
+
+                setPosition(x, y);
             }
     }
 }

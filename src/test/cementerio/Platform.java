@@ -15,9 +15,6 @@ public class Platform extends Sprite {
     public Platform(double x, double y, char dir, double distance, double speed) {
         super("platform", new PointD(x, y));
 
-        // acceso a LGE
-        // lge = LittleGameEngine.getInstance();
-
         // los eventos que recibiremos
         setCollider(new RectangleD(new PointD(0, 0), new Size(getWidth(), 1)));
         enableCollider(true);

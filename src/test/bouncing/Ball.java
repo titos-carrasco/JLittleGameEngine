@@ -28,7 +28,7 @@ public class Ball extends Canvas {
         enableCollider(true);
         ground = lge.getGObject("ground");
 
-        Color fillColor = new Color(0, 255, 0, 64);
+        Color fillColor = new Color(100, 255, 0, 64);
         fill(fillColor);
     }
 

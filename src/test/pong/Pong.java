@@ -6,12 +6,11 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 
 import rcr.lge.Canvas;
-import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
 import rcr.lge.PointD;
 import rcr.lge.Size;
 
-public class Pong implements IEvents {
+public class Pong {
     private LittleGameEngine lge;
     private int paddleSpeed = 240;
 
@@ -20,13 +19,16 @@ public class Pong implements IEvents {
         Size winSize = new Size(640, 640);
 
         lge = new LittleGameEngine(winSize, "Ping", new Color(0x000000));
-        lge.setOnMainUpdate(this);
         // lge.showColliders(new Color(255, 0, 0));
+        lge.onMainUpdate = (dt) -> {
+            onMainUpdate(dt);
+        };
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../resources");
 
-        lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        // Load sound
+        lge.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 15);
 
         // agregamos la barra de info
         Canvas infobar = new Canvas(new PointD(0, 0), new Size(640, 20), "infobar");
@@ -81,7 +83,6 @@ public class Pong implements IEvents {
         lge.addGObject(paddle, 1);
     }
 
-    @Override
     public void onMainUpdate(double dt) {
         // abortamos con la tecla Escape
         if (lge.keyPressed(KeyEvent.VK_ESCAPE))
@@ -91,12 +92,12 @@ public class Pong implements IEvents {
         Point mousePosition = lge.getMousePosition();
         boolean[] mouseButtons = lge.getMouseButtons();
 
-        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.getFPS(),
-                lge.getCountGObjects(), mousePosition.x, mousePosition.y, mouseButtons[0] ? 1 : 0,
-                mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
+        String info = String.format("FPS: %07.2f - LPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)",
+                lge.getFPS(), lge.getLPS(), lge.getCountGObjects(), mousePosition.x, mousePosition.y,
+                mouseButtons[0] ? 1 : 0, mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
-        infobar.fill(new Color(0x80808080, true));
-        infobar.drawText(info, new PointD(50, 0), "monospace.plain.16", Color.WHITE);
+        infobar.fill(new Color(0x10202020, true));
+        infobar.drawText(info, new PointD(20, 0), "monospace", Color.WHITE);
 
         // user paddle
         Canvas userPaddle = (Canvas) lge.getGObject("user-paddle");

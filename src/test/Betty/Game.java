@@ -10,13 +10,12 @@ import java.util.Scanner;
 
 import rcr.lge.Canvas;
 import rcr.lge.GameObject;
-import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
 import rcr.lge.PointD;
 import rcr.lge.Size;
 import rcr.lge.Sprite;
 
-public class Game implements IEvents {
+public class Game {
     private LittleGameEngine lge;
 
     private int[][] mapa;
@@ -26,8 +25,10 @@ public class Game implements IEvents {
         Size winSize = new Size(608, 736);
 
         lge = new LittleGameEngine(winSize, "Betty", new Color(0xFFFFFF));
-        lge.setOnMainUpdate(this);
-        lge.showColliders(new Color(0xFF0000));
+        // lge.showColliders(new Color(0xFF0000));
+        lge.onMainUpdate = (dt) -> {
+            onMainUpdate(dt);
+        };
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../resources");
@@ -39,7 +40,7 @@ public class Game implements IEvents {
         lge.loadImage("betty_left", resourceDir + "/images/Betty/left-0*.png", false, false);
         lge.loadImage("betty_right", resourceDir + "/images/Betty/right-0*.png", false, false);
         lge.loadImage("zombie", resourceDir + "/images/Kenny/Zombie/zombie_walk*.png", false, false);
-        lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 15);
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new PointD(0, 0), "fondo");
@@ -91,7 +92,6 @@ public class Game implements IEvents {
                 }
     }
 
-    @Override
     public void onMainUpdate(double dt) {
         // abortamos con la tecla Escape
         if (lge.keyPressed(KeyEvent.VK_ESCAPE))
@@ -101,12 +101,12 @@ public class Game implements IEvents {
         Point mousePosition = lge.getMousePosition();
         boolean[] mouseButtons = lge.getMouseButtons();
 
-        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.getFPS(),
-                lge.getCountGObjects(), mousePosition.x, mousePosition.y, mouseButtons[0] ? 1 : 0,
-                mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
+        String info = String.format("FPS: %07.2f - LPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)",
+                lge.getFPS(), lge.getLPS(), lge.getCountGObjects(), mousePosition.x, mousePosition.y,
+                mouseButtons[0] ? 1 : 0, mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x80808080, true));
-        infobar.drawText(info, new PointD(50, 0), "monospace.plain.16", Color.WHITE);
+        infobar.drawText(info, new PointD(5, 0), "monospace", Color.WHITE);
     }
 
     // main loop

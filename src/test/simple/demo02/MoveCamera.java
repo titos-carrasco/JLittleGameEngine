@@ -6,14 +6,13 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 
 import rcr.lge.Canvas;
-import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
 import rcr.lge.PointD;
 import rcr.lge.RectangleD;
 import rcr.lge.Size;
 import rcr.lge.Sprite;
 
-public class MoveCamera implements IEvents {
+public class MoveCamera {
     private LittleGameEngine lge;
 
     public MoveCamera() {
@@ -21,7 +20,9 @@ public class MoveCamera implements IEvents {
         Size winSize = new Size(640, 480);
 
         lge = new LittleGameEngine(winSize, "Move Camera", new Color(0xFFFFFF));
-        lge.setOnMainUpdate(this);
+        lge.onMainUpdate = (dt) -> {
+            onMainUpdate(dt);
+        };
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../../resources");
@@ -29,11 +30,11 @@ public class MoveCamera implements IEvents {
         lge.loadImage("fondo", resourceDir + "/images/Backgrounds/FreeTileset/Fondo.png", false, false);
         lge.loadImage("heroe", resourceDir + "/images/Swordsman/Idle/Idle_000.png", 0.16, false, false);
         lge.loadImage("mute", resourceDir + "/images/icons/sound-*.png", false, false);
-        lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
-        lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
+        lge.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 15);
+        // lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
 
         // activamos la musica de fondo
-        lge.playSound("fondo", true, 50);
+        // lge.playSound("fondo", true, 50);
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new PointD(0, 0), "fondo");
@@ -64,7 +65,6 @@ public class MoveCamera implements IEvents {
         lge.setCameraPosition(new PointD(x, y));
     }
 
-    @Override
     public void onMainUpdate(double dt) {
         // abortamos con la tecla Escape
         if (lge.keyPressed(KeyEvent.VK_ESCAPE))
@@ -74,12 +74,12 @@ public class MoveCamera implements IEvents {
         Point mousePosition = lge.getMousePosition();
         boolean[] mouseButtons = lge.getMouseButtons();
 
-        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.getFPS(),
-                lge.getCountGObjects(), mousePosition.x, mousePosition.y, mouseButtons[0] ? 1 : 0,
-                mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
+        String info = String.format("FPS: %07.2f - LPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)",
+                lge.getFPS(), lge.getLPS(), lge.getCountGObjects(), mousePosition.x, mousePosition.y,
+                mouseButtons[0] ? 1 : 0, mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new PointD(50, 0), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new PointD(30, 0), "monospace", Color.BLACK);
 
         // mute on/off
         mousePosition = lge.getMouseClicked(0);
@@ -89,9 +89,9 @@ public class MoveCamera implements IEvents {
             if (r.contains(mousePosition.x, mousePosition.y)) {
                 int idx = mute.getImagesIndex();
                 if (idx == 1)
-                    lge.setSoundVolume("fondo", 0);
+                    ;// lge.setSoundVolume("fondo", 0);
                 else
-                    lge.setSoundVolume("fondo", 50);
+                    ;// lge.setSoundVolume("fondo", 50);
                 mute.nextImage();
             }
         }

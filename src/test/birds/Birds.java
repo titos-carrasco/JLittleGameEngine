@@ -6,13 +6,12 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 
 import rcr.lge.Canvas;
-import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
 import rcr.lge.PointD;
 import rcr.lge.Size;
 import rcr.lge.Sprite;
 
-public class Birds implements IEvents {
+public class Birds {
     private LittleGameEngine lge;
 
     public Birds() {
@@ -20,8 +19,10 @@ public class Birds implements IEvents {
         Size winSize = new Size(800, 440);
 
         lge = new LittleGameEngine(winSize, "Birds", new Color(0xFFFFFF));
-        lge.setOnMainUpdate(this);
         // lge.showColliders(new Color(255, 0, 0));
+        lge.onMainUpdate = (dt) -> {
+            onMainUpdate(dt);
+        };
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "../resources");
@@ -30,8 +31,8 @@ public class Birds implements IEvents {
         lge.loadImage("heroe", resourceDir + "/images/Swordsman/Idle/Idle_0*.png", 0.08, false, false);
         lge.loadImage("mute", resourceDir + "/images/icons/sound-*.png", false, false);
         lge.loadImage("bird", resourceDir + "/images/BlueBird/frame-*.png", 0.04, false, false);
-        lge.loadTTFont("monospace.plain.16", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
-        lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
+        lge.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        // lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new PointD(0, 0), "fondo");
@@ -48,14 +49,12 @@ public class Birds implements IEvents {
         // agregamos pajaros
         for (int i = 0; i < 500; i++) {
             double x = Math.random() * winSize.width;
-            double y = Math.random() * winSize.height;
+            double y = 15 + Math.random() * winSize.height;
             Bird bird = new Bird("bird", new PointD(x, y));
-            // bird.enableCollider(true);
             lge.addGObject(bird, 1);
         }
     }
 
-    @Override
     public void onMainUpdate(double dt) {
         // abortamos con la tecla Escape
         if (lge.keyPressed(KeyEvent.VK_ESCAPE))
@@ -65,12 +64,12 @@ public class Birds implements IEvents {
         Point mousePosition = lge.getMousePosition();
         boolean[] mouseButtons = lge.getMouseButtons();
 
-        String info = String.format("FPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)", lge.getFPS(),
-                lge.getCountGObjects(), mousePosition.x, mousePosition.y, mouseButtons[0] ? 1 : 0,
-                mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
+        String info = String.format("FPS: %07.2f - LPS: %07.2f - gObjs: %03d - Mouse: (%3d,%3d) (%d,%d,%d)",
+                lge.getFPS(), lge.getLPS(), lge.getCountGObjects(), mousePosition.x, mousePosition.y,
+                mouseButtons[0] ? 1 : 0, mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x10202020, true));
-        infobar.drawText(info, new PointD(140, 0), "monospace.plain.16", Color.BLACK);
+        infobar.drawText(info, new PointD(40, 0), "monospace", Color.BLACK);
     }
 
     // main loop

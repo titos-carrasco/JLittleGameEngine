@@ -78,7 +78,7 @@ public class MiHeroe extends Sprite {
     @Override
     public void onPostUpdate(double dt) {
         if (collidesWith(ninja)) {
-            lge.playSound("poing", false, 50);
+            // lge.playSound("poing", false, 50);
             setPosition(last);
         }
     }

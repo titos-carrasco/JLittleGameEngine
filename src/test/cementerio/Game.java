@@ -4,22 +4,23 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 
 import rcr.lge.Canvas;
-import rcr.lge.IEvents;
 import rcr.lge.LittleGameEngine;
 import rcr.lge.PointD;
 import rcr.lge.RectangleD;
 import rcr.lge.Size;
 import rcr.lge.Sprite;
 
-public class Game implements IEvents {
+public class Game {
     private LittleGameEngine lge;
 
     public Game() {
         Size winSize = new Size(640, 342);
 
         lge = new LittleGameEngine(winSize, "El Cementerio", new Color(0, 0, 0));
-        lge.setOnMainUpdate(this);
-        //lge.showColliders(new Color(255, 0, 0));
+        // lge.showColliders(new Color(255, 0, 0));
+        lge.onMainUpdate = (dt) -> {
+            onMainUpdate(dt);
+        };
 
         // cargamos los recursos que usaremos
         String resourceDir = lge.getRealPath(this, "./resources");
@@ -47,10 +48,8 @@ public class Game implements IEvents {
 
     public void makeFloor() {
         Canvas[] suelos = new Canvas[] { new Canvas(new PointD(0, 85), new Size(170, 1)),
-                new Canvas(new PointD(0, 214), new Size(170, 1)),
-                new Canvas(new PointD(214, 300), new Size(128, 1)),
-                new Canvas(new PointD(342, 214), new Size(127, 1)),
-                new Canvas(new PointD(470, 257), new Size(127, 1)),
+                new Canvas(new PointD(0, 214), new Size(170, 1)), new Canvas(new PointD(214, 300), new Size(128, 1)),
+                new Canvas(new PointD(342, 214), new Size(127, 1)), new Canvas(new PointD(470, 257), new Size(127, 1)),
                 new Canvas(new PointD(513, 86), new Size(127, 1)) };
 
         for (Canvas s : suelos) {
@@ -68,7 +67,6 @@ public class Game implements IEvents {
         }
     }
 
-    @Override
     public void onMainUpdate(double dt) {
         // abortamos con la tecla Escape
         if (lge.keyPressed(KeyEvent.VK_ESCAPE))

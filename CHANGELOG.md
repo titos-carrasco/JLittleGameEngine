@@ -1,5 +1,13 @@
 # Changelog
 
+# 2022-06-08
+- Modifica setting de onMainUpdate() de Interface IEvent a DoubleConsumer y función lambda
+- Cambia verificación de tiempo transcurrido de milisegundos a nanosegundos
+- Agrega cálculo de Ciclos por Segundo en el GameLoop
+- Cálculo de FPS se lleva a evento PaintComponent()
+- Se inhabilitan métodos para manejo de sonidos hasta corregir los problemas detectados
+- Ajusta los demos acorde a lo anterior
+
 # v0.6.1 2022-05-28
 - Renombre dos clases para coincidir con la versión en C#
 
