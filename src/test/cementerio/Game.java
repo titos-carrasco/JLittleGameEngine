@@ -13,24 +13,22 @@ import rcr.lge.Sprite;
 public class Game {
     private LittleGameEngine lge;
 
-    public Game() {
+    public Game(String resourceDir) {
         Size winSize = new Size(640, 342);
 
-        lge = new LittleGameEngine(winSize, "El Cementerio", new Color(0, 0, 0));
-        // lge.showColliders(new Color(255, 0, 0));
+        lge = new LittleGameEngine(winSize, "El Cementerio", Color.BLACK);
+        // lge.showColliders(Color.RED);
         lge.onMainUpdate = (dt) -> {
             onMainUpdate(dt);
         };
 
         // cargamos los recursos que usaremos
-        String resourceDir = lge.getRealPath(this, "./resources");
-
-        lge.loadImage("fondo", resourceDir + "/fondo.png", false, false);
-        lge.loadImage("ninja-idle-right", resourceDir + "/NinjaGirl/Idle_*.png", 0.1, false, false);
-        lge.loadImage("ninja-idle-left", resourceDir + "/NinjaGirl/Idle_*.png", 0.1, true, false);
-        lge.loadImage("ninja-run-right", resourceDir + "/NinjaGirl/Run_*.png", 0.1, false, false);
-        lge.loadImage("ninja-run-left", resourceDir + "/NinjaGirl/Run_*.png", 0.1, true, false);
-        lge.loadImage("platform", resourceDir + "/platform.png", 0.3, false, false);
+        lge.imageManager.loadImages("fondo", resourceDir + "/fondo.png", false, false);
+        lge.imageManager.loadImages("ninja-idle-right", resourceDir + "/NinjaGirl/Idle_*.png", 0.1, false, false);
+        lge.imageManager.loadImages("ninja-idle-left", resourceDir + "/NinjaGirl/Idle_*.png", 0.1, true, false);
+        lge.imageManager.loadImages("ninja-run-right", resourceDir + "/NinjaGirl/Run_*.png", 0.1, false, false);
+        lge.imageManager.loadImages("ninja-run-left", resourceDir + "/NinjaGirl/Run_*.png", 0.1, true, false);
+        lge.imageManager.loadImages("platform", resourceDir + "/platform.png", 0.3, false, false);
 
         // el fondo
         Sprite fondo = new Sprite("fondo", new PointD(0, 0));
@@ -80,7 +78,8 @@ public class Game {
 
     // show time
     public static void main(String[] args) {
-        Game game = new Game();
+        String resourceDir = args[0];
+        Game game = new Game(resourceDir);
         game.Run(60);
         System.out.println("Eso es todo!!!");
     }

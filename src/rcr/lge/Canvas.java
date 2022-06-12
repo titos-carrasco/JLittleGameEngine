@@ -34,7 +34,7 @@ public class Canvas extends GameObject {
      */
     public Canvas(PointD origin, Size size, String name) {
         super(origin, size, name);
-        surface = LittleGameEngine.getInstance().createTranslucentImage(size.width, size.height);
+        surface = ImageManager.createTranslucentImage(size.width, size.height);
     }
 
     /**
@@ -62,13 +62,15 @@ public class Canvas extends GameObject {
      * @param color    color a utilizar (r,g,b) para trazar el texto
      */
     public void drawText(String text, PointD position, String fname, Color color) {
+        LittleGameEngine lge = LittleGameEngine.getInstance();
+
         double x = position.x;
         double y = position.y;
 
         Graphics2D g2d = surface.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        Font f = LittleGameEngine.getInstance().getFont(fname);
+        Font f = lge.fontManager.getFont(fname);
         FontMetrics metrics = g2d.getFontMetrics(f);
 
         g2d.setColor(color);

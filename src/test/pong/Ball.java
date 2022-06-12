@@ -46,10 +46,12 @@ public class Ball extends Canvas {
                 if (gobj.getTag().equals("wall-horizontal")) {
                     speedY = -speedY;
                     dy = -dy;
+                    lge.soundManager.playSound("pong", false);
                 }
                 if (gobj.getTag().equals("paddle")) {
                     speedX = -speedX;
                     dx = -dx;
+                    lge.soundManager.playSound("pong", false);
                 }
                 if (gobj.getTag().equals("wall-vertical")) {
                     x = initX;

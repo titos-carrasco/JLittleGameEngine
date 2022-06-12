@@ -16,19 +16,17 @@ public class Particles {
     int numParticles = 500;
     Particle[] particles;
 
-    public Particles() {
+    public Particles(String resourceDir) {
         // creamos el juego
         Size winSize = new Size(800, 440);
 
-        lge = new LittleGameEngine(winSize, "Particles", new Color(0xFFFFFF));
+        lge = new LittleGameEngine(winSize, "Particles", Color.WHITE);
         lge.onMainUpdate = (dt) -> {
             onMainUpdate(dt);
         };
 
         // cargamos los recursos que usaremos
-        String resourceDir = lge.getRealPath(this, "../resources");
-
-        lge.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.fontManager.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos la barra de info
         Canvas infobar = new Canvas(new PointD(0, 0), new Size(800, 20), "infobar");
@@ -91,7 +89,8 @@ public class Particles {
 
     // show time
     public static void main(String[] args) {
-        Particles game = new Particles();
+        String resourceDir = args[0];
+        Particles game = new Particles(resourceDir);
         game.Run(60);
         System.out.println("Eso es todo!!!");
     }

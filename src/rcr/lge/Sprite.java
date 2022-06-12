@@ -126,9 +126,13 @@ public class Sprite extends GameObject {
      * @return el indice de la imagen actual
      */
     public int setImage(String iname, int idx) {
+        LittleGameEngine lge = LittleGameEngine.getInstance();
+        if (lge == null)
+            return 0;
+
         if (iname != null) {
             if (!iname.equals(this.iname)) {
-                surfaces = LittleGameEngine.getInstance().getImages(iname);
+                surfaces = lge.imageManager.getImages(iname);
                 this.iname = iname;
             }
 

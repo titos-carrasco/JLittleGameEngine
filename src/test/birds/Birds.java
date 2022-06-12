@@ -14,25 +14,21 @@ import rcr.lge.Sprite;
 public class Birds {
     private LittleGameEngine lge;
 
-    public Birds() {
+    public Birds(String resourceDir) {
         // creamos el juego
         Size winSize = new Size(800, 440);
 
-        lge = new LittleGameEngine(winSize, "Birds", new Color(0xFFFFFF));
-        // lge.showColliders(new Color(255, 0, 0));
+        lge = new LittleGameEngine(winSize, "Birds", Color.WHITE);
         lge.onMainUpdate = (dt) -> {
             onMainUpdate(dt);
         };
 
         // cargamos los recursos que usaremos
-        String resourceDir = lge.getRealPath(this, "../resources");
-
-        lge.loadImage("fondo", resourceDir + "/images/Backgrounds/FreeTileset/Fondo.png", winSize, false, false);
-        lge.loadImage("heroe", resourceDir + "/images/Swordsman/Idle/Idle_0*.png", 0.08, false, false);
-        lge.loadImage("mute", resourceDir + "/images/icons/sound-*.png", false, false);
-        lge.loadImage("bird", resourceDir + "/images/BlueBird/frame-*.png", 0.04, false, false);
-        lge.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
-        // lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
+        lge.imageManager.loadImages("fondo", resourceDir + "/images/Backgrounds/FreeTileset/Fondo.png", winSize, false,
+                false);
+        lge.imageManager.loadImages("heroe", resourceDir + "/images/Swordsman/Idle/Idle_0*.png", 0.08, false, false);
+        lge.imageManager.loadImages("bird", resourceDir + "/images/BlueBird/frame-*.png", 0.04, false, false);
+        lge.fontManager.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new PointD(0, 0), "fondo");
@@ -79,7 +75,8 @@ public class Birds {
 
     // show time
     public static void main(String[] args) {
-        Birds game = new Birds();
+        String resourceDir = args[0];
+        Birds game = new Birds(resourceDir);
         game.Run(60);
         System.out.println("Eso es todo!!!");
     }

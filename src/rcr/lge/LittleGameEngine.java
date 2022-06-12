@@ -2,16 +2,10 @@ package rcr.lge;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
-import java.awt.Image;
 import java.awt.MouseInfo;
 import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.Transparency;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -19,23 +13,13 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.function.DoubleConsumer;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -51,7 +35,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     public static final int GUI_LAYER = 0xFFFF;
 
     private static LittleGameEngine lge = null;
-    private GraphicsConfiguration gconfig;
+    boolean running = false;
 
     private TreeMap<Integer, ArrayList<GameObject>> gLayers;
     private HashMap<String, GameObject> gObjects;
@@ -64,16 +48,15 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
     private int fpsIdx;
     private double[] lpsData;
     private int lpsIdx;
-    private boolean running = false;
 
     public DoubleConsumer onMainUpdate = null;
     private HashMap<Integer, Boolean> keysPressed;
     private boolean[] mouseButtons;
-    private Point[] mouseClicked;
+    private Point[] mouseClicks;
 
-    private HashMap<String, BufferedImage[]> images;
-    private HashMap<String, Font> fonts;
-    // private HashMap<String, ClipData> sounds;
+    public final ImageManager imageManager;
+    public final FontManager fontManager;
+    public final SoundManager soundManager;
 
     private Color bgColor;
     private Color collidersColor = null;
@@ -91,11 +74,14 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param bgColor color de fondo de la ventana
      */
     public LittleGameEngine(Size winSize, String title, Color bgColor) {
-        assertion(LittleGameEngine.lge == null, "LittleGameEngine ya se encuentra activa");
+        if (lge != null) {
+            System.out.println("LittleGameEngine ya se encuentra activa");
+            System.exit(ERROR);
+        }
+
         lge = this;
         this.winSize = winSize;
 
-        gconfig = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
         fpsData = new double[10];
         fpsIdx = 0;
         lpsData = new double[10];
@@ -103,13 +89,13 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
         this.bgColor = bgColor;
 
-        images = new HashMap<String, BufferedImage[]>();
-        fonts = new HashMap<String, Font>();
-        // sounds = new HashMap<String, ClipData>();
+        imageManager = new ImageManager();
+        fontManager = new FontManager();
+        soundManager = new SoundManager();
 
         keysPressed = new HashMap<Integer, Boolean>();
         mouseButtons = new boolean[] { false, false, false };
-        mouseClicked = new Point[] { null, null, null };
+        mouseClicks = new Point[] { null, null, null };
 
         gObjects = new HashMap<String, GameObject>();
         gLayers = new TreeMap<Integer, ArrayList<GameObject>>();
@@ -118,16 +104,10 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
         camera = new Camera(new PointD(0, 0), winSize);
 
-        screen = createOpaqueImage(winSize.width, winSize.height);
-
-        Font f = new Font("Arial", Font.PLAIN, 40);
+        screen = ImageManager.createOpaqueImage(winSize.width, winSize.height);
         Graphics2D g2d = screen.createGraphics();
-        g2d.setColor(Color.WHITE);
+        g2d.setColor(bgColor);
         g2d.fillRect(0, 0, screen.getWidth(), screen.getHeight());
-        g2d.setColor(Color.BLACK);
-        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2d.setFont(f);
-        g2d.drawString("Loading...", (winSize.width - 160) / 2, (winSize.height - 8) / 2);
         g2d.dispose();
 
         addKeyListener(this);
@@ -154,6 +134,11 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @return la instancia de LGE en ejecucion
      */
     public static LittleGameEngine getInstance() {
+        if (lge == null) {
+            System.out.println("LittleGameEngine no se encuentra activa");
+            System.exit(ERROR);
+        }
+
         return LittleGameEngine.lge;
     }
 
@@ -214,7 +199,7 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      */
     public void run(int fps) {
         screenTime = System.nanoTime();
-        BufferedImage screenImage = createOpaqueImage(winSize.width, winSize.height);
+        BufferedImage screenImage = ImageManager.createOpaqueImage(winSize.width, winSize.height);
 
         long tExpected = 1000000000 / fps;
         long tPrev = System.nanoTime();
@@ -394,11 +379,8 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
             }
         }
 
-        // apagamos los sonidos
-        /*
-         * for (Entry<String, ClipData> elem : sounds.entrySet()) { ClipData clipData =
-         * elem.getValue(); if (clipData.clip != null) clipData.clip.stop(); }
-         */
+        // --- apaga los sonidos
+        soundManager.stopAll();
 
         // eso es todo
         win.dispose();
@@ -432,8 +414,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param layer la capa a la cual pertenece
      */
     public void addGObject(GameObject gobj, int layer) {
-        assertion(gobj.layer < 0, "'gobj' ya fue agregado");
-        assertion(layer >= 0 && layer <= GUI_LAYER, "'layer' invalido");
         gobj.layer = layer;
         gObjects.put(gobj.name, gobj);
         gObjectsToAdd.add(gobj);
@@ -492,7 +472,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @param gobj el GameObject a eliminar
      */
     public void delGObject(GameObject gobj) {
-        assertion(gobj.layer >= 0, "'gobj' no ha sido agregado");
         gObjectsToDel.add(gobj);
     }
 
@@ -555,9 +534,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      *               izquierdo
      */
     public void setCameraTarget(GameObject gobj, boolean center) {
-        assertion(gobj.layer >= 0, "'gobj' no ha sido agregado");
-        assertion(gobj.layer != GUI_LAYER, "'gobj' invalido");
-
         camera.target = gobj;
         camera.targetInCenter = center;
     }
@@ -649,17 +625,17 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
      * @return verdadero si se encuentra presionado
      */
     public Point getMouseClicked(int button) {
-        synchronized (mouseClicked) {
-            Point p = mouseClicked[button];
-            mouseClicked[button] = null;
+        synchronized (mouseClicks) {
+            Point p = mouseClicks[button];
+            mouseClicks[button] = null;
             return p;
         }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        synchronized (mouseClicked) {
-            mouseClicked[e.getButton() - 1] = new Point(e.getX(), e.getY());
+        synchronized (mouseClicks) {
+            mouseClicks[e.getButton() - 1] = new Point(e.getX(), e.getY());
         }
     }
 
@@ -683,403 +659,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
     @Override
     public void mouseExited(MouseEvent e) {
-    }
-
-    // ------ fonts ------
-    /**
-     * Obtiene los tipos de letra del sistema
-     *
-     * @return los tipos de letra
-     */
-    public String[] getSysFonts() {
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        Font[] fonts = ge.getAllFonts();
-
-        String[] sysFonts = new String[fonts.length];
-        for (int i = 0; i < fonts.length; i++)
-            sysFonts[i] = fonts[i].getFontName();
-        return sysFonts;
-    }
-
-    /**
-     * Carga un tipo de letra para ser utilizado en el juego
-     *
-     * @param name   nombre interno a asignar
-     * @param fname  nombre del tipo de letra
-     * @param fstyle estilo del tipo de letra
-     * @param fsize  tamano del tipo de letra
-     */
-    public void loadSysFont(String name, String fname, int fstyle, int fsize) {
-        if (fonts.get(name) == null) {
-            Font f = new Font(fname, fstyle, fsize);
-            fonts.put(name, f);
-        }
-    }
-
-    /**
-     * Carga un tipo de letra True Type para ser utilizado en el juego
-     *
-     * @param name   nombre interno a asignar
-     * @param fname  nombre del archivo que contiene la fuente TTF
-     * @param fstyle estilo del tipo de letra
-     * @param fsize  tamano del tipo de letra
-     */
-    public void loadTTFont(String name, String fname, int fstyle, int fsize) {
-        try {
-            if (fname.charAt(2) == ':')
-                fname = fname.substring(1);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        if (fonts.get(name) == null) {
-            Font font = null;
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            try {
-                File file = new File(fname);
-                font = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream(file));
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-            Font f = font.deriveFont(fstyle, fsize);
-            ge.registerFont(f);
-            fonts.put(name, f);
-        }
-    }
-
-    /**
-     * Recupera un tipo de letra previamente cargado
-     *
-     * @param fname el nombre del tipo de letra a recuperar
-     *
-     * @return el tipo de letra
-     */
-    public Font getFont(String fname) {
-        return fonts.get(fname);
-    }
-
-    // ------ sounds ------
-    /**
-     * Carga un archivo de sonido para ser utilizado durante el juego
-     *
-     * @param name  nombre a asignar al sonido
-     * @param fname nombre del archivo que contiene el sonido
-     */
-    /*
-     * public void loadSound(String name, String fname) { if (fname.charAt(2) ==
-     * ':') fname = fname.substring(1);
-     * 
-     * ClipData clipData = sounds.get(name); if (clipData == null) { Path path =
-     * Paths.get(fname); byte[] data = null;
-     * 
-     * try { data = Files.readAllBytes(path); } catch (IOException e) {
-     * e.printStackTrace(); System.exit(1); }
-     * 
-     * clipData = new ClipData(); clipData.clip = null; clipData.data = data;
-     * clipData.level = 50; sounds.put(name, clipData);
-     * 
-     * } }
-     */
-
-    /**
-     * Inicia la reproduccion de un sonido
-     *
-     * @param name  el sonido (previamente cargado) a reproducir
-     * @param loop  el numero de veces a repeptirlo
-     * @param level el nivel de volumen
-     */
-    /*
-     * public void playSound(String name, boolean loop, double level) { ClipData
-     * clipData = sounds.get(name);
-     * 
-     * if (clipData == null) return;
-     * 
-     * if (clipData.clip != null) return;
-     * 
-     * try { ByteArrayInputStream bis = new ByteArrayInputStream(clipData.data);
-     * AudioInputStream ais = AudioSystem.getAudioInputStream(bis);
-     * 
-     * clipData.clip = AudioSystem.getClip();
-     * 
-     * clipData.level = level; setSoundVolume(clipData);
-     * 
-     * clipData.clip.addLineListener(new LineListener() { private ClipData
-     * TheClipData = clipData;
-     * 
-     * @Override public void update(LineEvent event) { if (event.getType() ==
-     * LineEvent.Type.STOP) { TheClipData.clip.close(); TheClipData.clip = null; } }
-     * }); clipData.clip.open(ais); if (loop)
-     * clipData.clip.loop(Clip.LOOP_CONTINUOUSLY); else clipData.clip.start(); }
-     * catch (Exception e) { e.printStackTrace(); System.exit(1); } }
-     */
-
-    /**
-     * Detiene la reproduccion de un sonido
-     *
-     * @param name el nombre del sonido a detener
-     */
-    /*
-     * public void stopSound(String name) { ClipData clipData = sounds.get(name);
-     * 
-     * if (clipData == null) return;
-     * 
-     * if (clipData.clip == null) return;
-     * 
-     * clipData.clip.stop(); }
-     */
-
-    /**
-     * Establece el volumen de un sonido previamente cargado
-     *
-     * @param name  el nombre del sonido
-     * @param level el nivel de volumen
-     */
-    /*
-     * public void setSoundVolume(String name, double level) { ClipData clipData =
-     * sounds.get(name);
-     * 
-     * if (clipData == null) return;
-     * 
-     * clipData.level = level;
-     * 
-     * if (clipData.clip == null) return;
-     * 
-     * setSoundVolume(clipData); }
-     */
-
-    /**
-     * Establece el volumen de un sonido previamente cargado
-     *
-     * @param clipData el sonido
-     */
-    /*
-     * private void setSoundVolume(ClipData clipData) { try { FloatControl volume =
-     * (FloatControl) clipData.clip.getControl(FloatControl.Type.VOLUME);
-     * volume.setValue((float) (clipData.level / 100.0)); } catch (Exception e) { //
-     * System.out.println("SetSoundVolume(): " + e); } }
-     */
-
-    /**
-     * Obtiene el volumen de un sonido previamente cargado
-     *
-     * @param name el nombre del sonido
-     *
-     * @return el nivel de volumen
-     */
-    /*
-     * public double getSoundVolume(String name) { ClipData clipData =
-     * sounds.get(name);
-     * 
-     * if (clipData == null) return 0;
-     * 
-     * return clipData.level * 100; }
-     */
-
-    // ------ images ------
-    /**
-     * Crea una imagen sin transparencia de dimensiones dadas
-     *
-     * @param width  ancho deseado
-     * @param height alto deseado
-     *
-     * @return la imagen creada
-     */
-    BufferedImage createOpaqueImage(int width, int height) {
-        return gconfig.createCompatibleImage(width, height, Transparency.OPAQUE);
-    }
-
-    /**
-     * Crea una imagen con transparencia de dimensiones dadas
-     *
-     * @param width  ancho deseado
-     * @param height alto deseado
-     *
-     * @return la imagen creada
-     */
-    BufferedImage createTranslucentImage(int width, int height) {
-        return gconfig.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
-    }
-
-    /**
-     * Recupera un grupo de imagenes previamente cargadas
-     *
-     * @param iname el nombre asignado al grupo de imagenes
-     *
-     * @return la imagenes
-     */
-    public BufferedImage[] getImages(String iname) {
-        return images.get(iname);
-    }
-
-    /**
-     * Cara una imagen o grupo de imagenes desde archivos para ser utilizadas en el
-     * juego
-     *
-     * @param iname   nombre a asignar a la imagen o grupo de imagenes cargados
-     * @param pattern nombre del archivo de imagenes a cargar. Si contiene un '*' se
-     *                cargaran todas las imaganes con igual nombre utilizando dicho
-     *                caracter como caracter especial de busqueda (ej.
-     *                imagen_0*.png)
-     * @param flipX   si es verdadero al imagen se reflejara en el eje X
-     * @param flipY   si es verdadero al imagen se reflejara en el eje Y
-     */
-    public void loadImage(String iname, String pattern, boolean flipX, boolean flipY) {
-        loadImage(iname, pattern, 0, null, flipX, flipY);
-    }
-
-    /**
-     * Cara una imagen o grupo de imagenes desde archivos para ser utilizadas en el
-     * juego
-     *
-     * @param iname   nombre a asignar a la imagen o grupo de imagenes cargados
-     * @param pattern nombre del archivo de imagenes a cargar. Si contiene un '*' se
-     *                cargaran todas las imaganes con igual nombre utilizando dicho
-     *                caracter como caracter especial de busqueda (ej.
-     *                imagen_0*.png)
-     * @param size    nuevo tamano de la imagen cargada
-     * @param flipX   si es verdadero al imagen se reflejara en el eje X
-     * @param flipY   si es verdadero al imagen se reflejara en el eje Y
-     */
-    public void loadImage(String iname, String pattern, Size size, boolean flipX, boolean flipY) {
-        loadImage(iname, pattern, 0, size, flipX, flipY);
-    }
-
-    /**
-     * Cara una imagen o grupo de imagenes desde archivos para ser utilizadas en el
-     * juego
-     *
-     * @param iname   nombre a asignar a la imagen o grupo de imagenes cargados
-     * @param pattern nombre del archivo de imagenes a cargar. Si contiene un '*' se
-     *                cargaran todas las imaganes con igual nombre utilizando dicho
-     *                caracter como caracter especial de busqueda (ej.
-     *                imagen_0*.png)
-     * @param scale   factor de escala a aplicar a la imagen cargada
-     * @param flipX   si es verdadero al imagen se reflejara en el eje X
-     * @param flipY   si es verdadero al imagen se reflejara en el eje Y
-     */
-    public void loadImage(String iname, String pattern, double scale, boolean flipX, boolean flipY) {
-        loadImage(iname, pattern, scale, null, flipX, flipY);
-    }
-
-    /**
-     * Cara una imagen o grupo de imagenes desde archivos para ser utilizadas en el
-     * juego
-     *
-     * @param iname   nombre a asignar a la imagen o grupo de imagenes cargados
-     * @param pattern nombre del archivo de imagenes a cargar. Si contiene un '*' se
-     *                cargaran todas las imaganes con igual nombre utilizando dicho
-     *                caracter como caracter especial de busqueda (ej.
-     *                imagen_0*.png)
-     * @param scale   factor de escala a aplicar a la imagen cargada
-     * @param size    nuevo tamano de la imagen cargada
-     * @param flipX   si es verdadero al imagen se reflejara en el eje X
-     * @param flipY   si es verdadero al imagen se reflejara en el eje Y
-     */
-    private void loadImage(String iname, String pattern, double scale, Size size, boolean flipX, boolean flipY) {
-        ArrayList<BufferedImage> images = readImages(pattern);
-
-        int nimages = images.size();
-        for (int i = 0; i < nimages; i++) {
-            BufferedImage img = images.get(i);
-            Image image;
-            if (size != null) {
-                image = img.getScaledInstance(size.width, size.height, BufferedImage.SCALE_SMOOTH);
-                img.flush();
-            } else if (scale > 0) {
-                int width = (int) Math.round(img.getWidth() * scale);
-                int height = (int) Math.round(img.getHeight() * scale);
-                image = img.getScaledInstance(width, height, BufferedImage.SCALE_SMOOTH);
-                img.flush();
-            } else
-                image = img;
-
-            int w = image.getWidth(null);
-            int h = image.getHeight(null);
-            BufferedImage bi = createTranslucentImage(w, h);
-            Graphics2D g2d = bi.createGraphics();
-
-            if (flipX)
-                g2d.drawImage(image, w, 0, -w, h, null);
-            if (flipY)
-                g2d.drawImage(image, 0, h, w, -h, null);
-            if (!flipX && !flipY)
-                g2d.drawImage(image, 0, 0, null);
-
-            g2d.dispose();
-            images.set(i, bi);
-
-            image.flush();
-        }
-
-        this.images.put(iname, images.toArray(new BufferedImage[images.size()]));
-    }
-
-    /**
-     * Carga una imagen o grupo de imagenes acorde al nombre de archivo dado
-     *
-     * @param pattern patron de busqueda de el o los archivos. El caracter '*' es
-     *                usado como comodin
-     *
-     * @return la o las imagenes cargadas
-     */
-    private ArrayList<BufferedImage> readImages(String pattern) {
-        try {
-            if (pattern.charAt(2) == ':')
-                pattern = pattern.substring(1);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
-
-        String dir = "";
-        int pos = pattern.lastIndexOf('/');
-        if (pos > -1) {
-            dir = pattern.substring(0, pos);
-            pattern = pattern.substring(pos + 1);
-        }
-
-        ArrayList<String> fnames = new ArrayList<String>();
-        Path p = Paths.get(dir);
-
-        DirectoryStream<Path> paths = null;
-        try {
-            paths = Files.newDirectoryStream(p, pattern);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        for (Path path : paths)
-            fnames.add(path.toString());
-
-        Collections.sort(fnames);
-        for (String fname : fnames) {
-            BufferedImage img = readImage(fname);
-            images.add(img);
-        }
-        return images;
-    }
-
-    /**
-     * Carga una imagen desde el archivo especificado
-     *
-     * @param fname el archivo que contiene la imagen
-     *
-     * @return la imagen
-     */
-    private BufferedImage readImage(String fname) {
-        File f = new File(fname);
-        BufferedImage img = null;
-        try {
-            img = ImageIO.read(f);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        return img;
     }
 
     // ------ JPanel ------
@@ -1127,40 +706,6 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
 
     @Override
     public void windowDeactivated(WindowEvent e) {
-    }
-
-    // ------ utils ------
-
-    /**
-     * Finaliza el programa si la condicion recibida no se cumple
-     *
-     * @param condition condicion a vertificar
-     * @param msg       mensaje a desplegar si la condicion no se cumple
-     */
-    private void assertion(boolean condition, String msg) {
-        if (!condition) {
-            System.out.println(msg);
-            System.exit(1);
-        }
-    }
-
-    /**
-     * Obtiene la ruta en el sistema de archivos del path recibido
-     *
-     * @param objClass clase a utilizar como directorio actual (su localizacion)
-     * @param path     ruta a convertir
-     *
-     * @return la ruta completa
-     */
-    public String getRealPath(Object objClass, String path) {
-        String p = null;
-        try {
-            p = new URI(objClass.getClass().getResource(path).getPath()).getPath();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        return p;
     }
 
 }

@@ -1,6 +1,21 @@
 # Changelog
 
-# 2022-06-08
+## v0.7.0 2022-06-12
+- El directorio de recursos es recibido desde la línea de comandos
+- Se elimina control de volumen
+- La reproducción de un clip de audio se delega a una tarea para evitar demoras en el loop game
+- Se manejan sonidos en threads
+
+## 2022-06-11
+- Crea clase ImagesManager para el manejo de imagen
+- Crea clase SoundManager para el manejo de sonidos
+- Crea clase Fontmanager para el manejo de fonts
+- Manejo de imágenes, sonido y fonts se llevan a las clases señaladas
+- Pendientes:
+    - En linux los clips de audio solo se reproducen los primeros segundos
+    - En Linux y Windows no funciona el control de volumen por clip de audio
+
+## 2022-06-08
 - Modifica setting de onMainUpdate() de Interface IEvent a DoubleConsumer y función lambda
 - Cambia verificación de tiempo transcurrido de milisegundos a nanosegundos
 - Agrega cálculo de Ciclos por Segundo en el GameLoop
@@ -8,16 +23,16 @@
 - Se inhabilitan métodos para manejo de sonidos hasta corregir los problemas detectados
 - Ajusta los demos acorde a lo anterior
 
-# v0.6.1 2022-05-28
+## v0.6.1 2022-05-28
 - Renombre dos clases para coincidir con la versión en C#
 
-# v0.6.0 2022-05-28
+## v0.6.0 2022-05-28
 - Versión estable
 
-# v0.5.7.2 2022-05-28
+## v0.5.7.2 2022-05-28
 - Renombra loadTTTFont a loadTTFont()
 
-# v0.5.7.1 2022-05-27
+## v0.5.7.1 2022-05-27
 - Canvas.java: corrige coordenadas en método drawText
 - Se corrigeb los demos acorde a lo anterior
 

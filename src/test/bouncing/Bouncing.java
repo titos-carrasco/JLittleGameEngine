@@ -14,20 +14,18 @@ public class Bouncing {
     private LittleGameEngine lge;
     private Canvas ground;
 
-    public Bouncing() {
+    public Bouncing(String resourceDir) {
         // creamos el juego
         Size winSize = new Size(800, 440);
 
-        lge = new LittleGameEngine(winSize, "Bouncing Balls", new Color(0xFFFFFF));
-        // lge.showColliders(new Color(0xFF0000));
+        lge = new LittleGameEngine(winSize, "Bouncing Balls", Color.WHITE);
+        lge.showColliders(Color.RED);
         lge.onMainUpdate = (dt) -> {
             onMainUpdate(dt);
         };
 
         // cargamos los recursos que usaremos
-        String resourceDir = lge.getRealPath(this, "../resources");
-
-        lge.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
+        lge.fontManager.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 16);
 
         // agregamos el suelo
         ground = new Canvas(new PointD(0, 340), new Size(800, 100), "ground");
@@ -76,7 +74,8 @@ public class Bouncing {
 
     // show time
     public static void main(String[] args) {
-        Bouncing game = new Bouncing();
+        String resourceDir = args[0];
+        Bouncing game = new Bouncing(resourceDir);
         game.Run(60);
         System.out.println("Eso es todo!!!");
     }

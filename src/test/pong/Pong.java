@@ -14,21 +14,19 @@ public class Pong {
     private LittleGameEngine lge;
     private int paddleSpeed = 240;
 
-    public Pong() {
+    public Pong(String resourceDir) {
         // creamos el juego
         Size winSize = new Size(640, 640);
 
-        lge = new LittleGameEngine(winSize, "Ping", new Color(0x000000));
-        // lge.showColliders(new Color(255, 0, 0));
+        lge = new LittleGameEngine(winSize, "Ping", Color.BLACK);
+        // lge.showColliders(Color.RED);
         lge.onMainUpdate = (dt) -> {
             onMainUpdate(dt);
         };
 
         // cargamos los recursos que usaremos
-        String resourceDir = lge.getRealPath(this, "../resources");
-
-        // Load sound
-        lge.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 15);
+        lge.soundManager.loadSound("pong", resourceDir + "/sounds/4391__noisecollector__pongblipf-5.wav");
+        lge.fontManager.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 15);
 
         // agregamos la barra de info
         Canvas infobar = new Canvas(new PointD(0, 0), new Size(640, 20), "infobar");
@@ -136,7 +134,8 @@ public class Pong {
 
     // show time
     public static void main(String[] args) {
-        Pong game = new Pong();
+        String resourceDir = args[0];
+        Pong game = new Pong(resourceDir);
         game.Run(60);
         System.out.println("Eso es todo!!!");
     }

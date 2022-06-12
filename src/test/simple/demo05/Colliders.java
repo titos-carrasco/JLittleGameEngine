@@ -15,33 +15,34 @@ import rcr.lge.Sprite;
 public class Colliders {
     private LittleGameEngine lge;
 
-    public Colliders() {
+    public Colliders(String resourceDir) {
         // creamos el juego
         Size winSize = new Size(640, 480);
 
-        lge = new LittleGameEngine(winSize, "Colliders", new Color(0xFFFFFF));
-        lge.showColliders(new Color(0xFF0000));
+        lge = new LittleGameEngine(winSize, "Colliders", Color.WHITE);
+        lge.showColliders(Color.RED);
         lge.onMainUpdate = (dt) -> {
             onMainUpdate(dt);
         };
 
         // cargamos los recursos que usaremos
-        String resourceDir = lge.getRealPath(this, "../../resources");
-
-        lge.loadImage("fondo", resourceDir + "/images/Backgrounds/FreeTileset/Fondo.png", false, false);
-        lge.loadImage("heroe_idle_right", resourceDir + "/images/Swordsman/Idle/Idle_0*.png", 0.16, false, false);
-        lge.loadImage("heroe_idle_left", resourceDir + "/images/Swordsman/Idle/Idle_0*.png", 0.16, true, false);
-        lge.loadImage("heroe_run_right", resourceDir + "/images/Swordsman/Run/Run_0*.png", 0.16, false, false);
-        lge.loadImage("heroe_run_left", resourceDir + "/images/Swordsman/Run/Run_0*.png", 0.16, true, false);
-        lge.loadImage("ninja", resourceDir + "/images/Swordsman/Idle/Idle_000.png", 0.16, false, false);
-        lge.loadImage("mute", resourceDir + "/images/icons/sound-*.png", false, false);
-        lge.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 15);
-        // lge.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
-        // lge.loadSound("aves", resourceDir + "/sounds/bird-thrush-nightingale.wav");
-        // lge.loadSound("poing", resourceDir + "/sounds/cartoon-poing.wav");
+        lge.imageManager.loadImages("fondo", resourceDir + "/images/Backgrounds/FreeTileset/Fondo.png", false, false);
+        lge.imageManager.loadImages("heroe_idle_right", resourceDir + "/images/Swordsman/Idle/Idle_0*.png", 0.16, false,
+                false);
+        lge.imageManager.loadImages("heroe_idle_left", resourceDir + "/images/Swordsman/Idle/Idle_0*.png", 0.16, true,
+                false);
+        lge.imageManager.loadImages("heroe_run_right", resourceDir + "/images/Swordsman/Run/Run_0*.png", 0.16, false,
+                false);
+        lge.imageManager.loadImages("heroe_run_left", resourceDir + "/images/Swordsman/Run/Run_0*.png", 0.16, true,
+                false);
+        lge.imageManager.loadImages("ninja", resourceDir + "/images/Swordsman/Idle/Idle_000.png", 0.16, false, false);
+        lge.fontManager.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 15);
+        lge.soundManager.loadSound("fondo", resourceDir + "/sounds/happy-and-sad.wav");
+        lge.soundManager.loadSound("aves", resourceDir + "/sounds/bird-thrush-nightingale.wav");
+        lge.soundManager.loadSound("poing", resourceDir + "/sounds/cartoon-poing.wav");
 
         // activamos la musica de fondo
-        // lge.playSound("fondo", true, 100);
+        lge.soundManager.playSound("fondo", true);
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new PointD(0, 0), "fondo");
@@ -50,11 +51,6 @@ public class Colliders {
         // agregamos la barra de info
         Canvas infobar = new Canvas(new PointD(0, 0), new Size(640, 20), "infobar");
         lge.addGObjectGUI(infobar);
-
-        // agregamos el icono del sonido
-        Sprite mute = new Sprite("mute", new PointD(8, 3), "mute");
-        mute.setImage("mute", 1);
-        lge.addGObjectGUI(mute);
 
         // agregamos un ninja
         Sprite ninja = new Sprite("ninja", new PointD(350, 720), "ninja");
@@ -89,25 +85,10 @@ public class Colliders {
         infobar.fill(new Color(0x10202020, true));
         infobar.drawText(info, new PointD(30, 0), "monospace", Color.BLACK);
 
-        // mute on/mute off
-        mousePosition = lge.getMouseClicked(0);
-        if (mousePosition != null) {
-            Sprite mute = (Sprite) lge.getGObject("mute");
-            RectangleD r = mute.getRectangle();
-            if (r.contains(mousePosition.x, mousePosition.y)) {
-                int idx = mute.getImagesIndex();
-                if (idx == 1)
-                    ; // lge.setSoundVolume("fondo", 0);
-                else
-                    ; // lge.setSoundVolume("fondo", 50);
-                mute.nextImage();
-            }
-        }
-
         // de manera aleatorio activamos sonido de aves
         int n = (int) (Math.random() * 1000);
         if (n < 3)
-            ; // lge.playSound("aves", false, 50);
+            lge.soundManager.playSound("aves", false);
     }
 
     // main loop
@@ -117,7 +98,8 @@ public class Colliders {
 
     // show time
     public static void main(String[] args) {
-        Colliders game = new Colliders();
+        String resourceDir = args[0];
+        Colliders game = new Colliders(resourceDir);
         game.Run(60);
         System.out.println("Eso es todo!!!");
     }

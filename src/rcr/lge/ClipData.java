@@ -1,6 +1,6 @@
 package rcr.lge;
 
-import javax.sound.sampled.Clip;
+import javax.sound.sampled.AudioFormat;
 
 /**
  * Clase para almacener un Clip de Audio en un contenedor
@@ -9,10 +9,6 @@ import javax.sound.sampled.Clip;
  *
  */
 public class ClipData {
-    Clip clip = null;
+    AudioFormat format = null;
     byte[] data = null;
-    double level = 50.0;
-
-    public ClipData() {
-    }
 }

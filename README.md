@@ -119,6 +119,3 @@ public class TheWorld implements IEvents {
 
 
 
-## Pendientes
-- En linux los clips de audio solo se reproducen los primeros segundos
-- En Linux y Windows no funciona el control de volumen por clip de audio

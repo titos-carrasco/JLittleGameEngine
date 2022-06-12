@@ -20,27 +20,25 @@ public class Game {
 
     private int[][] mapa;
 
-    public Game() {
+    public Game(String resourceDir) {
         // creamos el juego
         Size winSize = new Size(608, 736);
 
-        lge = new LittleGameEngine(winSize, "Betty", new Color(0xFFFFFF));
-        // lge.showColliders(new Color(0xFF0000));
+        lge = new LittleGameEngine(winSize, "Betty", Color.WHITE);
+        // lge.showColliders(Color.RED);
         lge.onMainUpdate = (dt) -> {
             onMainUpdate(dt);
         };
 
         // cargamos los recursos que usaremos
-        String resourceDir = lge.getRealPath(this, "../resources");
-
-        lge.loadImage("fondo", resourceDir + "/images/Betty/Fondo.png", false, false);
-        lge.loadImage("betty_idle", resourceDir + "/images/Betty/idle-0*.png", false, false);
-        lge.loadImage("betty_down", resourceDir + "/images/Betty/down-0*.png", false, false);
-        lge.loadImage("betty_up", resourceDir + "/images/Betty/up-0*.png", false, false);
-        lge.loadImage("betty_left", resourceDir + "/images/Betty/left-0*.png", false, false);
-        lge.loadImage("betty_right", resourceDir + "/images/Betty/right-0*.png", false, false);
-        lge.loadImage("zombie", resourceDir + "/images/Kenny/Zombie/zombie_walk*.png", false, false);
-        lge.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 15);
+        lge.imageManager.loadImages("fondo", resourceDir + "/images/Betty/Fondo.png", false, false);
+        lge.imageManager.loadImages("betty_idle", resourceDir + "/images/Betty/idle-0*.png", false, false);
+        lge.imageManager.loadImages("betty_down", resourceDir + "/images/Betty/down-0*.png", false, false);
+        lge.imageManager.loadImages("betty_up", resourceDir + "/images/Betty/up-0*.png", false, false);
+        lge.imageManager.loadImages("betty_left", resourceDir + "/images/Betty/left-0*.png", false, false);
+        lge.imageManager.loadImages("betty_right", resourceDir + "/images/Betty/right-0*.png", false, false);
+        lge.imageManager.loadImages("zombie", resourceDir + "/images/Kenny/Zombie/zombie_walk*.png", false, false);
+        lge.fontManager.loadTTFont("monospace", resourceDir + "/fonts/FreeMono.ttf", Font.PLAIN, 14);
 
         // agregamos el fondo
         Sprite fondo = new Sprite("fondo", new PointD(0, 0), "fondo");
@@ -106,7 +104,7 @@ public class Game {
                 mouseButtons[0] ? 1 : 0, mouseButtons[1] ? 1 : 0, mouseButtons[2] ? 1 : 0);
         Canvas infobar = (Canvas) lge.getGObject("infobar");
         infobar.fill(new Color(0x80808080, true));
-        infobar.drawText(info, new PointD(5, 0), "monospace", Color.WHITE);
+        infobar.drawText(info, new PointD(40, 0), "monospace", Color.WHITE);
     }
 
     // main loop
@@ -116,7 +114,8 @@ public class Game {
 
     // show time
     public static void main(String[] args) {
-        Game game = new Game();
+        String resourceDir = args[0];
+        Game game = new Game(resourceDir);
         game.Run(60);
         System.out.println("Eso es todo!!!");
     }
