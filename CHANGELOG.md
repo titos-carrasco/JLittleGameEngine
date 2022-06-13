@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.7.1 2022-06-13
+- Corrige tamaño del buffer al reproducir sonidos y agrega un drain() para lso sonidos cortos
+- Corrige manejo del caracter separador de archivos
+
+
 ## v0.7.0 2022-06-12
 - El directorio de recursos es recibido desde la línea de comandos
 - Se elimina control de volumen
