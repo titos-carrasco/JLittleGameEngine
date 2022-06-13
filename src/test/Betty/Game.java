@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.net.URI;
 import java.util.Scanner;
 
 import rcr.lge.Canvas;
@@ -50,7 +49,9 @@ public class Game {
 
         // cargamos el mapa en memoria
         try {
-            String fname = new URI(resourceDir + "/images/Betty/Mapa.txt").getPath();
+            String fname = resourceDir + "/images/Betty/Mapa.txt";
+            fname = fname.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+
             mapa = new int[22][19];
             int x = 0, y = 0;
             Scanner scanner = new Scanner(new File(fname));

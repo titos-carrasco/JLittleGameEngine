@@ -43,8 +43,7 @@ public class SoundManager {
         if (clipData != null)
             return;
 
-        if (fname.charAt(2) == ':')
-            fname = fname.substring(1);
+        fname = fname.replace('\\', '/');
 
         byte[] data = null;
         AudioFormat format = null;
@@ -90,9 +89,9 @@ public class SoundManager {
                 SourceDataLine line = null;
                 try {
                     line = (SourceDataLine) AudioSystem.getLine(info);
-                    line.open(format, format.getFrameSize() * 128);
-                } catch (LineUnavailableException e1) {
-                    e1.printStackTrace();
+                    line.open(format, format.getFrameSize() * (int) format.getFrameRate());
+                } catch (LineUnavailableException e) {
+                    e.printStackTrace();
                     return;
                 }
 
@@ -102,25 +101,21 @@ public class SoundManager {
                 while (lge.running) {
                     int pos = 0;
                     while (lge.running && pos < total) {
-                        int n = format.getFrameSize() * 128;
+                        int n = format.getFrameSize() * (int) format.getFrameRate();
                         if (n > total - pos)
                             n = total - pos;
                         int nb = line.write(clipData.data, pos, n);
                         pos += nb;
-                        try {
-                            Thread.sleep(1);
-                        } catch (InterruptedException e) {
-                        }
                     }
                     if (!loop)
                         break;
                 }
-                // line.flush();
-                // line.stop();
+                line.drain();
                 line.close();
                 try {
                     bais.close();
                 } catch (IOException e) {
+                    e.printStackTrace();
                 }
 
                 bais = null;
@@ -151,7 +146,6 @@ public class SoundManager {
             try {
                 t.join();
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
     }

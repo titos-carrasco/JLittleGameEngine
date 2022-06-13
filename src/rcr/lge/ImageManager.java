@@ -152,14 +152,7 @@ public class ImageManager {
      * @return la o las imagenes cargadas
      */
     private ArrayList<BufferedImage> readImages(String pattern) {
-        try {
-            if (pattern.charAt(2) == ':')
-                pattern = pattern.substring(1);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
+        pattern = pattern.replace('\\', '/');
         ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 
         String dir = "";

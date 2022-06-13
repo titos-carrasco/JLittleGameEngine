@@ -46,15 +46,8 @@ public class FontManager {
      * @param fsize  tamano del tipo de letra
      */
     public void loadTTFont(String name, String fname, int fstyle, int fsize) {
-        try {
-            if (fname.charAt(2) == ':')
-                fname = fname.substring(1);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
         if (fonts.get(name) == null) {
+            fname = fname.replace('\\', '/');
             Font font = null;
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             try {
