@@ -50,7 +50,7 @@ public class Game {
         // cargamos el mapa en memoria
         try {
             String fname = resourceDir + "/images/Betty/Mapa.txt";
-            fname = fname.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+            fname = fname.replace('\\', '/');
 
             mapa = new int[22][19];
             int x = 0, y = 0;

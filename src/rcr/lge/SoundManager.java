@@ -21,14 +21,14 @@ import javax.sound.sampled.SourceDataLine;
  */
 public class SoundManager {
     private final HashMap<String, ClipData> sounds;
-    private final ArrayList<Thread> threads;
+    private final ArrayList<Thread> players;
 
     /**
      * Construye un objeto manejador de sonidos en memoria
      */
     public SoundManager() {
         sounds = new HashMap<String, ClipData>();
-        threads = new ArrayList<Thread>();
+        players = new ArrayList<Thread>();
     }
 
     /**
@@ -70,17 +70,18 @@ public class SoundManager {
      *
      * @param name el sonido (previamente cargado) a reproducir
      * @param loop Verdadero para repetir el sonido de manera constante
+     * @return el ID del player del sonido a reproducir
      */
-    public void playSound(String name, boolean loop) {
+    public Object playSound(String name, boolean loop) {
         ClipData clipData = sounds.get(name);
 
         if (clipData == null)
-            return;
+            return null;
 
-        new Thread() {
+        Thread player = new Thread() {
             public void run() {
-                synchronized (threads) {
-                    threads.add(this);
+                synchronized (players) {
+                    players.add(this);
                 }
                 LittleGameEngine lge = LittleGameEngine.getInstance();
                 AudioFormat format = clipData.format;
@@ -122,12 +123,22 @@ public class SoundManager {
                 line = null;
                 info = null;
 
-                synchronized (threads) {
-                    threads.remove(this);
+                synchronized (players) {
+                    players.remove(this);
                 }
 
             }
-        }.start();
+        };
+        player.start();
+        return player;
+    }
+
+    /**
+     * Detiene la reproduccion del sonido especificado
+     *
+     * @param player El ID del player del sonido a detene
+     */
+    public void stopSound(Object player) {
     }
 
     /**
@@ -136,13 +147,13 @@ public class SoundManager {
      * @param name el nombre del sonido a detener
      */
     public void stopAll() {
-        ArrayList<Thread> tsounds = null;
+        ArrayList<Thread> _players = null;
 
-        synchronized (threads) {
-            tsounds = new ArrayList<Thread>(threads);
+        synchronized (players) {
+            _players = new ArrayList<Thread>(players);
         }
 
-        for (Thread t : tsounds)
+        for (Thread t : _players)
             try {
                 t.join();
             } catch (InterruptedException e) {

@@ -25,6 +25,9 @@ import javax.imageio.ImageIO;
 public class ImageManager {
     private final HashMap<String, BufferedImage[]> images;
 
+    /**
+     * Construye un objeto manejador de imagenes en memoria
+     */
     public ImageManager() {
         images = new HashMap<String, BufferedImage[]>();
     }

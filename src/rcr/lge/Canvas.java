@@ -157,4 +157,23 @@ public class Canvas extends GameObject {
         g2d.dispose();
     }
 
+    public void DrawImage(PointD position, String name) {
+        DrawImage((int) position.x, (int) position.y, name, 0);
+    }
+
+    public void DrawImage(PointD position, String name, int idx) {
+        DrawImage((int) position.x, (int) position.y, name, idx);
+    }
+
+    public void DrawImage(int x, int y, String name) {
+        DrawImage(x, y, name, 0);
+    }
+
+    public void DrawImage(int x, int y, String name, int idx) {
+        LittleGameEngine lge = LittleGameEngine.getInstance();
+        BufferedImage surface = lge.imageManager.getImages(name)[idx];
+        Graphics2D g2d = this.surface.createGraphics();
+        g2d.drawImage(surface, x, y, null);
+        g2d.dispose();
+    }
 }
