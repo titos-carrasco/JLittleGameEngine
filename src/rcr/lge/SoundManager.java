@@ -73,6 +73,18 @@ public class SoundManager {
      * @return el ID del player del sonido a reproducir
      */
     public Object playSound(String name, boolean loop) {
+        return playSound(name, loop, 0);
+    }
+
+    /**
+     * Inicia la reproduccion de un sonido
+     *
+     * @param name     el sonido (previamente cargado) a reproducir
+     * @param loop     Verdadero para repetir el sonido de manera constante
+     * @param buffSize Tamano del buffer asociado a la linea
+     * @return el ID del player del sonido a reproducir
+     */
+    public Object playSound(String name, boolean loop, int buffSize) {
         ClipData clipData = sounds.get(name);
 
         if (clipData == null)
@@ -85,12 +97,18 @@ public class SoundManager {
                 }
                 LittleGameEngine lge = LittleGameEngine.getInstance();
                 AudioFormat format = clipData.format;
+                int _buffSize = buffSize;
+                if (buffSize <= 0) {
+                    _buffSize = format.getFrameSize() * format.getChannels() * (int) format.getFrameRate();
+                    if (!System.getProperty("os.name").startsWith("Windows"))
+                        _buffSize /= 200;
+                }
 
                 DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
                 SourceDataLine line = null;
                 try {
                     line = (SourceDataLine) AudioSystem.getLine(info);
-                    line.open(format, format.getFrameSize() * (int) format.getFrameRate());
+                    line.open(format, _buffSize);
                 } catch (LineUnavailableException e) {
                     e.printStackTrace();
                     return;
@@ -102,7 +120,7 @@ public class SoundManager {
                 while (lge.running) {
                     int pos = 0;
                     while (lge.running && pos < total) {
-                        int n = format.getFrameSize() * (int) format.getFrameRate();
+                        int n = _buffSize;
                         if (n > total - pos)
                             n = total - pos;
                         int nb = line.write(clipData.data, pos, n);

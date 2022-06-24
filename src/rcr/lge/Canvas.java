@@ -18,22 +18,22 @@ public class Canvas extends GameObject {
     /**
      * Crea un canvas, para dibujar, en la posicion y dimensiones dadas
      *
-     * @param origin posicion (x, y) del canvas
-     * @param size   dimension (width, height) del canvas
+     * @param position posicion (x, y) del canvas
+     * @param size     dimension (width, height) del canvas
      */
-    public Canvas(PointD origin, Size size) {
-        this(origin, size, null);
+    public Canvas(PointD position, Size size) {
+        this(position, size, null);
     }
 
     /**
      * Crea un canvas, para dibujar, en la posicion y dimensiones dadas
      *
-     * @param origin posicion (x, y) del canvas
-     * @param size   dimension (width, height) del canvas
-     * @param name   nombre para esta GameObject
+     * @param position posicion (x, y) del canvas
+     * @param size     dimension (width, height) del canvas
+     * @param name     nombre para esta GameObject
      */
-    public Canvas(PointD origin, Size size, String name) {
-        super(origin, size, name);
+    public Canvas(PointD position, Size size, String name) {
+        super(position, size, name);
         surface = ImageManager.createTranslucentImage(size.width, size.height);
     }
 
@@ -157,18 +157,50 @@ public class Canvas extends GameObject {
         g2d.dispose();
     }
 
+    /**
+     * Traza una imagen, previamente cargada, en este canvas en la posicion dada
+     *
+     * @param position Coordenadas (x, y) en donde se trazara la imagen dentro del
+     *                 canvas
+     * @param name     Nombre de la secuencia de imagenes a utilizar
+     */
     public void DrawImage(PointD position, String name) {
         DrawImage((int) position.x, (int) position.y, name, 0);
     }
 
+    /**
+     * Traza una imagen, previamente cargada, en este canvas en la posicion dada
+     *
+     * @param position Coordenadas (x, y) en donde se trazara la imagen dentro del
+     *                 canvas
+     * @param name     Nombre de la secuencia de imagenes a utilizar
+     * @param idx      indice dentro de la secuencia de imagenes para especificar
+     *                 que imagen utilizar
+     */
     public void DrawImage(PointD position, String name, int idx) {
         DrawImage((int) position.x, (int) position.y, name, idx);
     }
 
+    /**
+     * Traza una imagen, previamente cargada, en este canvas en la posicion dada
+     *
+     * @param x    Coordenada X en donde se trazara la imagen dentro del canvas
+     * @param y    Coordenada Y en donde se trazara la imagen dentro del canvas
+     * @param name Nombre de la secuencia de imagenes a utilizar
+     */
     public void DrawImage(int x, int y, String name) {
         DrawImage(x, y, name, 0);
     }
 
+    /**
+     * Traza una imagen, previamente carga77da, en este canvas en la posicion dada
+     *
+     * @param x    Coordenada X en donde se trazara la imagen dentro del canvas
+     * @param y    Coordenada Y en donde se trazara la imagen dentro del canvas
+     * @param name Nombre de la secuencia de imagenes a utilizar
+     * @param idx  Indice dentro de la secuencia de imagenes para especificar que
+     *             imagen utilizar
+     */
     public void DrawImage(int x, int y, String name, int idx) {
         LittleGameEngine lge = LittleGameEngine.getInstance();
         BufferedImage surface = lge.imageManager.getImages(name)[idx];

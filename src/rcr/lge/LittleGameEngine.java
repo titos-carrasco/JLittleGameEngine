@@ -494,6 +494,37 @@ public class LittleGameEngine extends JPanel implements KeyListener, MouseListen
         return gobjs.toArray(new GameObject[gobjs.size()]);
     }
 
+    /**
+     * Obtiene todos los GameObjects de una capa dada que contienen un punto
+     * especificado
+     *
+     * @param layer La capa a revisar
+     * @param x     Coordenada X del punto a revisar
+     * @param y     Coordenada Y del punto a revisar
+     * @return Los GameObjects que contienen al punto
+     */
+    public GameObject[] contains(int layer, double x, double y) {
+        return contains(layer, new PointD(x, y));
+    }
+
+    /**
+     * Obtiene todos los GameObjects de una capa dada que contienen un punto
+     * especificado
+     *
+     * @param layer    La capa a revisar
+     * @param position El punto a revisar
+     * @return Los GameObjects que contienen al punto
+     */
+    public GameObject[] contains(int layer, PointD position) {
+        ArrayList<GameObject> gobjs = new ArrayList<GameObject>();
+
+        for (GameObject o : gLayers.get(layer))
+            if (o.rect.contains(position))
+                gobjs.add(o);
+
+        return gobjs.toArray(new GameObject[gobjs.size()]);
+    }
+
     // ------ camera ------
     /**
      * Retorna la posiciona de la camara

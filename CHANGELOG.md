@@ -1,9 +1,13 @@
 # Changelog
 
-## v0.7.1 2022-06-13
-- Corrige tamaño del buffer al reproducir sonidos y agrega un drain() para lso sonidos cortos
-- Corrige manejo del caracter separador de archivos
+## v0.7.2 2022-06-23
+- Agrega método LittleGameEngine.contains() pata detectar los GameObjects que contienen a un punto dado en un layer
+- Completa documentación en Canvas.py
+- Parametriza tamaño del buffer para reproducir sonidos (SoundManager)
 
+## v0.7.1 2022-06-13
+- Corrige tamaño del buffer al reproducir sonidos y agrega un drain() para los sonidos cortos
+- Corrige manejo del caracter separador de archivos
 
 ## v0.7.0 2022-06-12
 - El directorio de recursos es recibido desde la línea de comandos
@@ -39,7 +43,7 @@
 
 ## v0.5.7.1 2022-05-27
 - Canvas.java: corrige coordenadas en método drawText
-- Se corrigeb los demos acorde a lo anterior
+- Se corrige los demos acorde a lo anterior
 
 ## 2022-05-26
 - Canvas.Java: corrige error de nombre de método drawPoint()
